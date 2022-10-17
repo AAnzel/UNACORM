@@ -1,0 +1,378 @@
+import os
+from pathlib import Path
+import pandas as pd
+import time
+import shutil
+import streamlit as st
+# import import_ipynb
+# import data_set_creation as dsc
+import json
+import requests
+# from Bio import SeqIO
+from time import sleep
+import numpy as np
+import bitarray as ba
+import bits2DNA as sim_dna
+import DNA2Bits as sim_dec_dna
+import goldman as gold_dna
+import altair as alt
+import testreedsolomon as rs
+
+path_uploaded = os.path.join('..', 'Data', 'uploaded')
+path_uploaded_txt = os.path.join(path_uploaded, 'txt')
+path_uploaded_jpg = os.path.join(path_uploaded, 'jpg')
+path_uploaded_wav = os.path.join(path_uploaded, 'wav')
+path_encoded_data = os.path.join('..', 'Data', 'Encoded')
+path_decoded_data = os.path.join('..', 'Data', 'Decoded')
+path_encoded_dna = os.path.join('..', 'Data', 'Encoded', 'DNA')
+path_decoded_dna = os.path.join('..', 'Data', 'Decoded', 'DNA')
+
+path_uploaded_dict = {
+    'txt': path_uploaded_txt,
+    'jpg': path_uploaded_jpg,
+    'wav': path_uploaded_wav
+}
+
+
+def remove_cached_data():
+
+    SAVE_TIME = 3600  # Time is given in seconds, 5400s = 1.5h, 3600 = 1h
+    time_limit = time.time() - SAVE_TIME
+
+    # Traversing every cache directory and deleting everything from it
+    for subdir in os.listdir(path_uploaded):
+        subdir_path = os.path.join(path_uploaded, subdir)
+        for file_name in os.listdir(subdir_path):
+            if 'gitkeep' in file_name:
+                continue
+            else:
+                file_path = os.path.join(subdir_path, file_name)
+
+                # Check if file is older than 1h, and if yes, delete it
+                if os.stat(file_path).st_mtime < time_limit:
+                    try:
+                        if os.path.isfile(file_path) or\
+                                os.path.islink(file_path):
+                            os.unlink(file_path)
+                        elif os.path.isdir(file_path):
+                            shutil.rmtree(file_path)
+                    except OSError as e:
+                        print('Failed to delete ' + file_path + '. Reason: '
+                              + e)
+
+                    print('Successfully removed everything from ' + subdir +
+                          ' data set')
+
+                else:
+                    pass
+
+    return None
+
+
+def upload_file(key_suffix, cache_folder_path):
+    save_path_os = ''
+    imported_file = st.file_uploader(
+        label='Upload your file', type=key_suffix, accept_multiple_files=False,
+        key='Upload_file_' + key_suffix)
+
+    if imported_file is not None:
+        save_path = Path(cache_folder_path, imported_file.name)
+        save_path_os = os.path.join(cache_folder_path, imported_file.name)
+        with open(save_path, mode='wb') as w:
+            w.write(imported_file.getvalue())
+
+        if save_path.exists():
+            st.success('Your file successfully uploaded!')
+        st.write(type(imported_file))
+        file_details = {"filename": imported_file.name, "filetype": imported_file.type, "filesize": imported_file.size}
+        st.write(file_details)
+        st.write(save_path)
+
+    return save_path_os
+
+
+def upload_txt():
+
+    key_suffix = 'txt'
+    cache_folder_path = path_uploaded_txt
+
+    st.header('Choose your ' + key_suffix + ' data')
+    st.markdown('')
+
+    save_path = upload_file(key_suffix, cache_folder_path)
+
+    return save_path
+
+
+def upload_jpg():
+
+    key_suffix = 'jpg'
+    cache_folder_path = path_uploaded_jpg
+
+    st.header('Choose your ' + key_suffix + ' data')
+    st.markdown('')
+
+    save_path = upload_file(key_suffix, cache_folder_path)
+
+    return save_path
+
+
+def upload_wav():
+
+    key_suffix = 'wav'
+    cache_folder_path = path_uploaded_wav
+
+    st.header('Choose your ' + key_suffix + ' data')
+    st.markdown('')
+
+    save_path = upload_file(key_suffix, cache_folder_path)
+
+    return save_path
+
+
+def run_requests(i, res_all, entry_list, c, payload, header, url):
+    start_time = time.time()
+    try:
+        for j in range(i, len(entry_list)):
+            # payload['sequence'] = entry_list[i][0].decode()
+            payload['sequence'] = entry_list[j]
+            res = requests.post(url, data=json.dumps(payload), headers=header)
+            res_all.append(res)
+            c += 1
+            print(c)
+
+    except:
+        print("Max retries, going to sleep for 100 sec.")
+        print("j= " + str(j))
+        sleep(100)
+        run_requests(j, res_all, entry_list, c, payload, header, url)
+    time_used = time.time() - start_time
+
+    return time_used
+
+
+def dna_encoding(encoding_method, df_report, bit_path):
+    for em in encoding_method:
+        if em == 'Simple Code':
+            start_time = time.time()
+            generated_seq = sim_dna.encode('', bit_path)
+            time_used = time.time() - start_time
+            file_basename = os.path.basename(bit_path)
+            file_name = os.path.splitext(file_basename)[0] + '_simple.txt'
+            file_path = os.path.join(path_encoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in generated_seq:
+                    f.write(i)
+            size = os.path.getsize(file_path)
+            list = [em, 'Encoding', size, 1, time_used]
+            df_report.loc[len(df_report)] = list
+
+            start_time = time.time()
+            decoded_seq = sim_dec_dna.decode('', generated_seq)
+            time_used = time.time() - start_time
+            file_name = os.path.splitext(file_basename)[0] + '_simple.npy'
+            file_path = os.path.join(path_decoded_dna, file_name)
+            np.save(file_path, decoded_seq)
+            size = os.path.getsize(file_path)
+            list = [em, 'Decoding', size, 1, time_used]
+            df_report.loc[len(df_report)] = list
+        elif em == 'Repetition Code':
+            start_time = time.time()
+            binary = np.load(bit_path)
+            generated_seq = gold_dna.encode(binary, '')
+            time_used = time.time() - start_time
+            file_basename = os.path.basename(bit_path)
+            file_name = os.path.splitext(file_basename)[0] + '_repetition.txt'
+            file_path = os.path.join(path_encoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in generated_seq:
+                    f.write(i)
+            size = os.path.getsize(file_path)
+            list = [em, 'Encoding', size, 1, time_used]
+            df_report.loc[len(df_report)] = list
+
+            start_time = time.time()
+            decoded_seq = sim_dec_dna.decode('', generated_seq)
+            time_used = time.time() - start_time
+            file_name = os.path.splitext(file_basename)[0] + '_repetition.npy'
+            file_path = os.path.join(path_decoded_dna, file_name)
+            np.save(file_path, decoded_seq)
+            size = os.path.getsize(file_path)
+            list = [em, 'Decoding', size, 1, time_used]
+            df_report.loc[len(df_report)] = list
+        elif em == 'The 2D Code':
+            start_time = time.time()
+            binary = np.load(bit_path)
+            generated_seq = rs.encode('', binary)
+            time_used = time.time() - start_time
+            file_basename = os.path.basename(bit_path)
+            file_name = os.path.splitext(file_basename)[0] + '_2d'
+            file_path = os.path.join(path_encoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in generated_seq:
+                    f.write(i)
+            size = os.path.getsize(file_path)
+            list = [em, 'Encoding', size, 1, time_used]
+            df_report.loc[len(df_report)] = list
+
+            start_time = time.time()
+            decoded_seq = rs.decode('', generated_seq)
+            time_used = time.time() - start_time
+            file_name = os.path.splitext(file_basename)[0] + '_2d.npy'
+            file_path = os.path.join(path_decoded_dna, file_name)
+            np.save(file_path, decoded_seq)
+            size = os.path.getsize(file_path)
+            list = [em, 'Decoding', size, 1, time_used]
+            df_report.loc[len(df_report)] = list
+        # elif em == 'XOR-Based Code':
+        #     start_time = time.time()
+        #     generated_seq = sim_dna.encode('', bit_path)
+        #     time_used = time.time() - start_time
+        #     file_basename = os.path.basename(bit_path)
+        #     file_name = os.path.splitext(file_basename)[0] + '_xor'
+        #     file_path = os.path.join(path_encoded_dna, file_name)
+        #     with open(file_path, 'w') as f:
+        #         for i in generated_seq:
+        #             f.write(i)
+        #     size = os.path.getsize(file_path)
+        #     list = [em, 'Encoding', size, 1, time_used]
+        #     df_report.loc[len(df_report)] = list
+        else:
+            pass
+
+    chart1 = alt.Chart(df_report).mark_bar().encode(
+        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Size:Q', title='Size'),
+        alt.Column('Method:N', title='Original File Type'),
+        alt.Color('Transformation:N'),
+        tooltip=['Size:Q', 'Method', 'Transformation']
+    )
+
+    chart2 = alt.Chart(df_report).mark_bar().encode(
+        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Time:Q', title='Process Time'),
+        alt.Column('Method:N', title='Original File Type'),
+        alt.Color('Transformation:N'),
+        tooltip=['Time:Q', 'Method', 'Transformation']
+    )
+
+    st.write(df_report)
+    st.altair_chart(chart1, use_container_width=True)
+    st.altair_chart(chart2, use_container_width=True)
+    return df_report
+
+
+def convert_text_data_to_binary(path_original_data):
+    # If we have a file, we convert it into numpy byte file (.npy)
+    file_basename = os.path.basename(path_original_data)
+    string_file_no_extension = os.path.splitext(file_basename)[0]
+    encoded_filename = string_file_no_extension + ".npy"
+    if os.path.isfile(path_original_data):
+        with open(path_original_data, 'rb') as fd_file:
+            binary_array_content = ba.bitarray()
+            binary_array_content.fromfile(fd_file)
+            binary_numpy_content = np.frombuffer(
+                binary_array_content.unpack(), dtype=bool)
+
+            np.save(os.path.join(path_encoded_data, string_file_no_extension), binary_numpy_content, allow_pickle=False)
+
+    bit_encoded_file = os.path.join(path_encoded_data, encoded_filename)
+
+    return bit_encoded_file
+
+
+def create_main_upload():
+
+    st.header('File Upload')
+
+    file_type = ['txt', 'jpg', 'wav']
+
+    choose_file_type = st.selectbox('Which type of file do you want to upload:', file_type)
+
+    # st.warning('Your data will be saved for 1 hour on our servers')
+
+    # Removing previously cached data
+    remove_cached_data()
+
+    st.markdown('---')
+
+    if choose_file_type == 'txt':
+        save_path = upload_txt()
+    elif choose_file_type == 'jpg':
+        save_path = upload_jpg()
+    elif choose_file_type == 'wav':
+        save_path = upload_wav()
+
+    st.write('Your uploaded path data: ', save_path)
+
+    st.markdown('---')
+
+    encoded_binary_path = convert_text_data_to_binary(save_path)
+    st.write('Your encoded binary: ', encoded_binary_path)
+
+    st.markdown('---')
+    # dsc.perform_encode_decode_check()
+
+    # url = 'https://mesa.mosla.de/api/all'
+    # header = {'content-type': 'application/json;charset=UTF-8'}
+    # with open("mesa.json") as json_file: # You can generate this file under simulate -> Download current config
+    #     config = json.load(json_file)
+
+    # entry_list = list()
+    # for seq_record in SeqIO.parse("kodim01_alpha1_0.fasta", "fasta"):
+    #     entry_list.append(str(seq_record.seq))
+    #
+    # # f = SeqIO.parse("kodim01_alpha1_0.fasta", "fasta") # Your sequences to evaluate / simulate
+    # payload = config
+    # payload['asHTML'] = False
+    # payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI" # "_zUAVSmg4lR09flEq8VCGcPVBgw61CJ0mxVp8GIqjto"  \
+    # Your api key
+    # c = 0
+    # res_all = list()
+    # i = 0
+    # # entry_list = list(f) # Check if get correct response by the first two oligos
+    # time_used = run_requests(i, res_all, entry_list, c, payload, header, url)
+    # st.write(time_used)
+    # for ent in res_all:
+    #     print(ent.json())
+
+    st.header('DNA Encoding')
+    choose_dna_encoding = st.multiselect(
+     'Select your prefered DNA Encoding Methods',
+     ["Repetition Code", "Simple Code", "The 2D Code", "XOR-Based Code"])
+
+    df_report = pd.DataFrame(columns=['Method', 'Transformation', 'Size', 'Cost', 'Time'])
+
+    if choose_dna_encoding != []:
+        dna_encoding(choose_dna_encoding, df_report, encoded_binary_path)
+    else:
+        pass
+
+    st.write('---')
+    st.header('Benchmark')
+    df_measure = pd.read_pickle("data/pre_measure.pkl")
+    st.write(df_measure)
+
+    chart1 = alt.Chart(df_measure).mark_bar().encode(
+        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('average(Size):Q', title='Average Size'),
+        alt.Column('Original_Type:N', title='Original File Type'),
+        alt.Color('Transformation:N'),
+        tooltip=['average(Size):Q', 'Method']
+    ).transform_filter(
+        alt.datum.Method == 'Simple Code'
+    ).properties(title='File Size with Simple Code')
+
+    chart2 = alt.Chart(df_measure).mark_bar().encode(
+        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('average(Size):Q', title='Average Size'),
+        alt.Column('Original_Type:N', title='Original File Type'),
+        alt.Color('Transformation:N'),
+        tooltip=['average(Size):Q', 'Method']
+    ).transform_filter(
+        alt.datum.Method == 'Repetition Code'
+    ).properties(title='File Size with Repetition Code')
+
+    chart = alt.vconcat(chart1, chart2)
+
+    st.altair_chart(chart, use_container_width=True)
