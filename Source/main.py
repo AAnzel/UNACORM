@@ -11,8 +11,6 @@ def create_sidebar_and_main():
     """
     tmp_col_1, tmp_col_2, tmp_col_3, tmp_col_4, tmp_col_5 = st.columns(5)
     tmp_col_3.title('UNACORM')
-    st.markdown(' ')
-    st.markdown(' ')
     st.markdown('---')
 
     st.sidebar.image(os.path.join('images', 'Uni Marburg Logo.png'),
@@ -21,20 +19,26 @@ def create_sidebar_and_main():
     st.sidebar.markdown('---')
     col_1, col_2 = st.sidebar.columns([3, 1])
     col_2.image(os.path.join('images', 'GitHub-Mark-120px-plus.png'), width=54)
-    col_2.markdown('[GitHub](https://github.com/itheldian/DNA_Encodings)')
+    col_2.markdown('[GitHub](https://github.com/AAnzel/DNA_Encodings)')
     col_1.markdown('''
                       **UNACORM**
 
                       The **U**NIFIED D**NA** EN**CO**DINGS PLATFO**RM**''')
 
-    st.sidebar.markdown('''
-                            ---
+    # st.sidebar.markdown('''
+    #                         ---
 
-                            **Navigation:**''')
+    #                         **Navigation:**''')
 
     st.sidebar.markdown('''
         ---
-        **Description Here**
+        **Description**\n
+        DNA Encoding Methods:\n
+        -Simple Code:\n
+        -Repetition Code:\n
+        -The 2D Code:\n
+        -XOR-Based Code:\n
+
 
         ---
         ''')
