@@ -86,7 +86,7 @@ def upload_file(key_suffix, cache_folder_path):
         st.write(type(imported_file))
         file_details = {"filename": imported_file.name, "filetype": imported_file.type, "filesize": imported_file.size}
         st.write(file_details)
-        st.write(save_path)
+        # st.write(save_path)
 
     return save_path_os
 
@@ -240,25 +240,51 @@ def dna_encoding(encoding_method, df_report, bit_path):
         else:
             pass
 
-    chart1 = alt.Chart(df_report).mark_bar().encode(
-        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Size:Q', title='Size'),
-        alt.Column('Method:N', title='Original File Type'),
-        alt.Color('Transformation:N'),
-        tooltip=['Size:Q', 'Method', 'Transformation']
-    )
-
-    chart2 = alt.Chart(df_report).mark_bar().encode(
-        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Time:Q', title='Process Time'),
-        alt.Column('Method:N', title='Original File Type'),
-        alt.Color('Transformation:N'),
-        tooltip=['Time:Q', 'Method', 'Transformation']
-    )
-
     st.write(df_report)
-    st.altair_chart(chart1, use_container_width=True)
-    st.altair_chart(chart2, use_container_width=True)
+
+    for em in encoding_method:
+        chart1 = alt.Chart(df_report).mark_bar().encode(
+            alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Size:Q', title='Size'),
+            # alt.Column('Method:N', title='Original File Type'),
+            alt.Color('Transformation:N'),
+            tooltip=['Size:Q', 'Method', 'Transformation']
+        ).transform_filter(
+            alt.datum.Method == em
+        ).properties(title=em+' Size')
+        text1 = chart1.mark_text(
+            align='center',
+            baseline='middle',
+            dy=-5
+        ).encode(
+            alt.Text('Size:Q', format=",.0f")
+        )
+
+        chartsize = text1 + chart1
+
+        chart2 = alt.Chart(df_report).mark_bar().encode(
+            alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Time:Q', title='Process Time'),
+            # alt.Column('Method:N', title='Original File Type'),
+            alt.Color('Transformation:N'),
+            tooltip=['Time:Q', 'Method', 'Transformation']
+        ).transform_filter(
+            alt.datum.Method == em
+        ).properties(title=em+' Time')
+
+        text2 = chart2.mark_text(
+            align='center',
+            baseline='middle',
+            dy=-5
+        ).encode(
+            alt.Text('Time:Q', format=",.4f")
+        )
+
+        charttime = text2 + chart2
+
+        chart = alt.hconcat(chartsize, charttime)
+        st.altair_chart(chart, use_container_width=True)
+
     return df_report
 
 
@@ -341,6 +367,8 @@ def create_main_upload():
      'Select your prefered DNA Encoding Methods',
      ["Repetition Code", "Simple Code", "The 2D Code", "XOR-Based Code"])
 
+    st.warning('The length of processing time depends on your chosen methods.')
+
     df_report = pd.DataFrame(columns=['Method', 'Transformation', 'Size', 'Cost', 'Time'])
 
     if choose_dna_encoding != []:
@@ -354,7 +382,7 @@ def create_main_upload():
     st.write(df_measure)
 
     chart1 = alt.Chart(df_measure).mark_bar().encode(
-        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
         alt.Y('average(Size):Q', title='Average Size'),
         alt.Column('Original_Type:N', title='Original File Type'),
         alt.Color('Transformation:N'),
@@ -364,7 +392,7 @@ def create_main_upload():
     ).properties(title='File Size with Simple Code')
 
     chart2 = alt.Chart(df_measure).mark_bar().encode(
-        alt.X('Transformation:N', title='Transformation', axis=alt.Axis(labelAngle=-45)),
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
         alt.Y('average(Size):Q', title='Average Size'),
         alt.Column('Original_Type:N', title='Original File Type'),
         alt.Color('Transformation:N'),
