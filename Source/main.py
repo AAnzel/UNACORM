@@ -25,21 +25,18 @@ def create_sidebar_and_main():
 
                       The **U**NIFIED D**NA** EN**CO**DINGS PLATFO**RM**''')
 
-    # st.sidebar.markdown('''
-    #                         ---
-
-    #                         **Navigation:**''')
-
     st.sidebar.markdown('''
         ---
         **Description**\n
         DNA Encoding Methods:\n
-        -Simple Code:\n
-        -Repetition Code:\n
-        -The 2D Code:\n
-        -XOR-Based Code:\n
-
-
+        -Simple Code by Church et al.:\n
+         DOI: 10.1126/science.1226355\n
+        -Repetition Code by Goldman et al.:\n
+         DOI: 10.1038/nature11875\n
+        -The 2D Code by Grass et al.:\n
+         DOI: 10.1002/anie.201411378\n
+        -XOR-Based Code by Bornholt et al.:\n
+         DOI: 10.1145/2872362.2872397\n
         ---
         ''')
 
