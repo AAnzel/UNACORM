@@ -4,6 +4,7 @@ import pandas as pd
 import time
 import shutil
 import streamlit as st
+import string
 # import import_ipynb
 # import data_set_creation as dsc
 import json
@@ -157,6 +158,9 @@ def dna_encoding(encoding_method, df_report, bit_path):
             start_time = time.time()
             generated_seq = sim_dna.encode('', bit_path)
             time_used = time.time() - start_time
+            cost = 0
+            for seq in generated_seq:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_basename = os.path.basename(bit_path)
             file_name = os.path.splitext(file_basename)[0] + '_simple.txt'
             file_path = os.path.join(path_encoded_dna, file_name)
@@ -164,23 +168,29 @@ def dna_encoding(encoding_method, df_report, bit_path):
                 for i in generated_seq:
                     f.write(i)
             size = os.path.getsize(file_path)
-            list = [em, 'Encoding', size, 1, time_used]
+            list = [em, 'Encoding', size, cost, time_used]
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
             decoded_seq = sim_dec_dna.decode('', generated_seq)
             time_used = time.time() - start_time
+            cost = 0
+            for seq in decoded_seq:
+                cost += 1
             file_name = os.path.splitext(file_basename)[0] + '_simple.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
             size = os.path.getsize(file_path)
-            list = [em, 'Decoding', size, 1, time_used]
+            list = [em, 'Decoding', size, cost, time_used]
             df_report.loc[len(df_report)] = list
         elif em == 'Repetition Code':
             start_time = time.time()
             binary = np.load(bit_path)
             generated_seq = gold_dna.encode(binary, '')
             time_used = time.time() - start_time
+            cost = 0
+            for seq in generated_seq:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_basename = os.path.basename(bit_path)
             file_name = os.path.splitext(file_basename)[0] + '_repetition.txt'
             file_path = os.path.join(path_encoded_dna, file_name)
@@ -188,23 +198,29 @@ def dna_encoding(encoding_method, df_report, bit_path):
                 for i in generated_seq:
                     f.write(i)
             size = os.path.getsize(file_path)
-            list = [em, 'Encoding', size, 1, time_used]
+            list = [em, 'Encoding', size, cost, time_used]
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
             decoded_seq = sim_dec_dna.decode('', generated_seq)
             time_used = time.time() - start_time
+            cost = 0
+            for seq in decoded_seq:
+                cost += 1
             file_name = os.path.splitext(file_basename)[0] + '_repetition.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
             size = os.path.getsize(file_path)
-            list = [em, 'Decoding', size, 1, time_used]
+            list = [em, 'Decoding', size, cost, time_used]
             df_report.loc[len(df_report)] = list
         elif em == 'The 2D Code':
             start_time = time.time()
             binary = np.load(bit_path)
             generated_seq = rs.encode('', binary)
             time_used = time.time() - start_time
+            cost = 0
+            for seq in generated_seq:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_basename = os.path.basename(bit_path)
             file_name = os.path.splitext(file_basename)[0] + '_2d'
             file_path = os.path.join(path_encoded_dna, file_name)
@@ -212,17 +228,20 @@ def dna_encoding(encoding_method, df_report, bit_path):
                 for i in generated_seq:
                     f.write(i)
             size = os.path.getsize(file_path)
-            list = [em, 'Encoding', size, 1, time_used]
+            list = [em, 'Encoding', size, cost, time_used]
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
             decoded_seq = rs.decode('', generated_seq)
             time_used = time.time() - start_time
+            cost = 0
+            for seq in decoded_seq:
+                cost += 1
             file_name = os.path.splitext(file_basename)[0] + '_2d.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
             size = os.path.getsize(file_path)
-            list = [em, 'Decoding', size, 1, time_used]
+            list = [em, 'Decoding', size, cost, time_used]
             df_report.loc[len(df_report)] = list
         # elif em == 'XOR-Based Code':
         #     start_time = time.time()
@@ -245,7 +264,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
     for em in encoding_method:
         chart1 = alt.Chart(df_report).mark_bar().encode(
             alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('Size:Q', title='Size'),
+            alt.Y('Size:Q', title='Size (in bytes)'),
             # alt.Column('Method:N', title='Original File Type'),
             alt.Color('Transformation:N'),
             tooltip=['Size:Q', 'Method', 'Transformation']
@@ -264,7 +283,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
 
         chart2 = alt.Chart(df_report).mark_bar().encode(
             alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('Time:Q', title='Process Time'),
+            alt.Y('Time:Q', title='Process Time (in seconds)'),
             # alt.Column('Method:N', title='Original File Type'),
             alt.Color('Transformation:N'),
             tooltip=['Time:Q', 'Method', 'Transformation']
@@ -282,7 +301,27 @@ def dna_encoding(encoding_method, df_report, bit_path):
 
         charttime = text2 + chart2
 
-        chart = alt.hconcat(chartsize, charttime)
+        chart3 = alt.Chart(df_report).mark_bar().encode(
+            alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Cost:Q', title='Cost (based on length of chars)'),
+            # alt.Column('Method:N', title='Original File Type'),
+            alt.Color('Transformation:N'),
+            tooltip=['Cost:Q', 'Method', 'Transformation']
+        ).transform_filter(
+            alt.datum.Method == em
+        ).properties(title=em+' Cost')
+
+        text3 = chart3.mark_text(
+            align='center',
+            baseline='middle',
+            dy=-5
+        ).encode(
+            alt.Text('Time:Q', format=",.4f")
+        )
+
+        chartcost = text3 + chart3
+
+        chart = alt.hconcat(chartsize, charttime, chartcost)
         st.altair_chart(chart, use_container_width=True)
 
     return df_report
