@@ -152,7 +152,7 @@ def run_requests(i, res_all, entry_list, c, payload, header, url):
     return time_used
 
 
-def dna_encoding(encoding_method, df_report, bit_path):
+def dna_encoding(encoding_method, df_report, bit_path, file_type):
     for em in encoding_method:
         if em == 'Simple Code':
             start_time = time.time()
@@ -168,7 +168,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
                 for i in generated_seq:
                     f.write(i)
             size = os.path.getsize(file_path)
-            list = [em, 'Encoding', size, cost, time_used]
+            list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
@@ -181,7 +181,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
             size = os.path.getsize(file_path)
-            list = [em, 'Decoding', size, cost, time_used]
+            list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'Repetition Code':
             start_time = time.time()
@@ -198,7 +198,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
                 for i in generated_seq:
                     f.write(i)
             size = os.path.getsize(file_path)
-            list = [em, 'Encoding', size, cost, time_used]
+            list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
@@ -211,7 +211,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
             size = os.path.getsize(file_path)
-            list = [em, 'Decoding', size, cost, time_used]
+            list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'The 2D Code':
             start_time = time.time()
@@ -228,7 +228,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
                 for i in generated_seq:
                     f.write(i)
             size = os.path.getsize(file_path)
-            list = [em, 'Encoding', size, cost, time_used]
+            list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
@@ -241,7 +241,7 @@ def dna_encoding(encoding_method, df_report, bit_path):
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
             size = os.path.getsize(file_path)
-            list = [em, 'Decoding', size, cost, time_used]
+            list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         # elif em == 'XOR-Based Code':
         #     start_time = time.time()
@@ -408,32 +408,33 @@ def create_main_upload():
 
     st.warning('The length of processing time depends on your chosen methods.')
 
-    df_report = pd.DataFrame(columns=['Method', 'Transformation', 'Size', 'Cost', 'Time'])
+    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
 
     if choose_dna_encoding != []:
-        dna_encoding(choose_dna_encoding, df_report, encoded_binary_path)
+        dna_encoding(choose_dna_encoding, df_report, encoded_binary_path, choose_file_type)
     else:
         pass
 
     st.write('---')
     st.header('Benchmark')
     df_measure = pd.read_pickle("data/pre_measure.pkl")
-    st.write(df_measure)
+    df_concat = pd.concat([df_report, df_measure])
+    st.write(df_concat)
 
-    chart1 = alt.Chart(df_measure).mark_bar().encode(
+    chart1 = alt.Chart(df_concat).mark_bar().encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
         alt.Y('average(Size):Q', title='Average Size'),
-        alt.Column('Original_Type:N', title='Original File Type'),
+        alt.Column('Type:N', title='Original File Type'),
         alt.Color('Transformation:N'),
         tooltip=['average(Size):Q', 'Method']
     ).transform_filter(
         alt.datum.Method == 'Simple Code'
     ).properties(title='File Size with Simple Code')
 
-    chart2 = alt.Chart(df_measure).mark_bar().encode(
+    chart2 = alt.Chart(df_concat).mark_bar().encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
         alt.Y('average(Size):Q', title='Average Size'),
-        alt.Column('Original_Type:N', title='Original File Type'),
+        alt.Column('Type:N', title='Original File Type'),
         alt.Color('Transformation:N'),
         tooltip=['average(Size):Q', 'Method']
     ).transform_filter(
