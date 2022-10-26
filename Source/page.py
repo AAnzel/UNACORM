@@ -18,6 +18,7 @@ import DNA2Bits as sim_dec_dna
 import goldman as gold_dna
 import altair as alt
 import testreedsolomon as rs
+import xor_code_python as xor
 
 path_uploaded = os.path.join('..', 'Data', 'uploaded')
 path_uploaded_txt = os.path.join(path_uploaded, 'txt')
@@ -243,19 +244,36 @@ def dna_encoding(encoding_method, df_report, bit_path, file_type):
             size = os.path.getsize(file_path)
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
-        # elif em == 'XOR-Based Code':
-        #     start_time = time.time()
-        #     generated_seq = sim_dna.encode('', bit_path)
-        #     time_used = time.time() - start_time
-        #     file_basename = os.path.basename(bit_path)
-        #     file_name = os.path.splitext(file_basename)[0] + '_xor'
-        #     file_path = os.path.join(path_encoded_dna, file_name)
-        #     with open(file_path, 'w') as f:
-        #         for i in generated_seq:
-        #             f.write(i)
-        #     size = os.path.getsize(file_path)
-        #     list = [em, 'Encoding', size, 1, time_used]
-        #     df_report.loc[len(df_report)] = list
+        elif em == 'XOR-Based Code':
+            start_time = time.time()
+            binary = np.load(bit_path)
+            generated_seq = xor.encode('', binary)
+            time_used = time.time() - start_time
+            cost = 0
+            for seq in generated_seq:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
+            file_basename = os.path.basename(bit_path)
+            file_name = os.path.splitext(file_basename)[0] + '_xor'
+            file_path = os.path.join(path_encoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in generated_seq:
+                    f.write(i)
+            size = os.path.getsize(file_path)
+            list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
+            df_report.loc[len(df_report)] = list
+
+            start_time = time.time()
+            decoded_seq = xor.decode('', generated_seq)
+            time_used = time.time() - start_time
+            cost = 0
+            for seq in decoded_seq:
+                cost += 1
+            file_name = os.path.splitext(file_basename)[0] + '_xor.npy'
+            file_path = os.path.join(path_decoded_dna, file_name)
+            np.save(file_path, decoded_seq)
+            size = os.path.getsize(file_path)
+            list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
+            df_report.loc[len(df_report)] = list
         else:
             pass
 
@@ -441,6 +459,11 @@ def create_main_upload():
         alt.datum.Method == 'Repetition Code'
     ).properties(title='File Size with Repetition Code')
 
-    chart = alt.vconcat(chart1, chart2)
+    chart3 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Method:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('average(Size):Q', title='Average Size')
+    )
+
+    chart = alt.vconcat(chart1, chart2, chart3)
 
     st.altair_chart(chart, use_container_width=True)
