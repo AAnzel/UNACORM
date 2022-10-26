@@ -379,6 +379,7 @@ def create_main_upload():
 
     st.markdown('---')
 
+    save_path = ''
     if choose_file_type == 'txt':
         save_path = upload_txt()
     elif choose_file_type == 'jpg':
@@ -390,7 +391,10 @@ def create_main_upload():
 
     st.markdown('---')
 
-    encoded_binary_path = convert_text_data_to_binary(save_path)
+    if save_path != '':
+        encoded_binary_path = convert_text_data_to_binary(save_path)
+    else:
+        encoded_binary_path = ''
     st.write('Your encoded binary: ', encoded_binary_path)
 
     st.markdown('---')
@@ -428,9 +432,10 @@ def create_main_upload():
 
     df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
 
-    if choose_dna_encoding != []:
+    if choose_dna_encoding != [] and encoded_binary_path != '':
         dna_encoding(choose_dna_encoding, df_report, encoded_binary_path, choose_file_type)
-    else:
+    elif choose_dna_encoding != [] and encoded_binary_path == '':
+        st.error('Choose your file first!')
         pass
 
     st.write('---')
@@ -439,31 +444,84 @@ def create_main_upload():
     df_concat = pd.concat([df_report, df_measure])
     st.write(df_concat)
 
-    chart1 = alt.Chart(df_concat).mark_bar().encode(
+    chart1 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('average(Size):Q', title='Average Size'),
-        alt.Column('Type:N', title='Original File Type'),
-        alt.Color('Transformation:N'),
-        tooltip=['average(Size):Q', 'Method']
+        alt.Y('Size:Q', title='Size (in bytes)'),
+        alt.Color('Transformation:N')
     ).transform_filter(
         alt.datum.Method == 'Simple Code'
     ).properties(title='File Size with Simple Code')
 
-    chart2 = alt.Chart(df_concat).mark_bar().encode(
+    chart2 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('average(Size):Q', title='Average Size'),
-        alt.Column('Type:N', title='Original File Type'),
-        alt.Color('Transformation:N'),
-        tooltip=['average(Size):Q', 'Method']
+        alt.Y('Size:Q', title='Size (in bytes)'),
+        alt.Color('Transformation:N')
     ).transform_filter(
         alt.datum.Method == 'Repetition Code'
     ).properties(title='File Size with Repetition Code')
 
     chart3 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Method:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('average(Size):Q', title='Average Size')
-    )
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Size:Q', title='Size (in bytes)'),
+        alt.Color('Transformation:N')
+    ).transform_filter(
+        alt.datum.Method == 'XOR-Based Code'
+    ).properties(title='File Size with XOR-Based Code')
 
-    chart = alt.vconcat(chart1, chart2, chart3)
+    chart_size = alt.hconcat(chart1, chart2, chart3)
+
+    chart4 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
+        alt.Color('Transformation:N'),
+    ).transform_filter(
+        alt.datum.Method == 'Simple Code'
+    ).properties(title='Cost with Simple Code')
+
+    chart5 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
+        alt.Color('Transformation:N')
+    ).transform_filter(
+        alt.datum.Method == 'Repetition Code'
+    ).properties(title='Cost with Repetition Code')
+
+    chart6 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
+        alt.Color('Transformation:N')
+    ).transform_filter(
+        alt.datum.Method == 'XOR-Based Code'
+    ).properties(title='Cost with XOR-Based Code')
+
+    chart_cost = alt.hconcat(chart4, chart5, chart6)
+
+    chart7 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Time:Q', title='Time (in seconds)'),
+        alt.Color('Transformation:N')
+    ).transform_filter(
+        alt.datum.Method == 'Simple Code'
+    ).properties(title='Time with Simple Code')
+
+    chart8 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Time:Q', title='Time (in seconds)'),
+        alt.Color('Transformation:N')
+    ).transform_filter(
+        alt.datum.Method == 'Repetition Code'
+    ).properties(title='Time with Repetition Code')
+
+    chart9 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
+        alt.Y('Time:Q', title='Time (in seconds)'),
+        alt.Color('Transformation:N')
+    ).transform_filter(
+        alt.datum.Method == 'XOR-Based Code'
+    ).properties(title='Time with XOR-Based Code')
+
+    chart_time = alt.hconcat(chart7, chart8, chart9)
+
+    chart = alt.vconcat(chart_size, chart_cost, chart_time)
 
     st.altair_chart(chart, use_container_width=True)
