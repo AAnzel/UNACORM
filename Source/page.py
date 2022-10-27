@@ -277,7 +277,22 @@ def dna_encoding(encoding_method, df_report, bit_path, file_type):
         else:
             pass
 
-    st.write(df_report)
+    df_summary = df_report.groupby(['Filename', 'Method', 'Type'], as_index=False).agg(
+            Size=('Size', sum),
+            Cost=('Cost', sum),
+            Time=('Time', sum)
+    )
+
+    st.write('Summary Report')
+    st.write(df_summary)
+    hide = 0
+    if st.button('Expand Detail') and hide == 0:
+        st.write('Detail Table')
+        st.write(df_report)
+        if st.button('Hide Detail'):
+            hide = 1
+    else:
+        pass
 
     for em in encoding_method:
         chart1 = alt.Chart(df_report).mark_bar().encode(
@@ -436,6 +451,7 @@ def create_main_upload():
         dna_encoding(choose_dna_encoding, df_report, encoded_binary_path, choose_file_type)
     elif choose_dna_encoding != [] and encoded_binary_path == '':
         st.error('Choose your file first!')
+    else:
         pass
 
     st.write('---')
