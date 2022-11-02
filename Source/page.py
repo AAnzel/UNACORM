@@ -153,7 +153,9 @@ def run_requests(i, res_all, entry_list, c, payload, header, url):
     return time_used
 
 
-def dna_encoding(encoding_method, df_report, bit_path, file_type):
+@st.cache(allow_output_mutation=True)
+def dna_encoding(encoding_method, bit_path, file_type):
+    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
     for em in encoding_method:
         if em == 'Simple Code':
             start_time = time.time()
@@ -203,7 +205,7 @@ def dna_encoding(encoding_method, df_report, bit_path, file_type):
             df_report.loc[len(df_report)] = list
 
             start_time = time.time()
-            decoded_seq = sim_dec_dna.decode('', generated_seq)
+            decoded_seq = gold_dna.decode(generated_seq)
             time_used = time.time() - start_time
             cost = 0
             for seq in decoded_seq:
@@ -283,17 +285,6 @@ def dna_encoding(encoding_method, df_report, bit_path, file_type):
             Time=('Time', sum)
     )
 
-    st.write('Summary Report')
-    st.write(df_summary)
-    hide = 0
-    if st.button('Expand Detail') and hide == 0:
-        st.write('Detail Table')
-        st.write(df_report)
-        if st.button('Hide Detail'):
-            hide = 1
-    else:
-        pass
-
     for em in encoding_method:
         chart1 = alt.Chart(df_report).mark_bar().encode(
             alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
@@ -349,15 +340,14 @@ def dna_encoding(encoding_method, df_report, bit_path, file_type):
             baseline='middle',
             dy=-5
         ).encode(
-            alt.Text('Time:Q', format=",.4f")
+            alt.Text('Cost:Q', format=",.0f")
         )
 
         chartcost = text3 + chart3
 
         chart = alt.hconcat(chartsize, charttime, chartcost)
-        st.altair_chart(chart, use_container_width=True)
 
-    return df_report
+    return df_report, df_summary, chart
 
 
 def convert_text_data_to_binary(path_original_data):
@@ -448,7 +438,23 @@ def create_main_upload():
     df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
 
     if choose_dna_encoding != [] and encoded_binary_path != '':
-        dna_encoding(choose_dna_encoding, df_report, encoded_binary_path, choose_file_type)
+        result = dna_encoding(choose_dna_encoding, encoded_binary_path, choose_file_type)
+        df_summary = result[1]
+        df_report = result[0]
+        chart = result[2]
+        st.write('Summary Report')
+        st.dataframe(df_summary)
+        hide = 0
+        if st.button('Expand Detail') and hide == 0:
+            st.write('Detail Table')
+            st.dataframe(df_report)
+            if st.button('Hide Detail'):
+                hide = 1
+        else:
+            pass
+
+        st.altair_chart(chart, use_container_width=True)
+
     elif choose_dna_encoding != [] and encoded_binary_path == '':
         st.error('Choose your file first!')
     else:
@@ -457,8 +463,8 @@ def create_main_upload():
     st.write('---')
     st.header('Benchmark')
     df_measure = pd.read_pickle("data/pre_measure.pkl")
-    df_concat = pd.concat([df_report, df_measure])
-    st.write(df_concat)
+    df_concat = pd.concat([df_report, df_measure], ignore_index=True)
+    st.dataframe(df_concat)
 
     chart1 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
