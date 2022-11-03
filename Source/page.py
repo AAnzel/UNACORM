@@ -35,6 +35,11 @@ path_uploaded_dict = {
     'wav': path_uploaded_wav
 }
 
+url = 'https://mesa.mosla.de/api/all'
+header = {'content-type': 'application/json;charset=UTF-8'}
+with open("mesa.json") as json_file:  # You can generate this file under simulate -> Download current config
+    config_api = json.load(json_file)
+
 
 def remove_cached_data():
 
@@ -153,8 +158,28 @@ def run_requests(i, res_all, entry_list, c, payload, header, url):
     return time_used
 
 
+def api_call(encoded_dna, storage_length):
+    entry_list = encoded_dna
+    payload = config_api
+    payload['asHTML'] = False
+    payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
+    payload["err_simulation_order"]["Storage/PCR"][0]["cycles"] = storage_length
+    c = 0
+    res_all = list()
+    i = 0
+    time_used = run_requests(i, res_all, entry_list, c, payload, header, url)
+    print(time_used)
+
+    for ent in res_all:
+        result = ent.json()
+
+    for key, value in result.items():
+        modified_sequence = result[key]["res"]["modified_sequence"]
+    return modified_sequence
+
+
 @st.cache(allow_output_mutation=True)
-def dna_encoding(encoding_method, bit_path, file_type):
+def dna_encoding(encoding_method, bit_path, file_type, storage_length):
     df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
     for em in encoding_method:
         if em == 'Simple Code':
@@ -174,12 +199,13 @@ def dna_encoding(encoding_method, bit_path, file_type):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
+            modified_sequence = api_call(generated_seq, storage_length)
+
             start_time = time.time()
-            decoded_seq = sim_dec_dna.decode('', generated_seq)
+            decoded_seq = sim_dec_dna.decode('', modified_sequence)
             time_used = time.time() - start_time
-            cost = 0
-            for seq in decoded_seq:
-                cost += 1
+            for seq in modified_sequence:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_simple.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
@@ -204,12 +230,13 @@ def dna_encoding(encoding_method, bit_path, file_type):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
+            modified_sequence = api_call(generated_seq, storage_length)
+
             start_time = time.time()
-            decoded_seq = gold_dna.decode(generated_seq)
+            decoded_seq = gold_dna.decode(modified_sequence)
             time_used = time.time() - start_time
-            cost = 0
-            for seq in decoded_seq:
-                cost += 1
+            for seq in modified_sequence:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_repetition.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
@@ -234,12 +261,13 @@ def dna_encoding(encoding_method, bit_path, file_type):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
+            modified_sequence = api_call(generated_seq, storage_length)
+
             start_time = time.time()
-            decoded_seq = rs.decode('', generated_seq)
+            decoded_seq = rs.decode('', modified_sequence)
             time_used = time.time() - start_time
-            cost = 0
-            for seq in decoded_seq:
-                cost += 1
+            for seq in modified_sequence:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_2d.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
@@ -264,12 +292,13 @@ def dna_encoding(encoding_method, bit_path, file_type):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
+            modified_sequence = api_call(generated_seq, storage_length)
+
             start_time = time.time()
-            decoded_seq = xor.decode('', generated_seq)
+            decoded_seq = xor.decode('', modified_sequence)
             time_used = time.time() - start_time
-            cost = 0
-            for seq in decoded_seq:
-                cost += 1
+            for seq in modified_sequence:
+                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_xor.npy'
             file_path = os.path.join(path_decoded_dna, file_name)
             np.save(file_path, decoded_seq)
@@ -403,30 +432,6 @@ def create_main_upload():
     st.write('Your encoded binary: ', encoded_binary_path)
 
     st.markdown('---')
-    # dsc.perform_encode_decode_check()
-
-    # url = 'https://mesa.mosla.de/api/all'
-    # header = {'content-type': 'application/json;charset=UTF-8'}
-    # with open("mesa.json") as json_file: # You can generate this file under simulate -> Download current config
-    #     config = json.load(json_file)
-
-    # entry_list = list()
-    # for seq_record in SeqIO.parse("kodim01_alpha1_0.fasta", "fasta"):
-    #     entry_list.append(str(seq_record.seq))
-    #
-    # # f = SeqIO.parse("kodim01_alpha1_0.fasta", "fasta") # Your sequences to evaluate / simulate
-    # payload = config
-    # payload['asHTML'] = False
-    # payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI" # "_zUAVSmg4lR09flEq8VCGcPVBgw61CJ0mxVp8GIqjto"  \
-    # Your api key
-    # c = 0
-    # res_all = list()
-    # i = 0
-    # # entry_list = list(f) # Check if get correct response by the first two oligos
-    # time_used = run_requests(i, res_all, entry_list, c, payload, header, url)
-    # st.write(time_used)
-    # for ent in res_all:
-    #     print(ent.json())
 
     st.header('DNA Encoding')
     choose_dna_encoding = st.multiselect(
@@ -435,10 +440,12 @@ def create_main_upload():
 
     st.warning('The length of processing time depends on your chosen methods.')
 
+    storage_length = st.text_input('Choose your length of storage (in hours)')
+
     df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
 
-    if choose_dna_encoding != [] and encoded_binary_path != '':
-        result = dna_encoding(choose_dna_encoding, encoded_binary_path, choose_file_type)
+    if choose_dna_encoding != [] and encoded_binary_path != '' and storage_length != '':
+        result = dna_encoding(choose_dna_encoding, encoded_binary_path, choose_file_type, storage_length)
         df_summary = result[1]
         df_report = result[0]
         chart = result[2]
@@ -456,7 +463,7 @@ def create_main_upload():
         st.altair_chart(chart, use_container_width=True)
 
     elif choose_dna_encoding != [] and encoded_binary_path == '':
-        st.error('Choose your file first!')
+        st.error('Choose your file and length of storage first!')
     else:
         pass
 
