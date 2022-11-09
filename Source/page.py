@@ -183,8 +183,9 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
     df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
     for em in encoding_method:
         if em == 'Simple Code':
+            binary = np.load(bit_path)
             start_time = time.time()
-            generated_seq = sim_dna.encode('', bit_path)
+            generated_seq = sim_dna.encode('', binary)
             time_used = time.time() - start_time
             cost = 0
             for seq in generated_seq:
@@ -199,11 +200,18 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
-            modified_sequence = api_call(generated_seq, storage_length)
+            modified_sequence = []
+            i = 0
+            while i < len(generated_seq):
+                seq = [str(generated_seq[i])]
+                result = api_call(seq, storage_length)
+                modified_sequence.append(result)
+                i += 1
 
             start_time = time.time()
             decoded_seq = sim_dec_dna.decode('', modified_sequence)
             time_used = time.time() - start_time
+            cost = 0
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_simple.npy'
@@ -213,8 +221,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'Repetition Code':
-            start_time = time.time()
             binary = np.load(bit_path)
+            start_time = time.time()
             generated_seq = gold_dna.encode(binary, '')
             time_used = time.time() - start_time
             cost = 0
@@ -230,11 +238,18 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
-            modified_sequence = api_call(generated_seq, storage_length)
+            modified_sequence = []
+            i = 0
+            while i < len(generated_seq):
+                seq = [str(generated_seq[i])]
+                result = api_call(seq, storage_length)
+                modified_sequence.append(result)
+                i += 1
 
             start_time = time.time()
             decoded_seq = gold_dna.decode(modified_sequence)
             time_used = time.time() - start_time
+            cost = 0
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_repetition.npy'
@@ -244,8 +259,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'The 2D Code':
-            start_time = time.time()
             binary = np.load(bit_path)
+            start_time = time.time()
             generated_seq = rs.encode('', binary)
             time_used = time.time() - start_time
             cost = 0
@@ -261,11 +276,18 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
-            modified_sequence = api_call(generated_seq, storage_length)
+            modified_sequence = []
+            i = 0
+            while i < len(generated_seq):
+                seq = [str(generated_seq[i])]
+                result = api_call(seq, storage_length)
+                modified_sequence.append(result)
+                i += 1
 
             start_time = time.time()
             decoded_seq = rs.decode('', modified_sequence)
             time_used = time.time() - start_time
+            cost = 0
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_2d.npy'
@@ -275,8 +297,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'XOR-Based Code':
-            start_time = time.time()
             binary = np.load(bit_path)
+            start_time = time.time()
             generated_seq = xor.encode('', binary)
             time_used = time.time() - start_time
             cost = 0
@@ -292,11 +314,18 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             list = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
 
-            modified_sequence = api_call(generated_seq, storage_length)
+            modified_sequence = []
+            i = 0
+            while i < len(generated_seq):
+                seq = [str(generated_seq[i])]
+                result = api_call(seq, storage_length)
+                modified_sequence.append(result)
+                i += 1
 
             start_time = time.time()
             decoded_seq = xor.decode('', modified_sequence)
             time_used = time.time() - start_time
+            cost = 0
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_xor.npy'
@@ -451,15 +480,10 @@ def create_main_upload():
         chart = result[2]
         st.write('Summary Report')
         st.dataframe(df_summary)
-        hide = 0
-        if st.button('Expand Detail') and hide == 0:
+
+        with st.expander("Expand Detail"):
             st.write('Detail Table')
             st.dataframe(df_report)
-            if st.button('Hide Detail'):
-                hide = 1
-        else:
-            pass
-
         st.altair_chart(chart, use_container_width=True)
 
     elif choose_dna_encoding != [] and encoded_binary_path == '':
