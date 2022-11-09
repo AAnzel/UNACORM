@@ -71,14 +71,13 @@ def bits2byte(param):
 def encode(string_file_name, numpy_boolean_array):
     output_text = []
     output_string = f+int2bp(0)
-    n=0
-    inarray = numpy.load(numpy_boolean_array)
-    if(len(inarray) > Max_Length):
+    n = 0
+    if (len(numpy_boolean_array) > Max_Length):
         print('the input data exceeds the maximum length the algorithm can encode')
         print('will truncate to the maximum length in order to continue with the encoding')
-        inarray = inarray[0: Max_Length-1]
-    for i in range(0, len(inarray), 8):
-        chunk = inarray[i:i+8]
+        numpy_boolean_array = numpy_boolean_array[0: Max_Length-1]
+    for i in range(0, len(numpy_boolean_array), 8):
+        chunk = numpy_boolean_array[i:i+8]
         bytedata = bits2byte(chunk)
         output_string += byt2bp(bytedata)
         n+=1
