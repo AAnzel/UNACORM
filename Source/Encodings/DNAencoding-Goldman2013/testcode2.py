@@ -2,10 +2,12 @@ import numpy
 import goldman
 import random
 
-# binary1 = numpy.load('La_Jeunesse.npy')
-binary1 = numpy.load('Vue_de_la_Buena_Vista.npy')
+binary1 = numpy.load('La_Jeunesse.npy')
+# binary1 = numpy.load('Vue_de_la_Buena_Vista.npy')
+# binary1 = numpy.load('test.npy')
 # print(binary1)
-dna_str = goldman.encode(binary1, "La_Jeunesse")
+# dna_str = goldman.encode(binary1, "The_Picture_of_Dorian_Gray.npy")
+dna_str = goldman.encode(binary1, "La_Jeunesse.npy")
 # print(dna_str)
 random.shuffle(dna_str)
 binary2 = goldman.decode(dna_str)
