@@ -343,8 +343,13 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             Time=('Time', sum)
     )
 
-    for em in encoding_method:
-        chart1 = alt.Chart(df_report).mark_bar().encode(
+    return df_report, df_summary
+
+
+def visualize_uploaded(df_report, df_summary):
+    method = df_report.Method.unique()
+    for em in method:
+        chart1 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().encode(
             alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
             alt.Y('Size:Q', title='Size (in bytes)'),
             # alt.Column('Method:N', title='Original File Type'),
@@ -363,7 +368,7 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
 
         chartsize = text1 + chart1
 
-        chart2 = alt.Chart(df_report).mark_bar().encode(
+        chart2 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().encode(
             alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
             alt.Y('Time:Q', title='Process Time (in seconds)'),
             # alt.Column('Method:N', title='Original File Type'),
@@ -378,12 +383,12 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             baseline='middle',
             dy=-5
         ).encode(
-            alt.Text('Time:Q', format=",.4f")
+            alt.Text('Time:Q', format=",.5f")
         )
 
         charttime = text2 + chart2
 
-        chart3 = alt.Chart(df_report).mark_bar().encode(
+        chart3 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().mark_bar().encode(
             alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
             alt.Y('Cost:Q', title='Cost (based on length of chars)'),
             # alt.Column('Method:N', title='Original File Type'),
@@ -405,7 +410,9 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
 
         chart = alt.hconcat(chartsize, charttime, chartcost)
 
-    return df_report, df_summary, chart
+        st.altair_chart(chart, use_container_width=True)
+
+    return chart
 
 
 def convert_text_data_to_binary(path_original_data):
@@ -477,14 +484,13 @@ def create_main_upload():
         result = dna_encoding(choose_dna_encoding, encoded_binary_path, choose_file_type, storage_length)
         df_summary = result[1]
         df_report = result[0]
-        chart = result[2]
         st.write('Summary Report')
         st.dataframe(df_summary)
 
         with st.expander("Expand Detail"):
             st.write('Detail Table')
             st.dataframe(df_report)
-        st.altair_chart(chart, use_container_width=True)
+        visualize_uploaded(df_report, df_summary)
 
     elif choose_dna_encoding != [] and encoded_binary_path == '':
         st.error('Choose your file and length of storage first!')
