@@ -63,8 +63,14 @@ def decode(dnastr):
     Fi = Findex_to_Fi(dnastr)
     # s5 = Fi_to_S5(Fi)
     # use Fi_to_S5(Fi), if you do not want to use the majority vote
-    s5 = majority_vote(Fi)
+
+    # & We need to have this workaround if the original nucleotide string is smaller then 100
+    if len(Fi) < 2:
+        s5 = Fi[0]
+    else:
+        s5 = majority_vote(Fi)
     # print("s5:" + str(len(s5)))
+
     s4 = S5_to_S4(s5)
     # print("s4:" + str(len(s4)))
     s0 = S4_to_S0(s4)
@@ -158,6 +164,11 @@ def S5_to_Fi(s5):
     :param s5: string of [A, T, C, G]
     :return: array of DNA segments (strings) [[A, T, C, G],...,[A, T, C, G]]
     """
+
+    # if s5 is smaller then 100 return the DNA-string as it is
+    if len(s5) < 100:
+        return [s5]
+
     n = len(s5)
     F = []
     for i in range(0, int(n / 25 - 3)):
@@ -260,7 +271,12 @@ def Findex_to_Fi(Findex):
             Fi = reverse_complement(Fi)
 
         # Remove prepended A/T and appended C/G
-        Fi = Fi[1:116]  # Prior lenght of Fi is 117
+        # Fi = Fi[1:116]  # Prior lenght of Fi is 117
+        # Fi = Fi[1:len(Findex)-2]
+        if len(Findex) < 2:
+            Fi = Fi[1:len(Findex) - 2]
+        else:
+            Fi = Fi[1:116]
 
         # Extract ix (last 15) n DNA format
         ix = Fi[-15:]
@@ -397,10 +413,20 @@ def S5_to_S4(s5):
         'T': {'G': '0', 'C': '1', 'A': '2'}
     }
 
-    s4 = ''
-    for i in range(len(s5) - 1, 0, -1):
-        s4 = dna_inv_table[s5[i]][s5[i - 1]] + s4
-    s4 = dna_inv_table[s5[0]]['A'] + s4
+    try:
+
+        s4 = ''
+        for i in range(len(s5) - 1, 0, -1):
+            s4 = dna_inv_table[s5[i]][s5[i - 1]] + s4
+        s4 = dna_inv_table[s5[0]]['A'] + s4
+
+    except:
+
+        print("Due to DNA manipulation a nucleotide appears to have been followed by the same nucleotide. "
+              "This variation of the original DNA string can not be handled by the algorithm described by"
+              "Goldman et al. (2013).")
+        exit()
+
 
     return s4
 
