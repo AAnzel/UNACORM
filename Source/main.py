@@ -28,14 +28,14 @@ def create_sidebar_and_main():
     st.sidebar.markdown('''
         ---
         **Description**\n
-        DNA Encoding Methods:\n
-        -Simple Code by Church et al.:\n
+        *****DNA Encoding Methods:*****\n
+        *****-Simple Code by Church et al.:*****\n
          [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)\n
-        -Repetition Code by Goldman et al.:\n
+        *****-Repetition Code by Goldman et al.:*****\n
          [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)\n
-        -The 2D Code by Grass et al.:\n
+        *****-The 2D Code by Grass et al.:*****\n
          [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)\n
-        -XOR-Based Code by Bornholt et al.:\n
+        *****-XOR-Based Code by Bornholt et al.:*****\n
          [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)\n
         ---
         ''')
