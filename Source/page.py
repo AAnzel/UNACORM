@@ -29,11 +29,10 @@ path_decoded_data = os.path.join('..', 'Data', 'Decoded')
 path_encoded_dna = os.path.join('..', 'Data', 'Encoded', 'DNA')
 path_decoded_dna = os.path.join('..', 'Data', 'Decoded', 'DNA')
 
-path_uploaded_dict = {
-    'txt': path_uploaded_txt,
-    'jpg': path_uploaded_jpg,
-    'wav': path_uploaded_wav
-}
+path_uploaded_list = \
+    [path_uploaded_txt, path_uploaded_jpg, path_uploaded_wav, path_encoded_data, path_decoded_data,
+        path_encoded_dna, path_decoded_dna]
+
 
 url = 'https://mesa.mosla.de/api/all'
 header = {'content-type': 'application/json;charset=UTF-8'}
@@ -47,13 +46,13 @@ def remove_cached_data():
     time_limit = time.time() - SAVE_TIME
 
     # Traversing every cache directory and deleting everything from it
-    for subdir in os.listdir(path_uploaded):
-        subdir_path = os.path.join(path_uploaded, subdir)
-        for file_name in os.listdir(subdir_path):
-            if 'gitkeep' in file_name:
+    for dir in path_uploaded_list:
+        for file_name in os.listdir(dir):
+            path = os.path.join(dir, file_name)
+            if 'gitkeep' in file_name and os.path.isdir(path) == 'True':
                 continue
             else:
-                file_path = os.path.join(subdir_path, file_name)
+                file_path = os.path.join(dir, file_name)
 
                 # Check if file is older than 1h, and if yes, delete it
                 if os.stat(file_path).st_mtime < time_limit:
@@ -67,8 +66,7 @@ def remove_cached_data():
                         print('Failed to delete ' + file_path + '. Reason: '
                               + e)
 
-                    print('Successfully removed everything from ' + subdir +
-                          ' data set')
+                    print('Successfully removed old data from uploaded directory')
 
                 else:
                     pass
@@ -208,6 +206,11 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
                 modified_sequence.append(result)
                 i += 1
 
+            file_path = os.path.join(path_decoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in modified_sequence:
+                    f.write(i)
+            size = os.path.getsize(file_path)
             start_time = time.time()
             decoded_seq = sim_dec_dna.decode('', modified_sequence)
             time_used = time.time() - start_time
@@ -215,9 +218,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_simple.npy'
-            file_path = os.path.join(path_decoded_dna, file_name)
+            file_path = os.path.join(path_decoded_data, file_name)
             np.save(file_path, decoded_seq)
-            size = os.path.getsize(file_path)
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'Repetition Code':
@@ -245,7 +247,11 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
                 result = api_call(seq, storage_length)
                 modified_sequence.append(result)
                 i += 1
-
+            file_path = os.path.join(path_decoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in modified_sequence:
+                    f.write(i)
+            size = os.path.getsize(file_path)
             start_time = time.time()
             decoded_seq = gold_dna.decode(modified_sequence)
             time_used = time.time() - start_time
@@ -253,9 +259,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_repetition.npy'
-            file_path = os.path.join(path_decoded_dna, file_name)
+            file_path = os.path.join(path_decoded_data, file_name)
             np.save(file_path, decoded_seq)
-            size = os.path.getsize(file_path)
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'The 2D Code':
@@ -267,7 +272,7 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             for seq in generated_seq:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_basename = os.path.basename(bit_path)
-            file_name = os.path.splitext(file_basename)[0] + '_2d'
+            file_name = os.path.splitext(file_basename)[0] + '_2d.txt'
             file_path = os.path.join(path_encoded_dna, file_name)
             with open(file_path, 'w') as f:
                 for i in generated_seq:
@@ -284,6 +289,11 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
                 modified_sequence.append(result)
                 i += 1
 
+            file_path = os.path.join(path_decoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in modified_sequence:
+                    f.write(i)
+            size = os.path.getsize(file_path)
             start_time = time.time()
             decoded_seq = rs.decode('', modified_sequence)
             time_used = time.time() - start_time
@@ -291,9 +301,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_2d.npy'
-            file_path = os.path.join(path_decoded_dna, file_name)
+            file_path = os.path.join(path_decoded_data, file_name)
             np.save(file_path, decoded_seq)
-            size = os.path.getsize(file_path)
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         elif em == 'XOR-Based Code':
@@ -305,7 +314,7 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             for seq in generated_seq:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_basename = os.path.basename(bit_path)
-            file_name = os.path.splitext(file_basename)[0] + '_xor'
+            file_name = os.path.splitext(file_basename)[0] + '_xor.txt'
             file_path = os.path.join(path_encoded_dna, file_name)
             with open(file_path, 'w') as f:
                 for i in generated_seq:
@@ -321,7 +330,11 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
                 result = api_call(seq, storage_length)
                 modified_sequence.append(result)
                 i += 1
-
+            file_path = os.path.join(path_decoded_dna, file_name)
+            with open(file_path, 'w') as f:
+                for i in modified_sequence:
+                    f.write(i)
+            size = os.path.getsize(file_path)
             start_time = time.time()
             decoded_seq = xor.decode('', modified_sequence)
             time_used = time.time() - start_time
@@ -329,9 +342,8 @@ def dna_encoding(encoding_method, bit_path, file_type, storage_length):
             for seq in modified_sequence:
                 cost += len(seq.translate({ord(c): None for c in string.whitespace}))
             file_name = os.path.splitext(file_basename)[0] + '_xor.npy'
-            file_path = os.path.join(path_decoded_dna, file_name)
+            file_path = os.path.join(path_decoded_data, file_name)
             np.save(file_path, decoded_seq)
-            size = os.path.getsize(file_path)
             list = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
             df_report.loc[len(df_report)] = list
         else:
