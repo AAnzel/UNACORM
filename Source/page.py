@@ -49,7 +49,7 @@ def remove_cached_data():
     for dir in path_uploaded_list:
         for file_name in os.listdir(dir):
             path = os.path.join(dir, file_name)
-            if 'gitkeep' in file_name and os.path.isdir(path):
+            if 'gitkeep' in file_name and os.path.isdir(path) is True:
                 continue
             else:
                 file_path = os.path.join(dir, file_name)
@@ -81,8 +81,10 @@ def upload_file(key_suffix, cache_folder_path):
         key='Upload_file_' + key_suffix)
 
     if imported_file is not None:
-        save_path = Path(cache_folder_path, imported_file.name)
-        save_path_os = os.path.join(cache_folder_path, imported_file.name)
+        time_uploaded = str(time.time())
+        filename = time_uploaded+'_'+imported_file.name
+        save_path = Path(cache_folder_path, filename)
+        save_path_os = os.path.join(cache_folder_path, filename)
         with open(save_path, mode='wb') as w:
             w.write(imported_file.getvalue())
 
