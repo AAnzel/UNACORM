@@ -49,7 +49,7 @@ def remove_cached_data():
     for dir in path_uploaded_list:
         for file_name in os.listdir(dir):
             path = os.path.join(dir, file_name)
-            if 'gitkeep' in file_name and os.path.isdir(path) is True:
+            if 'gitkeep' in file_name or os.path.isdir(path):
                 continue
             else:
                 file_path = os.path.join(dir, file_name)
