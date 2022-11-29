@@ -40,6 +40,7 @@ with open("mesa.json") as json_file:  # You can generate this file under simulat
     config_api = json.load(json_file)
 
 
+# Removing old uploaded data
 def remove_cached_data():
 
     SAVE_TIME = 3600  # Time is given in seconds, 5400s = 1.5h, 3600 = 1h
@@ -74,6 +75,7 @@ def remove_cached_data():
     return None
 
 
+# Upload function general
 def upload_file(key_suffix, cache_folder_path):
     save_path_os = ''
     imported_file = st.file_uploader(
@@ -137,6 +139,7 @@ def upload_wav():
     return save_path
 
 
+# Running API
 def run_requests(i, res_all, entry_list, c, payload, header, url):
     start_time = time.time()
     try:
@@ -158,6 +161,7 @@ def run_requests(i, res_all, entry_list, c, payload, header, url):
     return time_used
 
 
+# Setup parameter and call API
 def api_call(encoded_dna, storage_length):
     entry_list = encoded_dna
     payload = config_api
@@ -178,256 +182,99 @@ def api_call(encoded_dna, storage_length):
     return modified_sequence
 
 
-@st.cache(allow_output_mutation=True)
-def dna_encoding(encoding_method, bit_path, file_type, storage_length):
-    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
-    df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Size', 'Cost', 'Time', 'Type', 'Similarity'])
-    for em in encoding_method:
-        if em == 'Simple Code':
-            binary = np.load(bit_path)
-            start_time = time.time()
-            generated_seq = sim_dna.encode('', binary)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in generated_seq:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_basename = os.path.basename(bit_path)
-            file_name = os.path.splitext(file_basename)[0] + '_simple.txt'
-            file_path = os.path.join(path_encoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in generated_seq:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            list_encoded = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_encoded
+@st.cache
+def pipeline(em, binary, file_basename, file_type, storage_length):
+    start_time = time.time()
 
-            modified_sequence = []
-            i = 0
-            while i < len(generated_seq):
-                seq = [str(generated_seq[i])]
-                result = api_call(seq, storage_length)
-                modified_sequence.append(result)
-                i += 1
+    if em == 'Simple Code':
+        generated_seq = sim_dna.encode('', binary)
+    elif em == 'Repetition Code':
+        generated_seq = gold_dna.encode(binary, '')
+    elif em == 'The 2D Code':
+        generated_seq = rs.encode('', binary)
+    elif em == 'XOR-Based Code':
+        generated_seq = xor.encode('', binary)
 
-            file_path = os.path.join(path_decoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in modified_sequence:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            start_time = time.time()
-            decoded_seq = sim_dec_dna.decode('', modified_sequence)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in modified_sequence:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_name = os.path.splitext(file_basename)[0] + '_simple.npy'
-            file_path = os.path.join(path_decoded_data, file_name)
-            np.save(file_path, decoded_seq)
-            list_decoded = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_decoded
+    time_used = time.time() - start_time
+    cost = 0
+    for seq in generated_seq:
+        cost += len(seq.translate({ord(c): None for c in string.whitespace}))
 
-            if len(binary) == len(decoded_seq):
-                i = 0
+    if em == 'Simple Code':
+        file_name = file_basename + '_simple.txt'
+    elif em == 'Repetition Code':
+        file_name = file_basename + '_repetition.txt'
+    elif em == 'The 2D Code':
+        file_name = file_basename + '_2d.txt'
+    elif em == 'XOR-Based Code':
+        file_name = file_basename + '_xor.txt'
+
+    file_path = os.path.join(path_encoded_dna, file_name)
+    with open(file_path, 'w') as f:
+        for i in generated_seq:
+            f.write(i)
+    size = os.path.getsize(file_path)
+    list_encoded = [file_basename, em, 'Encoding', size, cost, time_used, '.'+file_type]
+
+    modified_sequence = []
+    i = 0
+    while i < len(generated_seq):
+        seq = [str(generated_seq[i])]
+        result = api_call(seq, storage_length)
+        modified_sequence.append(result)
+        i += 1
+
+    file_path = os.path.join(path_decoded_dna, file_name)
+    with open(file_path, 'w') as f:
+        for i in modified_sequence:
+            f.write(i)
+    size = os.path.getsize(file_path)
+
+    start_time = time.time()
+    if em == 'Simple Code':
+        decoded_seq = sim_dec_dna.decode('', modified_sequence)
+    elif em == 'Repetition Code':
+        decoded_seq = gold_dna.decode(modified_sequence)
+    elif em == 'The 2D Code':
+        decoded_seq = rs.decode('', modified_sequence)
+    elif em == 'XOR-Based Code':
+        decoded_seq = xor.decode('', modified_sequence)
+
+    time_used = time.time() - start_time
+    cost = 0
+    for seq in modified_sequence:
+        cost += len(seq.translate({ord(c): None for c in string.whitespace}))
+
+    if em == 'Simple Code':
+        file_name = file_basename + '_simple.npy'
+    elif em == 'Repetition Code':
+        file_name = file_basename + '_repetition.npy'
+    elif em == 'The 2D Code':
+        file_name = file_basename + '_2d.npy'
+    elif em == 'XOR-Based Code':
+        file_name = file_basename + '_xor.npy'
+
+    file_path = os.path.join(path_decoded_data, file_name)
+    np.save(file_path, decoded_seq)
+    list_decoded = [file_basename, em, 'Decoding', size, cost, time_used, '.'+file_type]
+
+    if len(binary) == len(decoded_seq):
+        i = 0
+        status = 'Same'
+        while i < len(binary) and status == 'Same':
+            if binary[i] == decoded_seq[i]:
                 status = 'Same'
-                while i < len(binary) and status == 'Same':
-                    if binary[i] == decoded_seq[i]:
-                        status = 'Same'
-                    else:
-                        status = 'Different'
-                    i += 1
             else:
                 status = 'Different'
-            sum_size = list_encoded[3] + list_decoded[3]
-            sum_cost = list_encoded[4] + list_decoded[4]
-            sum_time_used = list_encoded[5] + list_decoded[5]
-            list_summary = [os.path.splitext(file_basename)[0], em, sum_size, sum_cost, sum_time_used, '.'+file_type,
-                            status]
-            df_summary.loc[len(df_summary)] = list_summary
-
-        elif em == 'Repetition Code':
-            binary = np.load(bit_path)
-            start_time = time.time()
-            generated_seq = gold_dna.encode(binary, '')
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in generated_seq:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_basename = os.path.basename(bit_path)
-            file_name = os.path.splitext(file_basename)[0] + '_repetition.txt'
-            file_path = os.path.join(path_encoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in generated_seq:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            list_encoded = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_encoded
-
-            modified_sequence = []
-            i = 0
-            while i < len(generated_seq):
-                seq = [str(generated_seq[i])]
-                result = api_call(seq, storage_length)
-                modified_sequence.append(result)
-                i += 1
-            file_path = os.path.join(path_decoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in modified_sequence:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            start_time = time.time()
-            decoded_seq = gold_dna.decode(modified_sequence)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in modified_sequence:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_name = os.path.splitext(file_basename)[0] + '_repetition.npy'
-            file_path = os.path.join(path_decoded_data, file_name)
-            np.save(file_path, decoded_seq)
-            list_decoded = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_decoded
-
-            if len(binary) == len(decoded_seq):
-                i = 0
-                status = 'Same'
-                while i < len(binary) and status == 'Same':
-                    if binary[i] == decoded_seq[i]:
-                        status = 'Same'
-                    else:
-                        status = 'Different'
-                    i += 1
-            else:
-                status = 'Different'
-            sum_size = list_encoded[3] + list_decoded[3]
-            sum_cost = list_encoded[4] + list_decoded[4]
-            sum_time_used = list_encoded[5] + list_decoded[5]
-            list_summary = [os.path.splitext(file_basename)[0], em, sum_size, sum_cost, sum_time_used, '.'+file_type,
-                            status]
-            df_summary.loc[len(df_summary)] = list_summary
-
-        elif em == 'The 2D Code':
-            binary = np.load(bit_path)
-            start_time = time.time()
-            generated_seq = rs.encode('', binary)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in generated_seq:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_basename = os.path.basename(bit_path)
-            file_name = os.path.splitext(file_basename)[0] + '_2d.txt'
-            file_path = os.path.join(path_encoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in generated_seq:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            list_encoded = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_encoded
-
-            modified_sequence = []
-            i = 0
-            while i < len(generated_seq):
-                seq = [str(generated_seq[i])]
-                result = api_call(seq, storage_length)
-                modified_sequence.append(result)
-                i += 1
-
-            file_path = os.path.join(path_decoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in modified_sequence:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            start_time = time.time()
-            decoded_seq = rs.decode('', modified_sequence)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in modified_sequence:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_name = os.path.splitext(file_basename)[0] + '_2d.npy'
-            file_path = os.path.join(path_decoded_data, file_name)
-            np.save(file_path, decoded_seq)
-            list_decoded = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_decoded
-
-            if len(binary) == len(decoded_seq):
-                i = 0
-                status = 'Same'
-                while i < len(binary) and status == 'Same':
-                    if binary[i] == decoded_seq[i]:
-                        status = 'Same'
-                    else:
-                        status = 'Different'
-                    i += 1
-            else:
-                status = 'Different'
-            sum_size = list_encoded[3] + list_decoded[3]
-            sum_cost = list_encoded[4] + list_decoded[4]
-            sum_time_used = list_encoded[5] + list_decoded[5]
-            list_summary = [os.path.splitext(file_basename)[0], em, sum_size, sum_cost, sum_time_used, '.'+file_type,
-                            status]
-            df_summary.loc[len(df_summary)] = list_summary
-
-        elif em == 'XOR-Based Code':
-            binary = np.load(bit_path)
-            start_time = time.time()
-            generated_seq = xor.encode('', binary)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in generated_seq:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_basename = os.path.basename(bit_path)
-            file_name = os.path.splitext(file_basename)[0] + '_xor.txt'
-            file_path = os.path.join(path_encoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in generated_seq:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            list_encoded = [os.path.splitext(file_basename)[0], em, 'Encoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_encoded
-
-            modified_sequence = []
-            i = 0
-            while i < len(generated_seq):
-                seq = [str(generated_seq[i])]
-                result = api_call(seq, storage_length)
-                modified_sequence.append(result)
-                i += 1
-            file_path = os.path.join(path_decoded_dna, file_name)
-            with open(file_path, 'w') as f:
-                for i in modified_sequence:
-                    f.write(i)
-            size = os.path.getsize(file_path)
-            start_time = time.time()
-            decoded_seq = xor.decode('', modified_sequence)
-            time_used = time.time() - start_time
-            cost = 0
-            for seq in modified_sequence:
-                cost += len(seq.translate({ord(c): None for c in string.whitespace}))
-            file_name = os.path.splitext(file_basename)[0] + '_xor.npy'
-            file_path = os.path.join(path_decoded_data, file_name)
-            np.save(file_path, decoded_seq)
-            list_decoded = [os.path.splitext(file_basename)[0], em, 'Decoding', size, cost, time_used, '.'+file_type]
-            df_report.loc[len(df_report)] = list_decoded
-
-            if len(binary) == len(decoded_seq):
-                i = 0
-                status = 'Same'
-                while i < len(binary) and status == 'Same':
-                    if binary[i] == decoded_seq[i]:
-                        status = 'Same'
-                    else:
-                        status = 'Different'
-                    i += 1
-            else:
-                status = 'Different'
-            sum_size = list_encoded[3] + list_decoded[3]
-            sum_cost = list_encoded[4] + list_decoded[4]
-            sum_time_used = list_encoded[5] + list_decoded[5]
-            list_summary = [os.path.splitext(file_basename)[0], em, sum_size, sum_cost, sum_time_used, '.'+file_type,
-                            status]
-            df_summary.loc[len(df_summary)] = list_summary
-        else:
-            pass
-
-    return df_report, df_summary
+            i += 1
+    else:
+        status = 'Different'
+    sum_size = list_encoded[3] + list_decoded[3]
+    sum_cost = list_encoded[4] + list_decoded[4]
+    sum_time_used = list_encoded[5] + list_decoded[5]
+    list_summary = [file_basename, em, sum_size, sum_cost, sum_time_used, '.'+file_type,
+                    status]
+    return list_encoded, list_decoded, list_summary
 
 
 def visualize_uploaded(df_report, df_summary):
@@ -562,12 +409,20 @@ def create_main_upload():
 
     storage_length = st.text_input('Choose your length of storage (in hours)')
 
-    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
-
     if choose_dna_encoding != [] and encoded_binary_path != '' and storage_length != '':
-        result = dna_encoding(choose_dna_encoding, encoded_binary_path, choose_file_type, storage_length)
-        df_summary = result[1]
-        df_report = result[0]
+        df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
+        df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Size', 'Cost', 'Time', 'Type', 'Similarity'])
+        binary = np.load(encoded_binary_path)
+        file_basename = os.path.basename(encoded_binary_path)
+        file_name = os.path.splitext(file_basename)[0]
+        for em in choose_dna_encoding:
+            output = pipeline(em, binary, file_name, choose_file_type, storage_length)
+            list_encoded = output[0]
+            list_decoded = output[1]
+            list_summary = output[2]
+            df_report.loc[len(df_report)] = list_encoded
+            df_report.loc[len(df_report)] = list_decoded
+            df_summary.loc[len(df_summary)] = list_summary
         st.write('Summary Report')
         st.dataframe(df_summary)
 
