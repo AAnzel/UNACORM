@@ -339,11 +339,14 @@ def visualize_uploaded(df_report, df_summary):
 
         chartcost = text3 + chart3
 
-        chart = alt.hconcat(chartsize, charttime, chartcost)
+        col1, col2, col3 = st.columns(3)
 
-        st.altair_chart(chart, use_container_width=True)
-
-    return chart
+        with col1:
+            st.altair_chart(chartsize, use_container_width=True)
+        with col2:
+            st.altair_chart(charttime, use_container_width=True)
+        with col3:
+            st.altair_chart(chartcost, use_container_width=True)
 
 
 def convert_text_data_to_binary(path_original_data):
@@ -409,9 +412,10 @@ def create_main_upload():
 
     storage_length = st.text_input('Choose your length of storage (in hours)')
 
+    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
+    df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Size', 'Cost', 'Time', 'Type', 'Similarity'])
+
     if choose_dna_encoding != [] and encoded_binary_path != '' and storage_length != '':
-        df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
-        df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Size', 'Cost', 'Time', 'Type', 'Similarity'])
         binary = np.load(encoded_binary_path)
         file_basename = os.path.basename(encoded_binary_path)
         file_name = os.path.splitext(file_basename)[0]
@@ -466,7 +470,15 @@ def create_main_upload():
         alt.datum.Method == 'XOR-Based Code'
     ).properties(title='File Size with XOR-Based Code')
 
-    chart_size = alt.hconcat(chart1, chart2, chart3)
+    st.markdown("<h3 style='text-align: center; color: black;'>File Size </h3>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.altair_chart(chart1, use_container_width=True)
+    with col2:
+        st.altair_chart(chart2, use_container_width=True)
+    with col3:
+        st.altair_chart(chart3, use_container_width=True)
 
     chart4 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
@@ -492,7 +504,16 @@ def create_main_upload():
         alt.datum.Method == 'XOR-Based Code'
     ).properties(title='Cost with XOR-Based Code')
 
-    chart_cost = alt.hconcat(chart4, chart5, chart6)
+    st.write('---')
+    st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.altair_chart(chart4, use_container_width=True)
+    with col2:
+        st.altair_chart(chart5, use_container_width=True)
+    with col3:
+        st.altair_chart(chart6, use_container_width=True)
 
     chart7 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
@@ -518,8 +539,13 @@ def create_main_upload():
         alt.datum.Method == 'XOR-Based Code'
     ).properties(title='Time with XOR-Based Code')
 
-    chart_time = alt.hconcat(chart7, chart8, chart9)
+    st.write('---')
+    st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>", unsafe_allow_html=True)
+    col1, col2, col3 = st.columns(3)
 
-    chart = alt.vconcat(chart_size, chart_cost, chart_time)
-
-    st.altair_chart(chart, use_container_width=True)
+    with col1:
+        st.altair_chart(chart7, use_container_width=True)
+    with col2:
+        st.altair_chart(chart8, use_container_width=True)
+    with col3:
+        st.altair_chart(chart9, use_container_width=True)
