@@ -442,9 +442,13 @@ def create_main_upload():
 
     st.write('---')
     st.header('Benchmark')
+    df_measure_sum = pd.read_pickle("data/pre_measure_stat_sum.pkl")
     df_measure = pd.read_pickle("data/pre_measure.pkl")
     df_concat = pd.concat([df_report, df_measure], ignore_index=True)
-    st.dataframe(df_concat)
+    st.dataframe(df_measure_sum)
+    with st.expander("Expand Detail"):
+        st.write('Detail Table')
+        st.dataframe(df_concat)
 
     chart1 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
         alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
