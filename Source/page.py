@@ -450,106 +450,62 @@ def create_main_upload():
         st.write('Detail Table')
         st.dataframe(df_concat)
 
-    chart1 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Size:Q', title='Size (in bytes)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'Simple Code'
-    ).properties(title='File Size with Simple Code')
-
-    chart2 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Size:Q', title='Size (in bytes)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'Repetition Code'
-    ).properties(title='File Size with Repetition Code')
-
-    chart3 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Size:Q', title='Size (in bytes)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'XOR-Based Code'
-    ).properties(title='File Size with XOR-Based Code')
-
     st.markdown("<h3 style='text-align: center; color: black;'>File Size </h3>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
+    col3, col4 = st.columns(2)
+    col = [col1, col2, col3, col4]
 
-    with col1:
-        st.altair_chart(chart1, use_container_width=True)
-    with col2:
-        st.altair_chart(chart2, use_container_width=True)
-    with col3:
-        st.altair_chart(chart3, use_container_width=True)
+    encoding_method = ["Repetition Code", "Simple Code", "The 2D Code", "XOR-Based Code"]
+    i = 0
+    for em in encoding_method:
+        chart = alt.Chart(df_concat).mark_circle().encode(
+            alt.X('OriFile_Size:O', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Size:Q', title='Size (in bytes)'),
+            alt.Color('Transformation:N'),
+            alt.Tooltip(['Transformation', 'OriFile_Size', 'Size'])
+        ).transform_filter(
+            (alt.datum.Method == em)
+        ).properties(title='File Size with ' + em)
 
-    chart4 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
-        alt.Color('Transformation:N'),
-    ).transform_filter(
-        alt.datum.Method == 'Simple Code'
-    ).properties(title='Cost with Simple Code')
-
-    chart5 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'Repetition Code'
-    ).properties(title='Cost with Repetition Code')
-
-    chart6 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'XOR-Based Code'
-    ).properties(title='Cost with XOR-Based Code')
+        with col[i]:
+            st.altair_chart(chart, use_container_width=True)
+        i += 1
 
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
+    col3, col4 = st.columns(2)
+    col = [col1, col2, col3, col4]
+    i = 0
+    for em in encoding_method:
+        chart = alt.Chart(df_concat).mark_circle().encode(
+            alt.X('OriFile_Size:O', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Cost:Q', title='Cost (based on length of chars)'),
+            alt.Color('Transformation:N'),
+            alt.Tooltip(['Transformation', 'OriFile_Size', 'Cost'])
+        ).transform_filter(
+            (alt.datum.Method == em)
+        ).properties(title='Cost with ' + em)
 
-    with col1:
-        st.altair_chart(chart4, use_container_width=True)
-    with col2:
-        st.altair_chart(chart5, use_container_width=True)
-    with col3:
-        st.altair_chart(chart6, use_container_width=True)
-
-    chart7 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Time:Q', title='Time (in seconds)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'Simple Code'
-    ).properties(title='Time with Simple Code')
-
-    chart8 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Time:Q', title='Time (in seconds)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'Repetition Code'
-    ).properties(title='Time with Repetition Code')
-
-    chart9 = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-        alt.X('Transformation:N', title='', axis=alt.Axis(labelAngle=-45)),
-        alt.Y('Time:Q', title='Time (in seconds)'),
-        alt.Color('Transformation:N')
-    ).transform_filter(
-        alt.datum.Method == 'XOR-Based Code'
-    ).properties(title='Time with XOR-Based Code')
+        with col[i]:
+            st.altair_chart(chart, use_container_width=True)
+        i += 1
 
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
+    col3, col4 = st.columns(2)
+    col = [col1, col2, col3, col4]
+    i = 0
+    for em in encoding_method:
+        chart = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
+            alt.X('OriFile_Size:O', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Time:Q', title='Time (in seconds)'),
+            alt.Color('Transformation:N')
+        ).transform_filter(
+            alt.datum.Method == em
+        ).properties(title='Time with ' + em)
 
-    with col1:
-        st.altair_chart(chart7, use_container_width=True)
-    with col2:
-        st.altair_chart(chart8, use_container_width=True)
-    with col3:
-        st.altair_chart(chart9, use_container_width=True)
+        with col[i]:
+            st.altair_chart(chart, use_container_width=True)
+        i += 1
