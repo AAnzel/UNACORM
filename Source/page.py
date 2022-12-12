@@ -277,7 +277,7 @@ def pipeline(em, binary, file_basename, file_type, storage_length):
     return list_encoded, list_decoded, list_summary
 
 
-def visualize_uploaded(df_report, df_summary):
+def visualize_uploaded(df_report):
     method = df_report.Method.unique()
     for em in method:
         chart1 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().encode(
@@ -397,6 +397,7 @@ def create_main_upload():
 
     if save_path != '':
         encoded_binary_path = convert_text_data_to_binary(save_path)
+        OriFileSize = os.path.getsize(encoded_binary_path)
     else:
         encoded_binary_path = ''
     st.write('Your encoded binary: ', encoded_binary_path)
@@ -433,7 +434,7 @@ def create_main_upload():
         with st.expander("Expand Detail"):
             st.write('Detail Table')
             st.dataframe(df_report)
-        visualize_uploaded(df_report, df_summary)
+        visualize_uploaded(df_report)
 
     elif choose_dna_encoding != [] and encoded_binary_path == '':
         st.error('Choose your file and length of storage first!')
@@ -442,10 +443,18 @@ def create_main_upload():
 
     st.write('---')
     st.header('Benchmark')
+    df_summary1 = df_summary
+    df_summary1 = df_summary1.rename({'Size': 'Sum_Mean_Size', 'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Mean_Cost'},
+                                     axis=1)
     df_measure_sum = pd.read_pickle("data/pre_measure_stat_sum.pkl")
     df_measure = pd.read_pickle("data/pre_measure.pkl")
-    df_concat = pd.concat([df_report, df_measure], ignore_index=True)
-    st.dataframe(df_measure_sum)
+    df_report1 = df_report
+    if save_path != '':
+        df_report1['OriFile_Size'] = OriFileSize
+        df_summary1['OriFile_Size'] = OriFileSize
+    df_concat = pd.concat([df_report1, df_measure], ignore_index=True)
+    df_measure_sum_concat = pd.concat([df_summary1, df_measure_sum], ignore_index=True)
+    st.dataframe(df_measure_sum_concat)
     with st.expander("Expand Detail"):
         st.write('Detail Table')
         st.dataframe(df_concat)
