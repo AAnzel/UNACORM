@@ -39,6 +39,8 @@ header = {'content-type': 'application/json;charset=UTF-8'}
 with open("mesa.json") as json_file:  # You can generate this file under simulate -> Download current config
     config_api = json.load(json_file)
 
+df_metrics = pd.read_excel('synthesis_cost.xlsx')
+
 
 # Removing old uploaded data
 def remove_cached_data():
@@ -182,7 +184,28 @@ def api_call(encoded_dna, storage_length):
     return modified_sequence
 
 
-@st.cache
+def calculate_cost(max_nt, oligos):
+    if max_nt <= 120:
+        i = 0
+    else:
+        i = 1
+
+    if oligos >= 2 and oligos <= 100:
+        j = 1
+    elif oligos >= 101 and oligos <= 500:
+        j = 2
+    elif oligos >= 501 and oligos <= 1000:
+        j = 3
+    else:
+        j = 4
+
+    cost = df_metrics.iloc[i, j]
+    cost_total = cost * oligos
+
+    return cost_total
+
+
+# @st.cache
 def pipeline(em, binary, file_basename, file_type, storage_length):
     start_time = time.time()
 
@@ -197,8 +220,17 @@ def pipeline(em, binary, file_basename, file_type, storage_length):
 
     time_used = time.time() - start_time
     cost = 0
+    len_oligos = len(generated_seq)
+    max_nt = 0
+    generated_seq_upper = []
     for seq in generated_seq:
-        cost += len(seq.translate({ord(c): None for c in string.whitespace}))
+        # cost += len(seq.translate({ord(c): None for c in string.whitespace}))
+        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
+        generated_seq_upper.append(seq.upper())
+        if nt > max_nt:
+            max_nt = nt
+    print('len_oligos = ' + str(len_oligos) + ' max_nt = ' + str(max_nt))
+    cost = calculate_cost(max_nt, len_oligos)
 
     if em == 'Simple Code':
         file_name = file_basename + '_simple.txt'
@@ -211,15 +243,15 @@ def pipeline(em, binary, file_basename, file_type, storage_length):
 
     file_path = os.path.join(path_encoded_dna, file_name)
     with open(file_path, 'w') as f:
-        for i in generated_seq:
-            f.write(i)
+        for i in generated_seq_upper:
+            f.write(i + '\n')
     size = os.path.getsize(file_path)
     list_encoded = [file_basename, em, 'Encoding', size, cost, time_used, '.'+file_type]
 
     modified_sequence = []
     i = 0
-    while i < len(generated_seq):
-        seq = [str(generated_seq[i])]
+    while i < len(generated_seq_upper):
+        seq = [str(generated_seq_upper[i])]
         result = api_call(seq, storage_length)
         modified_sequence.append(result)
         i += 1
