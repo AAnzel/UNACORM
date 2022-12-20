@@ -28,6 +28,11 @@ path_encoded_data = os.path.join('..', 'Data', 'Encoded')
 path_decoded_data = os.path.join('..', 'Data', 'Decoded')
 path_encoded_dna = os.path.join('..', 'Data', 'Encoded', 'DNA')
 path_decoded_dna = os.path.join('..', 'Data', 'Decoded', 'DNA')
+path_original_data = os.path.join('..', 'Data', 'Original')
+data_original = []
+for file_name in os.listdir(path_original_data):
+    data_original.append(os.path.splitext(file_name)[0])
+
 
 path_uploaded_list = \
     [path_uploaded_txt, path_uploaded_jpg, path_uploaded_wav, path_encoded_data, path_decoded_data,
@@ -184,7 +189,7 @@ def api_call(encoded_dna, storage_length):
     return modified_sequence
 
 
-def calculate_cost(max_nt, oligos):
+def cost_encoding(max_nt, oligos):
     if max_nt <= 120:
         i = 0
     else:
@@ -230,7 +235,7 @@ def pipeline(em, binary, file_basename, file_type, storage_length):
         if nt > max_nt:
             max_nt = nt
     print('len_oligos = ' + str(len_oligos) + ' max_nt = ' + str(max_nt))
-    cost = calculate_cost(max_nt, len_oligos)
+    cost = cost_encoding(max_nt, len_oligos)
 
     if em == 'Simple Code':
         file_name = file_basename + '_simple.txt'
@@ -400,6 +405,11 @@ def convert_text_data_to_binary(path_original_data):
     return bit_encoded_file
 
 
+@st.cache
+def convert_df(df):
+    return df.to_csv().encode('utf-8')
+
+
 def create_main_upload():
 
     st.header('File Upload')
@@ -486,47 +496,57 @@ def create_main_upload():
         df_summary1['OriFile_Size'] = OriFileSize
     df_concat = pd.concat([df_report1, df_measure], ignore_index=True)
     df_measure_sum_concat = pd.concat([df_summary1, df_measure_sum], ignore_index=True)
+    csv_sum = convert_df(df_measure_sum_concat)
+    csv_detail = convert_df(df_concat)
     st.dataframe(df_measure_sum_concat)
+    st.download_button(
+        label="Download",
+        data=csv_sum,
+        file_name='summary_data.csv',
+        mime='text/csv',
+    )
     with st.expander("Expand Detail"):
         st.write('Detail Table')
         st.dataframe(df_concat)
-
+        st.download_button(
+            label="Download",
+            data=csv_detail,
+            file_name='detail_data.csv',
+            mime='text/csv',
+        )
+    df_multipliers = pd.read_pickle("data/encoded_multipliers.pkl")
     st.markdown("<h3 style='text-align: center; color: black;'>File Size </h3>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    col3, col4 = st.columns(2)
-    col = [col1, col2, col3, col4]
+    col1, col2, col3 = st.columns([1, 6, 1])
+    with col1:
+        st.write("")
+    with col2:
+        chart = alt.Chart(df_multipliers).mark_boxplot(extent='min-max').encode(
+            alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('Multipliers:Q', title='Multipliers')
+        ).properties(title='Multipliers ')
 
-    encoding_method = ["Repetition Code", "Simple Code", "The 2D Code", "XOR-Based Code"]
-    i = 0
-    for em in encoding_method:
-        chart = alt.Chart(df_concat).mark_circle().encode(
-            alt.X('OriFile_Size:O', title='', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('Size:Q', title='Size (in bytes)'),
-            alt.Color('Transformation:N'),
-            alt.Tooltip(['Transformation', 'OriFile_Size', 'Size'])
-        ).transform_filter(
-            (alt.datum.Method == em)
-        ).properties(title='File Size with ' + em)
-
-        with col[i]:
-            st.altair_chart(chart, use_container_width=True)
-        i += 1
+        st.altair_chart(chart, use_container_width=True)
+    with col3:
+        st.write("")
 
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    col3, col4 = st.columns(2)
-    col = [col1, col2, col3, col4]
+    file_chosen = st.multiselect(
+     'Select files that you want to review (This will affect Cost and Time Charts)',
+     data_original)
+    col1, col2, col3 = st.columns(3)
+    col4, col5, col6 = st.columns(3)
+    col7, col8, col9 = st.columns(3)
+    col = [col1, col2, col3, col4, col5, col6, col7, col8, col9]
     i = 0
-    for em in encoding_method:
-        chart = alt.Chart(df_concat).mark_circle().encode(
-            alt.X('OriFile_Size:O', title='', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('Cost:Q', title='Cost (based on length of chars)'),
-            alt.Color('Transformation:N'),
-            alt.Tooltip(['Transformation', 'OriFile_Size', 'Cost'])
+    for fc in file_chosen:
+        chart = alt.Chart(df_concat).mark_bar().encode(
+            alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
+            alt.Y('mean(Cost):Q', title='Cost (based on length of chars)'),
+            alt.Tooltip(['Method', 'Cost'])
         ).transform_filter(
-            (alt.datum.Method == em)
-        ).properties(title='Cost with ' + em)
+            (alt.datum.Filename == fc) & (alt.datum.Transformation == 'Encoding')
+        ).properties(title=fc)
 
         with col[i]:
             st.altair_chart(chart, use_container_width=True)
@@ -534,18 +554,19 @@ def create_main_upload():
 
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    col3, col4 = st.columns(2)
-    col = [col1, col2, col3, col4]
+    col1, col2, col3 = st.columns(3)
+    col4, col5, col6 = st.columns(3)
+    col7, col8, col9 = st.columns(3)
+    col = [col1, col2, col3, col4, col5, col6, col7, col8, col9]
     i = 0
-    for em in encoding_method:
+    for fc in file_chosen:
         chart = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-            alt.X('OriFile_Size:O', title='', axis=alt.Axis(labelAngle=-45)),
+            alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
             alt.Y('Time:Q', title='Time (in seconds)'),
             alt.Color('Transformation:N')
         ).transform_filter(
-            alt.datum.Method == em
-        ).properties(title='Time with ' + em)
+            (alt.datum.Filename == fc)
+        ).properties(title=fc)
 
         with col[i]:
             st.altair_chart(chart, use_container_width=True)
