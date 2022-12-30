@@ -17,7 +17,7 @@ import bits2DNA as sim_dna
 import DNA2Bits as sim_dec_dna
 import goldman as gold_dna
 import altair as alt
-import testreedsolomon as rs
+# import testreedsolomon as rs
 import xor_code_python as xor
 
 path_uploaded = os.path.join('..', 'Data', 'uploaded')
@@ -89,8 +89,11 @@ def upload_file(key_suffix, cache_folder_path):
         label='Upload your file', type=key_suffix, accept_multiple_files=False,
         key='Upload_file_' + key_suffix)
 
+    uploaded_filename = ''
+
     if imported_file is not None:
         time_uploaded = str(time.time())
+        uploaded_filename = os.path.splitext(imported_file.name)[0]
         filename = time_uploaded+'_'+imported_file.name
         save_path = Path(cache_folder_path, filename)
         save_path_os = os.path.join(cache_folder_path, filename)
@@ -104,7 +107,7 @@ def upload_file(key_suffix, cache_folder_path):
         st.write(file_details)
         # st.write(save_path)
 
-    return save_path_os
+    return save_path_os, uploaded_filename
 
 
 def upload_txt():
@@ -115,9 +118,11 @@ def upload_txt():
     st.header('Choose your ' + key_suffix + ' data')
     st.markdown('')
 
-    save_path = upload_file(key_suffix, cache_folder_path)
+    output = upload_file(key_suffix, cache_folder_path)
+    save_path = output[0]
+    file_uploaded_name = output[1]
 
-    return save_path
+    return save_path, file_uploaded_name
 
 
 def upload_jpg():
@@ -128,9 +133,11 @@ def upload_jpg():
     st.header('Choose your ' + key_suffix + ' data')
     st.markdown('')
 
-    save_path = upload_file(key_suffix, cache_folder_path)
+    output = upload_file(key_suffix, cache_folder_path)
+    save_path = output[0]
+    file_uploaded_name = output[1]
 
-    return save_path
+    return save_path, file_uploaded_name
 
 
 def upload_wav():
@@ -141,9 +148,11 @@ def upload_wav():
     st.header('Choose your ' + key_suffix + ' data')
     st.markdown('')
 
-    save_path = upload_file(key_suffix, cache_folder_path)
+    output = upload_file(key_suffix, cache_folder_path)
+    save_path = output[0]
+    file_uploaded_name = output[1]
 
-    return save_path
+    return save_path, file_uploaded_name
 
 
 # Running API
@@ -210,21 +219,71 @@ def cost_encoding(max_nt, oligos):
     return cost_total
 
 
-# @st.cache
-def pipeline(em, binary, file_basename, file_type, storage_length):
-    start_time = time.time()
-
+@st.cache
+def encoding(em, binary, file_basename, save_path):
     if em == 'Simple Code':
         generated_seq = sim_dna.encode('', binary)
     elif em == 'Repetition Code':
         generated_seq = gold_dna.encode(binary, '')
     elif em == 'The 2D Code':
-        generated_seq = rs.encode('', binary)
+        output_path = os.path.join(path_encoded_dna, file_basename + "_2d.txt")
+        os.system("2D_Code.exe --encode --input=" + save_path + " --output=" + output_path)
+        generated_seq = open(output_path).readlines()
     elif em == 'XOR-Based Code':
         generated_seq = xor.encode('', binary)
 
+    return generated_seq
+
+
+def check_text_equal(path_original_file, path_decoded_file):
+
+    if os.path.isfile(path_original_file):
+        with open(path_original_file, 'rb') as fd_original_file,\
+                open(path_decoded_file, 'rb') as fd_decoded_file:
+            binary_array_original = ba.bitarray()
+            binary_array_decoded = ba.bitarray()
+
+            binary_array_original.fromfile(fd_original_file)
+            binary_array_decoded.fromfile(fd_decoded_file)
+
+            binary_numpy_original = np.frombuffer(
+                binary_array_original.unpack(), dtype=bool)
+            binary_numpy_decoded = np.frombuffer(
+                binary_array_decoded.unpack(), dtype=bool)
+
+            status = ''
+            if np.array_equal(binary_numpy_original, binary_numpy_decoded):
+                status = 'Same'
+            else:
+                status = 'Different'
+
+    return status
+
+
+def compare2ori(save_path, decoded_path, em, binary, decoded_seq):
+    if em == 'The 2D Code':
+        status = check_text_equal(save_path, decoded_path)
+    else:
+        if len(binary) == len(decoded_seq):
+            i = 0
+            status = 'Same'
+            while i < len(binary) and status == 'Same':
+                if binary[i] == decoded_seq[i]:
+                    status = 'Same'
+                else:
+                    status = 'Different'
+                i += 1
+        else:
+            status = 'Different'
+
+    return status
+
+
+@st.cache
+def pipeline(em, binary, file_basename, file_type, storage_length, save_path, uploaded_filename):
+    start_time = time.time()
+    generated_seq = encoding(em, binary, file_basename, save_path)
     time_used = time.time() - start_time
-    cost = 0
     len_oligos = len(generated_seq)
     max_nt = 0
     generated_seq_upper = []
@@ -247,40 +306,53 @@ def pipeline(em, binary, file_basename, file_type, storage_length):
         file_name = file_basename + '_xor.txt'
 
     file_path = os.path.join(path_encoded_dna, file_name)
-    with open(file_path, 'w') as f:
-        for i in generated_seq_upper:
-            f.write(i + '\n')
+    if em != 'The 2D Code':
+        with open(file_path, 'w') as f:
+            for i in generated_seq_upper:
+                f.write(i + '\n')
     size = os.path.getsize(file_path)
-    list_encoded = [file_basename, em, 'Encoding', size, cost, time_used, '.'+file_type]
+    list_encoded = [uploaded_filename, em, 'Encoding', size, cost, time_used, '.'+file_type]
 
     modified_sequence = []
     i = 0
-    while i < len(generated_seq_upper):
-        seq = [str(generated_seq_upper[i])]
-        result = api_call(seq, storage_length)
-        modified_sequence.append(result)
-        i += 1
+    if em == 'The 2D Code':
+        # input_path = os.path.join(path_encoded_dna, file_name)
+        # output_path = os.path.join(path_decoded_dna, file_name)
+        # os.system("2D_Code.exe --encode --input=" + input_path + " --output=" + output_path)
+        # file_path = output_path
+        modified_sequence = generated_seq
+    else:
+        while i < len(generated_seq_upper):
+            seq = [str(generated_seq_upper[i])]
+            result = api_call(seq, storage_length)
+            modified_sequence.append(result)
+            i += 1
 
     file_path = os.path.join(path_decoded_dna, file_name)
     with open(file_path, 'w') as f:
         for i in modified_sequence:
             f.write(i)
+
     size = os.path.getsize(file_path)
 
     start_time = time.time()
+    decoded_path = ''
     if em == 'Simple Code':
         decoded_seq = sim_dec_dna.decode('', modified_sequence)
     elif em == 'Repetition Code':
         decoded_seq = gold_dna.decode(modified_sequence)
     elif em == 'The 2D Code':
-        decoded_seq = rs.decode('', modified_sequence)
+        # decoded_seq = rs.decode('', modified_sequence)
+        decoded_path = os.path.join('..', 'Data', file_basename + "_2d." + file_type)
+        os.system("2D_Code.exe --decode --numblocks=1 --input=" + file_path + " --output=" + decoded_path)
+        decoded_seq = ''
     elif em == 'XOR-Based Code':
         decoded_seq = xor.decode('', modified_sequence)
 
     time_used = time.time() - start_time
     cost = 0
-    for seq in modified_sequence:
-        cost += len(seq.translate({ord(c): None for c in string.whitespace}))
+    # for seq in modified_sequence:
+    #     cost += len(seq.translate({ord(c): None for c in string.whitespace}))
 
     if em == 'Simple Code':
         file_name = file_basename + '_simple.npy'
@@ -293,23 +365,13 @@ def pipeline(em, binary, file_basename, file_type, storage_length):
 
     file_path = os.path.join(path_decoded_data, file_name)
     np.save(file_path, decoded_seq)
-    list_decoded = [file_basename, em, 'Decoding', size, cost, time_used, '.'+file_type]
+    list_decoded = [uploaded_filename, em, 'Decoding', size, cost, time_used, '.'+file_type]
 
-    if len(binary) == len(decoded_seq):
-        i = 0
-        status = 'Same'
-        while i < len(binary) and status == 'Same':
-            if binary[i] == decoded_seq[i]:
-                status = 'Same'
-            else:
-                status = 'Different'
-            i += 1
-    else:
-        status = 'Different'
+    status = compare2ori(save_path, decoded_path, em, binary, decoded_seq)
     sum_size = list_encoded[3] + list_decoded[3]
     sum_cost = list_encoded[4] + list_decoded[4]
     sum_time_used = list_encoded[5] + list_decoded[5]
-    list_summary = [file_basename, em, sum_size, sum_cost, sum_time_used, '.'+file_type,
+    list_summary = [uploaded_filename, em, sum_size, sum_cost, sum_time_used, '.'+file_type,
                     status]
     return list_encoded, list_decoded, list_summary
 
@@ -427,11 +489,17 @@ def create_main_upload():
 
     save_path = ''
     if choose_file_type == 'txt':
-        save_path = upload_txt()
+        output = upload_txt()
+        save_path = output[0]
+        uploaded_filename = output[1]
     elif choose_file_type == 'jpg':
-        save_path = upload_jpg()
+        output = upload_jpg()
+        save_path = output[0]
+        uploaded_filename = output[1]
     elif choose_file_type == 'wav':
-        save_path = upload_wav()
+        output = upload_wav()
+        save_path = output[0]
+        uploaded_filename = output[1]
 
     st.write('Your uploaded path data: ', save_path)
 
@@ -463,7 +531,7 @@ def create_main_upload():
         file_basename = os.path.basename(encoded_binary_path)
         file_name = os.path.splitext(file_basename)[0]
         for em in choose_dna_encoding:
-            output = pipeline(em, binary, file_name, choose_file_type, storage_length)
+            output = pipeline(em, binary, file_name, choose_file_type, storage_length, save_path, uploaded_filename)
             list_encoded = output[0]
             list_decoded = output[1]
             list_summary = output[2]
