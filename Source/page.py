@@ -19,11 +19,13 @@ import goldman as gold_dna
 import altair as alt
 # import testreedsolomon as rs
 import xor_code_python as xor
+import subprocess as sp
 
 path_uploaded = os.path.join('..', 'Data', 'uploaded')
 path_uploaded_txt = os.path.join(path_uploaded, 'txt')
 path_uploaded_jpg = os.path.join(path_uploaded, 'jpg')
 path_uploaded_wav = os.path.join(path_uploaded, 'wav')
+path_uploaded_decoded = os.path.join(path_uploaded, 'decoded')
 path_encoded_data = os.path.join('..', 'Data', 'Encoded')
 path_decoded_data = os.path.join('..', 'Data', 'Decoded')
 path_encoded_dna = os.path.join('..', 'Data', 'Encoded', 'DNA')
@@ -36,7 +38,7 @@ for file_name in os.listdir(path_original_data):
 
 path_uploaded_list = \
     [path_uploaded_txt, path_uploaded_jpg, path_uploaded_wav, path_encoded_data, path_decoded_data,
-        path_encoded_dna, path_decoded_dna]
+        path_encoded_dna, path_decoded_dna, path_uploaded_decoded]
 
 
 url = 'https://mesa.mosla.de/api/all'
@@ -221,18 +223,22 @@ def cost_encoding(max_nt, oligos):
 
 @st.cache
 def encoding(em, binary, file_basename, save_path):
+    numblocks = 0
     if em == 'Simple Code':
         generated_seq = sim_dna.encode('', binary)
     elif em == 'Repetition Code':
         generated_seq = gold_dna.encode(binary, '')
     elif em == 'The 2D Code':
         output_path = os.path.join(path_encoded_dna, file_basename + "_2d.txt")
-        os.system("2D_Code.exe --encode --input=" + save_path + " --output=" + output_path)
+        output = sp.check_output("2D_Code.exe --encode --input=" + save_path + " --output=" + output_path)
+        numblocks = output[output.find(b'to')+3:output.find(b'to')+3+output[output.find(b'to')+3:].find(b' ')]
+        numblocks = numblocks.decode("utf-8")
+        # os.system("2D_Code.exe --encode --input=" + save_path + " --output=" + output_path)
         generated_seq = open(output_path).readlines()
     elif em == 'XOR-Based Code':
         generated_seq = xor.encode('', binary)
 
-    return generated_seq
+    return generated_seq, numblocks
 
 
 def check_text_equal(path_original_file, path_decoded_file):
@@ -282,8 +288,10 @@ def compare2ori(save_path, decoded_path, em, binary, decoded_seq):
 @st.cache
 def pipeline(em, binary, file_basename, file_type, storage_length, save_path, uploaded_filename):
     start_time = time.time()
-    generated_seq = encoding(em, binary, file_basename, save_path)
+    enc_output = encoding(em, binary, file_basename, save_path)
     time_used = time.time() - start_time
+    generated_seq = enc_output[0]
+    numblocks = enc_output[1]
     len_oligos = len(generated_seq)
     max_nt = 0
     generated_seq_upper = []
@@ -343,8 +351,9 @@ def pipeline(em, binary, file_basename, file_type, storage_length, save_path, up
         decoded_seq = gold_dna.decode(modified_sequence)
     elif em == 'The 2D Code':
         # decoded_seq = rs.decode('', modified_sequence)
-        decoded_path = os.path.join('..', 'Data', file_basename + "_2d." + file_type)
-        os.system("2D_Code.exe --decode --numblocks=1 --input=" + file_path + " --output=" + decoded_path)
+        decoded_path = os.path.join(path_uploaded_decoded, file_basename + "_2d." + file_type)
+        os.system("2D_Code.exe --decode --numblocks=" + numblocks + " --input=" + file_path + " --output="
+                  + decoded_path)
         decoded_seq = ''
     elif em == 'XOR-Based Code':
         decoded_seq = xor.decode('', modified_sequence)
@@ -373,6 +382,8 @@ def pipeline(em, binary, file_basename, file_type, storage_length, save_path, up
     sum_time_used = list_encoded[5] + list_decoded[5]
     list_summary = [uploaded_filename, em, sum_size, sum_cost, sum_time_used, '.'+file_type,
                     status]
+    if uploaded_filename not in data_original:
+        data_original.append(uploaded_filename)
     return list_encoded, list_decoded, list_summary
 
 
