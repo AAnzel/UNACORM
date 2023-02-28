@@ -8,15 +8,23 @@ import xor_code_python as xor
 import subprocess as sp
 import importlib
 import streamlit as st
+from pathlib import Path
 
 # List of files and directories
 df_metrics = pd.read_excel('synthesis_cost.xlsx')
-path_original_data = os.path.join('..', 'Data', 'Original', 'Test')
+path_original_data = os.path.join('..', 'Data', 'Original', 'Test')  # after test, 'Test' at the end should be removed
 path_original_decoded = os.path.join('..', 'Data', 'Original', 'decoded')
 path_encoded_data = os.path.join('..', 'Data', 'Encoded_DNA')
 path_decoded_data = os.path.join('..', 'Data', 'Decoded_DNA')
 path_encoded_dna = os.path.join('..', 'Data', 'Encoded_DNA', 'DNA')
 path_decoded_dna = os.path.join('..', 'Data', 'Decoded_DNA', 'DNA')
+existed_summary = pd.read_pickle('data/pre_measure_stat_sum1.pkl')  # pickel file for summary data
+existed_detail = pd.read_pickle('data/pre_measure1.pkl')   # pickel file for detail data
+path_encoding_methods = os.path.join('Encodings')
+
+existing_encoding = []
+for encoding_method in os.listdir(path_encoding_methods):
+    existing_encoding.append(encoding_method)
 
 
 def cost_encoding(max_nt, oligos):
@@ -141,17 +149,16 @@ def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
     return status
 
 
-def pipeline(encoding_method, binary, file_basename, file_type, save_path, uploaded_filename, original_size):
+def pipeline(encoding_method, binary, file_basename, file_type, save_path, original_size):
     """This function is used for integrating the process for uploaded file
 
     Args:
         encoding_method (str): chosen encoding method
         binary (array): numpy binary array of uploaded file
-        file_basename (str): name of file that contains timestamp
+        file_basename (str): name of file
         file_type (str): file extension
-        storage_length (int): chosen length of storage in hour
         save_path (str): path of uploaded data
-        uploaded_filename (str): uploaded file name without timestamp and extension
+        original_size (number): size of original file
 
     Returns:
         list_encoded [list]: list of result from encoding process including time, cost, and size
@@ -181,7 +188,7 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, uploa
             for i in generated_seq_upper:
                 f.write(i + '\n')
     encoded_size = os.path.getsize(file_path)
-    list_encoded = [uploaded_filename, encoding_method, 'Encoding', '.'+file_type, encoded_size, cost, time_used,
+    list_encoded = [file_basename, encoding_method, 'Encoding', '.'+file_type, encoded_size, cost, time_used,
                     original_size]
 
     modified_sequence = []
@@ -215,12 +222,26 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, uploa
 
     file_path = os.path.join(path_decoded_data, file_name)
     np.save(file_path, decoded_seq)
-    list_decoded = [uploaded_filename, encoding_method, 'Decoding', '.'+file_type, size, cost, time_used, original_size]
+    list_decoded = [file_basename, encoding_method, 'Decoding', '.'+file_type, size, cost, time_used, original_size]
     return list_encoded, list_decoded
 
 
-def generate_summary(encoding_method, binary, file_basename, file_type, save_path, uploaded_filename, path):
-    df = df_report[(df_report['Filename'] == uploaded_filename) & (df_report['Method'] == encoding_method) &
+def generate_summary(encoding_method, binary, file_basename, file_type, save_path, path):
+    """This function is used for generating summary dataframe from detail dataframe (from 10 times running pipeline)
+
+    Args:
+        encoding_method (str): chosen encoding method
+        binary (array): numpy binary array of uploaded file
+        file_basename (str): name of file
+        file_type (str): file extension
+        storage_length (int): chosen length of storage in hour
+        save_path (str): path of uploaded data
+        path (str): path of evaluated file
+
+    Returns:
+        _type_: _description_
+    """
+    df = df_report[(df_report['Filename'] == file_basename) & (df_report['Method'] == encoding_method) &
                    (df_report['Type'] == '.'+file_type)]
     original_size = os.path.getsize(path)
     encoded_file_name = file_basename + '_' + encoding_method + '.txt'
@@ -242,14 +263,15 @@ def generate_summary(encoding_method, binary, file_basename, file_type, save_pat
     return df_agg_sum
 
 
-df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost', 'Time',
-                                  'OriFile_Size'])
-df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Type', 'Sum_Mean_Time', 'Sum_Size', 'Sum_Cost',
-                                   'Encoding_Multipliers', 'Similarity'])
-
-
 def convert_text_data_to_binary(path_original_data):
-    # If we have a file, we convert it into numpy byte file (.npy)
+    """This function is used to convert data to binary
+
+    Args:
+        path_original_data (str): path of original uploaded file
+
+    Returns:
+        bit_encoded_file (str): path of generated binary from uploaded file
+    """
     file_basename = os.path.basename(path_original_data)
     string_file_no_extension = os.path.splitext(file_basename)[0]
     encoded_filename = string_file_no_extension + ".npy"
@@ -267,71 +289,77 @@ def convert_text_data_to_binary(path_original_data):
     return bit_encoded_file
 
 
-existed_summary = pd.read_pickle('data/pre_measure_stat_sum1.pkl')
-existed_detail = pd.read_pickle('data/pre_measure1.pkl')
-path_encoding_methods = os.path.join('Encodings')
-
-existing_encoding = []
-for encoding_method in os.listdir(path_encoding_methods):
-    existing_encoding.append(encoding_method)
-
-for list_file in os.listdir(path_original_data):
-    path = os.path.join(path_original_data, list_file)
-    if os.path.isfile(path):
-        file_name = os.path.splitext(list_file)[0]
-        file_ext = os.path.splitext(list_file)[1]
-        file_type = file_ext[1:len(file_ext)]
-        for encoding_method in existing_encoding:
-            if len(existed_summary[(existed_summary["Filename"] == file_name) &
-                                   (existed_summary["Method"] == encoding_method)]) == 0:
-                print(file_name, file_type, encoding_method)
-                path_original = os.path.join(path_original_data, list_file)
-                OriFileSize = os.path.getsize(path_original)
-                encoded_binary_path = convert_text_data_to_binary(path_original)
-                binary = np.load(encoded_binary_path)
-                i = 0
-                while i < 3:
-                    output = pipeline(encoding_method, binary, file_name, file_type, path_original, file_name,
-                                      OriFileSize)
-                    list_encoded = output[0]
-                    list_decoded = output[1]
-                    # list_summary = output[2]
-                    df_report.loc[len(df_report)] = list_decoded
-                    df_report.loc[len(df_report)] = list_encoded
-                    i += 1
-                df_summary_generated = generate_summary(encoding_method, binary, file_name, file_type, path_original,
-                                                        file_name, path)
-                df_summary = pd.concat([df_summary, df_summary_generated], ignore_index=True)
-
-st.header('Recently calculated details')
-st.dataframe(df_report)
-st.header('Existed precalculated details')
-st.dataframe(existed_detail)
-st.write('Do you want to merge both detail data into pickel file?')
-if st.button('Merge Details'):
-    detail_concat = pd.concat([df_report, existed_detail], ignore_index=True)
-    save_file = 'data/detail_updated.pkl'
-    detail_concat.to_pickle(save_file)
-    if save_file != '':
-        st.success('Details data has been successfully merged')
-        new_detail = pd.read_pickle(save_file)
-        st.dataframe(detail_concat)
-    else:
-        st.error('There was an error while uploading the pickel file')
+df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost', 'Time',
+                                  'OriFile_Size'])
 
 
-st.header('Recently calculated summary')
-st.dataframe(df_summary)
-st.header('Existed precalculated details')
-st.dataframe(existed_summary)
-st.write('Do you want to merge both summary data into pickel file?')
-if st.button('Merge Summary'):
-    detail_concat = pd.concat([df_summary, existed_summary], ignore_index=True)
-    save_file = 'data/summary_updated.pkl'
-    detail_concat.to_pickle(save_file)
-    if save_file != '':
-        st.success('Summary data has been successfully merged')
-        new_detail = pd.read_pickle(save_file)
-        st.dataframe(detail_concat)
-    else:
-        st.error('There was an error while uploading the pickel file')
+def run_precalculation(num_of_iteration):
+    """This function is used for running precalculation
+
+    Args:
+        num_of_iteration (int): number of iteration for each file
+    """
+    df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Type', 'Sum_Mean_Time', 'Sum_Size', 'Sum_Cost',
+                                       'Encoding_Multipliers', 'Similarity'])
+    for list_file in os.listdir(path_original_data):
+        path = os.path.join(path_original_data, list_file)
+        if os.path.isfile(path):
+            file_name = os.path.splitext(list_file)[0]
+            file_ext = os.path.splitext(list_file)[1]
+            file_type = file_ext[1:len(file_ext)]
+            for encoding_method in existing_encoding:
+                if len(existed_summary[(existed_summary["Filename"] == file_name) &
+                                       (existed_summary["Method"] == encoding_method)]) == 0:
+                    print(file_name, file_type, encoding_method)
+                    path_original = os.path.join(path_original_data, list_file)
+                    OriFileSize = os.path.getsize(path_original)
+                    encoded_binary_path = convert_text_data_to_binary(path_original)
+                    binary = np.load(encoded_binary_path)
+                    i = 0
+                    try:
+                        while i < num_of_iteration:
+                            output = pipeline(encoding_method, binary, file_name, file_type, path_original,
+                                              OriFileSize)
+                            list_encoded = output[0]
+                            list_decoded = output[1]
+                            # list_summary = output[2]
+                            df_report.loc[len(df_report)] = list_decoded
+                            df_report.loc[len(df_report)] = list_encoded
+                            i += 1
+                    except Exception as e:
+                        print(e)
+                        continue
+                    df_summary_generated = generate_summary(encoding_method, binary, file_name, file_type,
+                                                            path_original, path)
+                    df_summary = pd.concat([df_summary, df_summary_generated], ignore_index=True)
+
+    st.header('Recently calculated details')
+    st.dataframe(df_report)
+    st.header('Existed precalculated details')
+    st.dataframe(existed_detail)
+
+    st.header('Recently calculated summary')
+    st.dataframe(df_summary)
+    st.header('Existed precalculated summary')
+    st.dataframe(existed_summary)
+    st.write('Do you want to merge both new data into pickel file?')
+    if st.button('Merge new data to pickel'):
+        detail_concat = pd.concat([df_report, existed_detail], ignore_index=True)
+        save_file_detail = Path('data/detail_updated.pkl')
+        detail_concat.to_pickle(save_file_detail)  # path should be changed to 'data/pre_measure1.pkl'
+        summary_concat = pd.concat([df_summary, existed_summary], ignore_index=True)
+        save_file_summary = Path('data/summary_updated.pkl')  # should be changed to 'data/pre_measure_stat_sum1.pkl'
+        summary_concat.to_pickle(save_file_summary)
+        if save_file_detail.exists() and save_file_summary.exists():
+            st.success('New data has been successfully merged')
+            st.header('New Detail Data')
+            new_summary = pd.read_pickle(save_file_summary)
+            st.dataframe(new_summary)
+            st.header('New Summary Data')
+            new_summary = pd.read_pickle(save_file_summary)
+            st.dataframe(new_summary)
+        else:
+            st.error('There was an error while uploading the pickel file')
+
+
+run_precalculation(2)  # 2 times iteration

@@ -109,7 +109,7 @@ def upload_file(key_suffix, cache_folder_path):
     if imported_file is not None:
         time_uploaded = str(time.time())
         uploaded_filename = os.path.splitext(imported_file.name)[0]
-        filename = time_uploaded+'_'+imported_file.name
+        filename = time_uploaded + '_' + imported_file.name
         save_path = Path(cache_folder_path, filename)
         save_path_os = os.path.join(cache_folder_path, filename)
         with open(save_path, mode='wb') as w:
@@ -209,9 +209,7 @@ def run_requests(res_all, entry_list, c, payload, header, url):
             res = requests.post(url, data=json.dumps(payload), headers=header)
             res_all.append(res)
             c += 1
-            print(c)
-
-    except:
+    except Exception:
         print("Max retries, going to sleep for 100 sec.")
         print("j= " + str(j))
         sleep(100)
@@ -250,17 +248,17 @@ def api_call(encoded_dna, storage_length):
     return modified_sequence
 
 
-def cost_encoding(max_nt, oligos):
+def cost_encoding(max_nucleotide, oligos):
     """This function is used for calculating synthesizing cost
 
     Args:
-        max_nt (int): max nucleutide from dna sequences
+        max_nucleotide (int): max nucleutide from dna sequences
         oligos (int): number of oligos
 
     Returns:
         cost_total (number): synthesising cost
     """
-    if max_nt <= 120:
+    if max_nucleotide <= 120:
         i = 0
     else:
         i = 1
@@ -399,16 +397,16 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
     generated_seq = enc_output[0]
     numblocks = enc_output[1]
     len_oligos = len(generated_seq)
-    max_nt = 0
+    max_nucleotide = 0
     generated_seq_upper = []
     # getting maximum nucleotide
     for seq in generated_seq:
-        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
+        nt = len(seq.translate({ord(c): None for c in string.whitespace}))  # nucleotide
         generated_seq_upper.append(seq.upper())
-        if nt > max_nt:
-            max_nt = nt
-    print('len_oligos = ' + str(len_oligos) + ' max_nt = ' + str(max_nt))
-    cost = cost_encoding(max_nt, len_oligos)
+        if nt > max_nucleotide:
+            max_nucleotide = nt
+    print('len_oligos = ' + str(len_oligos) + ' max_nucleotide = ' + str(max_nucleotide))
+    cost = cost_encoding(max_nucleotide, len_oligos)
 
     file_name = file_basename + '_' + encoding_method + '.txt'
 
@@ -465,7 +463,7 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
     sum_cost = list_encoded[4] + list_decoded[4]
     sum_time_used = list_encoded[5] + list_decoded[5]
     list_summary = [uploaded_filename, encoding_method, sum_size, sum_cost, sum_time_used, '.'+file_type,
-                    status, encoded_size]
+                    status, encoded_size]  # summary list
     if uploaded_filename not in data_original:
         data_original.append(uploaded_filename)
     return list_encoded, list_decoded, list_summary
@@ -595,7 +593,7 @@ def visualize_size_benchmark(df_measure_sum_concat):
         df_measure_sum_concat (dataframe): summary dataframe from concanated precalculated data with result of uploaded
         file (benchmarking dataset)
     """
-    num_method = df_measure_sum_concat['Method'].nunique()
+    num_method = df_measure_sum_concat['Method'].nunique()  # number of unique encoding methods in dataframe
     chart = alt.Chart(df_measure_sum_concat).transform_density(
         'Encoding_Multipliers',
         as_=['Multipliers', 'density'],
@@ -640,7 +638,7 @@ def visualize_cost_benchmark(file_chosen, df_concat):
         file_chosen (str): name of file that want to be showed
         df_concat (dataframe): detail benchmarking dataset
     """
-    col1, col2, col3 = st.columns(3)
+    col_1, col_2, col_3 = st.columns(3)
     i = 0
     for fc in file_chosen:
         col_nr = (i % 3) + 1
@@ -667,13 +665,13 @@ def visualize_cost_benchmark(file_chosen, df_concat):
         )
 
         if col_nr == 1:
-            with col1:
+            with col_1:
                 st.altair_chart(chart, use_container_width=True)
         if col_nr == 2:
-            with col2:
+            with col_2:
                 st.altair_chart(chart, use_container_width=True)
         if col_nr == 3:
-            with col3:
+            with col_3:
                 st.altair_chart(chart, use_container_width=True)
         i += 1
 
@@ -686,7 +684,7 @@ def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
         df_concat (dataframe): concanated detail precalculated data and data from uploaded file
         filename_uploaded (list): name of file that is contained in uploaded file to differentiate the type of chart
     """
-    col1, col2, col3 = st.columns(3)
+    col_1, col_2, col_3 = st.columns(3)
     i = 0
     for fc in file_chosen:
         col_nr = (i % 3) + 1
@@ -709,19 +707,19 @@ def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
             ).properties(title=fc)
 
         if col_nr == 1:
-            with col1:
+            with col_1:
                 st.altair_chart(chart, use_container_width=True)
         if col_nr == 2:
-            with col2:
+            with col_2:
                 st.altair_chart(chart, use_container_width=True)
         if col_nr == 3:
-            with col3:
+            with col_3:
                 st.altair_chart(chart, use_container_width=True)
         i += 1
 
 
 def create_main_upload():
-    """_summary_
+    """This function is used to wrap all functionalities
     """
 
     st.header('File Upload')
@@ -730,7 +728,7 @@ def create_main_upload():
 
     choose_file_type = st.selectbox('Which type of file do you want to upload:', file_type)
 
-    # Removing previously cached data
+    # Removing old uploaded data
     remove_cached_data()
 
     st.markdown('---')
@@ -755,7 +753,7 @@ def create_main_upload():
 
     if save_path != '':
         encoded_binary_path = convert_text_data_to_binary(save_path)
-        OriFileSize = os.path.getsize(save_path)
+        original_file_size = os.path.getsize(save_path)
     else:
         encoded_binary_path = ''
     st.write('Your encoded binary: ', encoded_binary_path)
@@ -791,9 +789,9 @@ def create_main_upload():
                 list_summary = output[2]
                 df_report.loc[len(df_report)] = list_encoded
                 df_report.loc[len(df_report)] = list_decoded
-                list_summary[7] = list_summary[7]/OriFileSize
+                list_summary[7] = list_summary[7]/original_file_size
                 df_summary.loc[len(df_summary)] = list_summary
-            except:
+            except Exception:
                 continue
         st.write('Summary Report')
         st.dataframe(df_summary)
@@ -810,17 +808,17 @@ def create_main_upload():
 
     st.write('---')
     st.header('Benchmark')
-    df_summary1 = df_summary
-    df_summary1 = df_summary1.rename({'Size': 'Sum_Size', 'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Cost'},
-                                     axis=1)
+    df_summary_1 = df_summary
+    df_summary_1 = df_summary_1.rename({'Size': 'Sum_Size', 'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Cost'},
+                                       axis=1)
     df_measure_sum = pd.read_pickle("data/pre_measure_stat_sum1.pkl")
     df_measure = pd.read_pickle("data/pre_measure1.pkl")
-    df_report1 = df_report
-    filename_uploaded = df_report1['Filename'].unique()
+    df_report_1 = df_report
+    filename_uploaded = df_report_1['Filename'].unique()
     if save_path != '':
-        df_report1['OriFile_Size'] = OriFileSize
-    df_concat = pd.concat([df_report1, df_measure], ignore_index=True)
-    df_measure_sum_concat = pd.concat([df_summary1, df_measure_sum], ignore_index=True)
+        df_report_1['OriFile_Size'] = original_file_size
+    df_concat = pd.concat([df_report_1, df_measure], ignore_index=True)
+    df_measure_sum_concat = pd.concat([df_summary_1, df_measure_sum], ignore_index=True)
     csv_sum = convert_df(df_measure_sum_concat)
     csv_detail = convert_df(df_concat)
     st.dataframe(df_measure_sum_concat)
