@@ -4,10 +4,10 @@ import page
 
 
 def create_sidebar_and_main():
-    """_summary_
+    """This function is used for creating sidebar description
 
     Returns:
-        _type_: _description_
+        None
     """
     tmp_col_1, tmp_col_2, tmp_col_3, tmp_col_4, tmp_col_5 = st.columns(5)
     tmp_col_3.title('UNACORM')
@@ -46,6 +46,11 @@ def create_sidebar_and_main():
 
 
 def main():
+    """This function is main function
+
+    Returns:
+        None
+    """
 
     st.set_page_config(page_title='UNACORM', layout='wide',
                        initial_sidebar_state='expanded')
