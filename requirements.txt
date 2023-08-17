@@ -1,0 +1,12 @@
+altair==5.0.1
+bitarray==2.5.1
+galois==0.3.5
+goldman==0.1.9
+ninja==1.11.1
+numpy==1.25.2
+pandas==1.5.3
+pathos==0.3.1
+pyrsistent==0.18.0
+requests==2.31.0
+setuptools==68.0.0
+streamlit==1.24.1
