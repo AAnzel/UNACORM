@@ -36,9 +36,10 @@ for file_name in os.listdir(path_original_data):
         data_original.append(os.path.splitext(file_name)[0])
 
 # List of directories for uploaded file
-path_uploaded_list = \
-    [path_uploaded_txt, path_uploaded_jpg, path_uploaded_wav, path_encoded_data, path_decoded_data,
-        path_encoded_dna, path_decoded_dna, path_uploaded_decoded]
+path_uploaded_list = [
+    path_uploaded_txt, path_uploaded_jpg, path_uploaded_wav, path_encoded_data,
+    path_decoded_data, path_encoded_dna, path_decoded_dna,
+    path_uploaded_decoded]
 
 # Attributes for API calling
 url = 'https://mesa.mosla.de/api/all'
@@ -47,13 +48,13 @@ with open("mesa.json") as json_file:  # Config file for API
     config_api = json.load(json_file)
 
 # Based file for calculating synthesis cost
-df_metrics = pd.read_excel('synthesis_cost.xlsx')
+df_metrics = pd.read_excel(os.path.join('..', 'Data', 'synthesis_cost.xlsx'))
 
 
 # Removing old uploaded data
 def remove_cached_data():
-    """This function is used for deleting old uploaded files by user that was uploaded older than 1 hour ago
-
+    """This function is used for deleting old uploaded files by user that was
+    uploaded older than 1 hour ago.
     """
 
     SAVE_TIME = 3600  # 3600 seconds = 1h
@@ -80,7 +81,8 @@ def remove_cached_data():
                         print('Failed to delete ' + file_path + '. Reason: '
                               + e)
 
-                    print('Successfully removed old data from uploaded directory')
+                    print('Successfully removed old data from uploaded' +
+                          ' directory')
 
                 else:
                     pass
@@ -118,7 +120,8 @@ def upload_file(key_suffix, cache_folder_path):
         if save_path.exists():
             st.success('Your file successfully uploaded!')
         st.write(type(imported_file))
-        file_details = {"filename": imported_file.name, "filetype": imported_file.type}
+        file_details = {"filename": imported_file.name,
+                        "filetype": imported_file.type}
         st.write(file_details)
 
     return save_path_os, uploaded_filename
@@ -234,7 +237,8 @@ def api_call(encoded_dna, storage_length):
     payload = config_api
     payload['asHTML'] = False
     payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
-    payload["err_simulation_order"]["Storage/PCR"][0]["cycles"] = storage_length
+    payload["err_simulation_order"]["Storage/PCR"][0][
+        "cycles"] = storage_length
     c = 0
     res_all = list()
     time_used = run_requests(res_all, entry_list, c, payload, header, url)
@@ -290,26 +294,32 @@ def encoding(encoding_method, binary, file_basename, save_path):
 
     Returns:
         generated_seq (list): encoded dna list
-        numblocks (int): number of blocks from 2D Code that will be used for decoding
+        numblocks (int): number of blocks from 2D Code that will be used for
+        decoding
     """
     numblocks = 0
     if encoding_method == 'The2DCode':
-        output_path = os.path.join(path_encoded_dna, file_basename + '_' + encoding_method + '.txt')
-        output = sp.check_output("2D_Code.exe --encode --input=" + save_path + " --output=" + output_path)
-        numblocks = output[output.find(b'to')+3:output.find(b'to')+3+output[output.find(b'to')+3:].find(b' ')]
+        output_path = os.path.join(path_encoded_dna, file_basename + '_' +
+                                   encoding_method + '.txt')
+        output = sp.check_output("2D_Code.exe --encode --input=" + save_path +
+                                 " --output=" + output_path)
+        numblocks = output[output.find(b'to') + 3:output.find(b'to') + 3 +
+                           output[output.find(b'to')+3:].find(b' ')]
         numblocks = numblocks.decode("utf-8")
         generated_seq = open(output_path).readlines()
     elif encoding_method == 'XORBasedCode':
         generated_seq = xor.encode('', binary)
     else:
-        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
+        method = importlib.import_module(
+            f'Encodings.{encoding_method}.src.transform')
         generated_seq = method.encode('', binary)
 
     return generated_seq, numblocks
 
 
 def check_text_equal(path_original_file, path_decoded_file):
-    """This function is used for checking if the original file is equal than generated decoded file
+    """This function is used for checking if the original file is equal than
+    generated decoded file
 
     Args:
         path_original_file (str): path of original uploaded file
@@ -320,7 +330,7 @@ def check_text_equal(path_original_file, path_decoded_file):
     """
 
     if os.path.isfile(path_original_file):
-        with open(path_original_file, 'rb') as fd_original_file,\
+        with open(path_original_file, 'rb') as fd_original_file, \
                 open(path_decoded_file, 'rb') as fd_decoded_file:
             binary_array_original = ba.bitarray()
             binary_array_decoded = ba.bitarray()
@@ -343,7 +353,8 @@ def check_text_equal(path_original_file, path_decoded_file):
 
 
 def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
-    """This function is used for specifying condition of comparison for different encoding method
+    """This function is used for specifying condition of comparison for
+    different encoding method
 
     Args:
         save_path (string): path of uploaded file
@@ -374,7 +385,8 @@ def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
 
 
 @st.cache
-def pipeline(encoding_method, binary, file_basename, file_type, storage_length, save_path, uploaded_filename):
+def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
+             save_path, uploaded_filename):
     """This function is used for integrating the process for uploaded file
 
     Args:
@@ -384,11 +396,14 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
         file_type (str): file extension
         storage_length (int): chosen length of storage in hour
         save_path (str): path of uploaded data
-        uploaded_filename (str): uploaded file name without timestamp and extension
+        uploaded_filename (str): uploaded file name without timestamp and
+        extension
 
     Returns:
-        list_encoded [list]: list of result from encoding process including time, cost, and size
-        list_decoded [list]: list of result from decoding process including time, cost, and size
+        list_encoded [list]: list of result from encoding process including
+        time, cost, and size
+        list_decoded [list]: list of result from decoding process including
+        time, cost, and size
         list_summary [list]: list of summary from encoding and decoding process
     """
     start_time = time.time()
@@ -401,11 +416,13 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
     generated_seq_upper = []
     # getting maximum nucleotide
     for seq in generated_seq:
-        nt = len(seq.translate({ord(c): None for c in string.whitespace}))  # nucleotide
+        # nucleotide is nt
+        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
         generated_seq_upper.append(seq.upper())
         if nt > max_nucleotide:
             max_nucleotide = nt
-    print('len_oligos = ' + str(len_oligos) + ' max_nucleotide = ' + str(max_nucleotide))
+    print('len_oligos = ' + str(len_oligos) + ' max_nucleotide = ' +
+          str(max_nucleotide))
     cost = cost_encoding(max_nucleotide, len_oligos)
 
     file_name = file_basename + '_' + encoding_method + '.txt'
@@ -416,7 +433,8 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
             for i in generated_seq_upper:
                 f.write(i + '\n')
     encoded_size = os.path.getsize(file_path)
-    list_encoded = [uploaded_filename, encoding_method, 'Encoding', encoded_size, cost, time_used, '.'+file_type]
+    list_encoded = [uploaded_filename, encoding_method, 'Encoding',
+                    encoded_size, cost, time_used, '.'+file_type]
 
     modified_sequence = []
     i = 0
@@ -439,14 +457,16 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
     decoded_path = ''
     start_time = time.time()
     if encoding_method == 'The2DCode':
-        decoded_path = os.path.join(path_uploaded_decoded, file_basename + '_' + encoding_method + '.' + file_type)
-        os.system("2D_Code.exe --decode --numblocks=" + numblocks + " --input=" + file_path + " --output="
-                  + decoded_path)
+        decoded_path = os.path.join(path_uploaded_decoded, file_basename +
+                                    '_' + encoding_method + '.' + file_type)
+        os.system("2D_Code.exe --decode --numblocks=" + numblocks +
+                  " --input=" + file_path + " --output=" + decoded_path)
         decoded_seq = ''
     elif encoding_method == 'XORBasedCode':
         decoded_seq = xor.decode('', modified_sequence)
     else:
-        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
+        method = importlib.import_module(
+            f'Encodings.{encoding_method}.src.transform')
         decoded_seq = method.decode('', modified_sequence)
 
     time_used = time.time() - start_time
@@ -456,21 +476,25 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
 
     file_path = os.path.join(path_decoded_data, file_name)
     np.save(file_path, decoded_seq)
-    list_decoded = [uploaded_filename, encoding_method, 'Decoding', size, cost, time_used, '.'+file_type]
+    list_decoded = [uploaded_filename, encoding_method, 'Decoding', size,
+                    cost, time_used, '.' + file_type]
 
-    status = compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq)
+    status = compare2ori(save_path, decoded_path, encoding_method, binary,
+                         decoded_seq)
     sum_size = list_encoded[3] + list_decoded[3]
     sum_cost = list_encoded[4] + list_decoded[4]
     sum_time_used = list_encoded[5] + list_decoded[5]
-    list_summary = [uploaded_filename, encoding_method, sum_size, sum_cost, sum_time_used, '.'+file_type,
-                    status, encoded_size]  # summary list
+    # summary list
+    list_summary = [uploaded_filename, encoding_method, sum_size, sum_cost,
+                    sum_time_used, '.'+file_type, status, encoded_size]
     if uploaded_filename not in data_original:
         data_original.append(uploaded_filename)
     return list_encoded, list_decoded, list_summary
 
 
 def visualize_uploaded(df_report):
-    """This function is used for visualizing the results (time, cost, size) for uploaded file
+    """This function is used for visualizing the results (time, cost, size)
+    for uploaded file
 
     Args:
         df_report (dataframe): dataframe of detail results of uploaded file
@@ -518,7 +542,8 @@ def visualize_uploaded(df_report):
         stroke='transparent'
     )
 
-    chart3 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().mark_bar().encode(
+    chart3 = alt.Chart(
+        df_report, width=alt.Step(50)).mark_bar().mark_bar().encode(
         alt.X('Transformation:N', axis=alt.Axis(labels=False, title='')),
         alt.Y('Cost:Q', title='Cost (based on length of chars)'),
         alt.Color('Transformation:N'),
@@ -566,7 +591,8 @@ def convert_text_data_to_binary(path_original_data):
             binary_numpy_content = np.frombuffer(
                 binary_array_content.unpack(), dtype=bool)
 
-            np.save(os.path.join(path_encoded_data, string_file_no_extension), binary_numpy_content, allow_pickle=False)
+            np.save(os.path.join(path_encoded_data, string_file_no_extension),
+                    binary_numpy_content, allow_pickle=False)
 
     bit_encoded_file = os.path.join(path_encoded_data, encoded_filename)
 
@@ -587,13 +613,16 @@ def convert_df(df):
 
 
 def visualize_size_benchmark(df_measure_sum_concat):
-    """This function is used for visualizing the size multipliers from the benchmarking dataset
+    """This function is used for visualizing the size multipliers from the
+    benchmarking dataset
 
     Args:
-        df_measure_sum_concat (dataframe): summary dataframe from concanated precalculated data with result of uploaded
+        df_measure_sum_concat (dataframe): summary dataframe from concanated
+        precalculated data with result of uploaded
         file (benchmarking dataset)
     """
-    num_method = df_measure_sum_concat['Method'].nunique()  # number of unique encoding methods in dataframe
+    # number of unique encoding methods in dataframe
+    num_method = df_measure_sum_concat['Method'].nunique()
     chart = alt.Chart(df_measure_sum_concat).transform_density(
         'Encoding_Multipliers',
         as_=['Multipliers', 'density'],
@@ -632,7 +661,8 @@ def visualize_size_benchmark(df_measure_sum_concat):
 
 
 def visualize_cost_benchmark(file_chosen, df_concat):
-    """This function is used for visualizing cost chart for chosen files from benchmarking dataset
+    """This function is used for visualizing cost chart for chosen files from
+    benchmarking dataset
 
     Args:
         file_chosen (str): name of file that want to be showed
@@ -647,7 +677,8 @@ def visualize_cost_benchmark(file_chosen, df_concat):
             alt.Y('mean(Cost):Q', title='Cost'),
             alt.Tooltip(['Method', 'Cost'])
         ).transform_filter(
-            (alt.datum.Filename == fc) & (alt.datum.Transformation == 'Encoding')
+            (alt.datum.Filename == fc) & (alt.datum.Transformation ==
+                                          'Encoding')
         ).properties(title=fc)
 
         text = chart.mark_text(
@@ -680,9 +711,12 @@ def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
     """This function is used for visualizing time charts for benchmarking
 
     Args:
-        file_chosen (str): chosen filename will be used for filtering which data will be shown
-        df_concat (dataframe): concanated detail precalculated data and data from uploaded file
-        filename_uploaded (list): name of file that is contained in uploaded file to differentiate the type of chart
+        file_chosen (str): chosen filename will be used for filtering which
+        data will be shown
+        df_concat (dataframe): concanated detail precalculated data and data
+        from uploaded file
+        filename_uploaded (list): name of file that is contained in uploaded
+        file to differentiate the type of chart
     """
     col_1, col_2, col_3 = st.columns(3)
     i = 0
@@ -690,7 +724,8 @@ def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
         col_nr = (i % 3) + 1
         if fc == filename_uploaded:
             chart = alt.Chart(df_concat).mark_circle(size=60).encode(
-                alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
+                alt.X('Method:N', title='Method',
+                      axis=alt.Axis(labelAngle=-45)),
                 alt.Y('Time:Q', title='Time (in seconds)'),
                 alt.Color('Transformation:N'),
                 tooltip=['Method', 'Filename', 'Time', 'Transformation']
@@ -699,7 +734,8 @@ def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
             ).properties(title=fc)
         else:
             chart = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-                alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
+                alt.X('Method:N', title='Method',
+                      axis=alt.Axis(labelAngle=-45)),
                 alt.Y('Time:Q', title='Time (in seconds)'),
                 alt.Color('Transformation:N')
             ).transform_filter(
@@ -726,7 +762,8 @@ def create_main_upload():
 
     file_type = ['txt', 'jpg', 'wav']
 
-    choose_file_type = st.selectbox('Which type of file do you want to upload:', file_type)
+    choose_file_type = st.selectbox(
+        'Which type of file do you want to upload:', file_type)
 
     # Removing old uploaded data
     remove_cached_data()
@@ -772,17 +809,21 @@ def create_main_upload():
 
     storage_length = st.text_input('Choose your length of storage (in hours)')
 
-    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation', 'Size', 'Cost', 'Time', 'Type'])
-    df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Size', 'Cost', 'Time', 'Type', 'Similarity',
+    df_report = pd.DataFrame(columns=['Filename', 'Method', 'Transformation',
+                                      'Size', 'Cost', 'Time', 'Type'])
+    df_summary = pd.DataFrame(columns=['Filename', 'Method', 'Size', 'Cost',
+                                       'Time', 'Type', 'Similarity',
                                        'Encoding_Multipliers'])
 
-    if choose_dna_encoding != [] and encoded_binary_path != '' and storage_length != '':
+    if (choose_dna_encoding != [] and encoded_binary_path != ''
+            and storage_length != ''):
         binary = np.load(encoded_binary_path)
         file_basename = os.path.basename(encoded_binary_path)
         file_name = os.path.splitext(file_basename)[0]
         for encoding_method in choose_dna_encoding:
             try:
-                output = pipeline(encoding_method, binary, file_name, choose_file_type, storage_length, save_path,
+                output = pipeline(encoding_method, binary, file_name,
+                                  choose_file_type, storage_length, save_path,
                                   uploaded_filename)
                 list_encoded = output[0]
                 list_decoded = output[1]
@@ -809,7 +850,8 @@ def create_main_upload():
     st.write('---')
     st.header('Benchmark')
     df_summary_1 = df_summary
-    df_summary_1 = df_summary_1.rename({'Size': 'Sum_Size', 'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Cost'},
+    df_summary_1 = df_summary_1.rename({
+        'Size': 'Sum_Size', 'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Cost'},
                                        axis=1)
     df_measure_sum = pd.read_pickle("data/pre_measure_stat_sum1.pkl")
     df_measure = pd.read_pickle("data/pre_measure1.pkl")
@@ -818,7 +860,8 @@ def create_main_upload():
     if save_path != '':
         df_report_1['OriFile_Size'] = original_file_size
     df_concat = pd.concat([df_report_1, df_measure], ignore_index=True)
-    df_measure_sum_concat = pd.concat([df_summary_1, df_measure_sum], ignore_index=True)
+    df_measure_sum_concat = pd.concat(
+        [df_summary_1, df_measure_sum], ignore_index=True)
     csv_sum = convert_df(df_measure_sum_concat)
     csv_detail = convert_df(df_concat)
     st.dataframe(df_measure_sum_concat)
@@ -837,14 +880,18 @@ def create_main_upload():
             file_name='detail_data.csv',
             mime='text/csv',
         )
-    st.markdown("<h3 style='text-align: center; color: black;'>File Size </h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center;" +
+                " color: black;'>File Size </h3>", unsafe_allow_html=True)
     visualize_size_benchmark(df_measure_sum_concat)
     st.write('---')
-    st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>",
+                unsafe_allow_html=True)
     file_chosen = st.multiselect(
-     'Select files that you want to review (This will affect Cost and Time Charts)',
+     'Select files that you want to review (This will affect Cost' +
+     ' and Time Charts)',
      data_original)
     visualize_cost_benchmark(file_chosen, df_concat)
     st.write('---')
-    st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>",
+                unsafe_allow_html=True)
     visualize_time_benchmark(file_chosen, df_concat, filename_uploaded)

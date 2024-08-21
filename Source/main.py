@@ -9,35 +9,32 @@ def create_sidebar_and_main():
     Returns:
         None
     """
-    tmp_col_1, tmp_col_2, tmp_col_3, tmp_col_4, tmp_col_5 = st.columns(5)
-    tmp_col_3.title('UNACORM')
-    st.markdown('---')
-
-    st.sidebar.image(os.path.join('images', 'Uni Marburg Logo.png'),
-                     use_column_width=True)
-
-    st.sidebar.markdown('---')
+    # st.markdown('---')
+    # st.sidebar.image(os.path.join('images', 'Uni Marburg Logo.png'),
+    #                  use_column_width=True)
+    # st.sidebar.markdown('---')
     col_1, col_2 = st.sidebar.columns([3, 1])
     col_2.image(os.path.join('images', 'GitHub-Mark-120px-plus.png'), width=54)
     col_2.markdown('[GitHub](https://github.com/AAnzel/DNA_Encodings)')
     col_1.markdown('''
-                      **UNACORM**
-
-                      The **U**NIFIED D**NA** EN**CO**DINGS PLATFO**RM**''')
+                      # UNACORM
+                      The **U**nified D**NA** En**co**dings Platfo**rm**''')
 
     st.sidebar.markdown('''
         ---
-        **Description**\n
-        *****DNA Encoding Methods:*****\n
-        *****-Simple Code by Church et al.:*****\n
-         [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)\n
-        *****-Repetition Code by Goldman et al.:*****\n
-         [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)\n
-        *****-The 2D Code by Grass et al.:*****\n
-         [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)\n
-        *****-XOR-Based Code by Bornholt et al.:*****\n
-         [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)\n
-        ---
+        ### DNA Encoding Methods:
+
+        * **Simple Code** by Church et al.
+            * [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)  # noqa
+
+        * **Repetition Code** by Goldman et al.
+            * [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)  # noqa
+
+        * **The 2D Code** by Grass et al.
+            * [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)  # noqa
+
+        * **XOR-Based Code** by Bornholt et al.
+            * [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)  # noqa
         ''')
 
     page.create_main_upload()
@@ -58,6 +55,7 @@ def main():
     st.markdown('''
                     <style>
                     #MainMenu {visibility: hidden;}
+                    .stDeployButton {display:none;}
                     footer {visibility: hidden;}
                     details {
                                 display: None;
