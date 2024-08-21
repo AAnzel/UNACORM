@@ -11,7 +11,7 @@ from time import sleep
 import numpy as np
 import bitarray as ba
 import altair as alt
-# import xor_code_python as xor
+import xor_code_python as xor
 import subprocess as sp
 import importlib
 
@@ -299,8 +299,8 @@ def encoding(encoding_method, binary, file_basename, save_path):
         numblocks = output[output.find(b'to')+3:output.find(b'to')+3+output[output.find(b'to')+3:].find(b' ')]
         numblocks = numblocks.decode("utf-8")
         generated_seq = open(output_path).readlines()
-    # elif encoding_method == 'XORBasedCode':
-    #    generated_seq = xor.encode('', binary)
+    elif encoding_method == 'XORBasedCode':
+        generated_seq = xor.encode('', binary)
     else:
         method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
         generated_seq = method.encode('', binary)
@@ -443,8 +443,8 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length, 
         os.system("2D_Code.exe --decode --numblocks=" + numblocks + " --input=" + file_path + " --output="
                   + decoded_path)
         decoded_seq = ''
-    # elif encoding_method == 'XORBasedCode':
-    #    decoded_seq = xor.decode('', modified_sequence)
+    elif encoding_method == 'XORBasedCode':
+        decoded_seq = xor.decode('', modified_sequence)
     else:
         method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
         decoded_seq = method.decode('', modified_sequence)

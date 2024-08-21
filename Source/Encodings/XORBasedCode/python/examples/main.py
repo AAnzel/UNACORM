@@ -16,7 +16,7 @@ def file_to_boolean_array(filename):
 
 file = 'test.txt'
 
-T = file_to_boolean_array('data/' + file)
+T = file_to_boolean_array('./python/examples/data/' + file)
 
 print('Setting max strand length to 120...')
 xor.set_max_strand_length(120)

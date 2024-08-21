@@ -1,0 +1,7 @@
+services:
+  xor:
+    build: .
+    image: xor:latest
+    container_name: xor
+    stdin_open: true
+    tty: true
