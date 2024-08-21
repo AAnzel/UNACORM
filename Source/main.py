@@ -3,18 +3,16 @@ import streamlit as st
 import page
 
 
-def create_sidebar_and_main():
+def create_sidebar():
     """This function is used for creating sidebar description
 
     Returns:
         None
     """
-    # st.markdown('---')
-    # st.sidebar.image(os.path.join('images', 'Uni Marburg Logo.png'),
-    #                  use_column_width=True)
-    # st.sidebar.markdown('---')
+
     col_1, col_2 = st.sidebar.columns([3, 1])
-    col_2.image(os.path.join('images', 'GitHub-Mark-120px-plus.png'), width=54)
+    col_2.image(os.path.join('data', 'images', 'GitHub-Mark-120px-plus.png'),
+                width=54)
     col_2.markdown('[GitHub](https://github.com/AAnzel/DNA_Encodings)')
     col_1.markdown('''
                       # UNACORM
@@ -36,8 +34,6 @@ def create_sidebar_and_main():
         * **XOR-Based Code** by Bornholt et al.
             * [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)  # noqa
         ''')
-
-    page.create_main_upload()
 
     return None
 
@@ -64,7 +60,8 @@ def main():
 
                 ''', unsafe_allow_html=True)
 
-    create_sidebar_and_main()
+    create_sidebar()
+    page.create_main_upload()
 
     return None
 
