@@ -1,6 +1,4 @@
-import altair as alt
 import plotly.express as px
-
 
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
 
@@ -69,7 +67,7 @@ def visualize_cost_benchmark_plotly(file_chosen, df_concat):
     return chart_cost
 
 
-def visualize_time_benchmark(file_chosen, df_concat, flag_filename_uploaded):
+def visualize_time_benchmark_plotly(file_chosen, df_concat):
     """This function is used for visualizing time charts for benchmarking
 
     Args:
@@ -77,27 +75,12 @@ def visualize_time_benchmark(file_chosen, df_concat, flag_filename_uploaded):
         data will be shown
         df_concat (dataframe): concanated detail precalculated data and data
         from uploaded file
-        flag_filename_uploaded (bool): boolean that checks if the name of the
-        uploaded file is different than the chosen file to differentiate the
-        type of chart
     """
+    df_tmp = df_concat[df_concat['Filename'].isin(file_chosen)]
 
-    if flag_filename_uploaded:
-        chart = alt.Chart(df_concat).mark_circle(size=60).encode(
-            alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('Time:Q', title='Time (in seconds)'),
-            alt.Color('Transformation:N'),
-            tooltip=['Method', 'Filename', 'Time', 'Transformation']
-        ).transform_filter(
-            (alt.datum.Filename == file_chosen)
-        ).properties(title=file_chosen)
-    else:
-        chart = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-            alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('Time:Q', title='Time (in seconds)'),
-            alt.Color('Transformation:N')
-        ).transform_filter(
-            (alt.datum.Filename == file_chosen)
-        ).properties(title=file_chosen)
+    chart_time = px.box(
+        df_tmp, x='Method', y='Time', color='Transformation',
+        title='Process Time (in seconds)', facet_col='Filename',
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE)  # ",.0f"
 
-    return chart
+    return chart_time

@@ -505,7 +505,6 @@ def create_main_page():
     df_measure_sum = pd.read_pickle("data/pre_measure_stat_sum1.pkl")
     df_measure = pd.read_pickle("data/pre_measure1.pkl")
     df_report_1 = df_report
-    filename_uploaded = df_report_1['Filename'].unique()
     if save_path != '':
         df_report_1['OriFile_Size'] = original_file_size
     df_concat = pd.concat([df_report_1, df_measure], ignore_index=True)
@@ -542,48 +541,15 @@ def create_main_page():
      'Select files that you want to review (This will affect Cost' +
      ' and Time Charts)', data_original)
 
-    col_1, col_2, col_3 = st.columns(3)
-    i = 0
-    for fc in file_chosen:
-        col_nr = (i % 3) + 1
-        chart = visualize.visualize_cost_benchmark(fc, df_concat)
-        if col_nr == 1:
-            with col_1:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 2:
-            with col_2:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 3:
-            with col_3:
-                st.altair_chart(chart, use_container_width=True)
-        i += 1
-
-    if not file_chosen:
+    if file_chosen:
         chart = visualize.visualize_cost_benchmark_plotly(
             file_chosen, df_concat)
         st.plotly_chart(chart, use_container_width=True)
 
-    st.write('---')
-    st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>",
-                unsafe_allow_html=True)
-    col_1, col_2, col_3 = st.columns(3)
-    i = 0
-    for fc in file_chosen:
-        col_nr = (i % 3) + 1
-        if fc == filename_uploaded:
-            flag_is_the_same = True
-        else:
-            flag_is_the_same = False
-        chart = visualize.visualize_time_benchmark(
-            fc, df_concat, flag_is_the_same)
+        st.write('---')
+        st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>",
+                    unsafe_allow_html=True)
 
-        if col_nr == 1:
-            with col_1:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 2:
-            with col_2:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 3:
-            with col_3:
-                st.altair_chart(chart, use_container_width=True)
-        i += 1
+        chart = visualize.visualize_time_benchmark_plotly(
+                file_chosen, df_concat)
+        st.plotly_chart(chart, use_container_width=True)
