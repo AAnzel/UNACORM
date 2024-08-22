@@ -282,7 +282,7 @@ def cost_encoding(max_nucleotide, oligos):
     return cost_total
 
 
-@st.cache
+@st.cache_data
 def encoding(encoding_method, binary, file_basename, save_path):
     """This function is used for encoding the binary
 
@@ -384,7 +384,7 @@ def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
     return status
 
 
-@st.cache
+@st.cache_data
 def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
              save_path, uploaded_filename):
     """This function is used for integrating the process for uploaded file
@@ -599,7 +599,7 @@ def convert_text_data_to_binary(path_original_data):
     return bit_encoded_file
 
 
-@st.cache
+@st.cache_data
 def convert_df(df):
     """This function is used to save csv file from dataframe
 
@@ -754,7 +754,7 @@ def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
         i += 1
 
 
-def create_main_upload():
+def create_main_page():
     """This function is used to wrap all functionalities
     """
 

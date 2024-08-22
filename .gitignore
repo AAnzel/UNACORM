@@ -54,3 +54,5 @@ coverage.xml
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Added by Aleksandar
+.DS_Store

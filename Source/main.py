@@ -61,7 +61,7 @@ def main():
                 ''', unsafe_allow_html=True)
 
     create_sidebar()
-    page.create_main_upload()
+    page.create_main_page()
 
     return None
 
