@@ -16,16 +16,17 @@ import subprocess as sp
 import importlib
 
 # List Path of Directories
-path_uploaded = os.path.join('..', 'Data', 'uploaded')
+path_root_data = os.path.join('..', 'Data')
+path_uploaded = os.path.join(path_root_data, 'uploaded')
 path_uploaded_txt = os.path.join(path_uploaded, 'txt')
 path_uploaded_jpg = os.path.join(path_uploaded, 'jpg')
 path_uploaded_wav = os.path.join(path_uploaded, 'wav')
 path_uploaded_decoded = os.path.join(path_uploaded, 'decoded')
-path_encoded_data = os.path.join('..', 'Data', 'Encoded')
-path_decoded_data = os.path.join('..', 'Data', 'Decoded')
-path_encoded_dna = os.path.join('..', 'Data', 'Encoded', 'DNA')
-path_decoded_dna = os.path.join('..', 'Data', 'Decoded', 'DNA')
-path_original_data = os.path.join('..', 'Data', 'Original')
+path_encoded_data = os.path.join(path_root_data, 'Encoded')
+path_decoded_data = os.path.join(path_root_data, 'Decoded')
+path_encoded_dna = os.path.join(path_root_data, 'Encoded', 'DNA')
+path_decoded_dna = os.path.join(path_root_data, 'Decoded', 'DNA')
+path_original_data = os.path.join(path_root_data, 'Original')
 path_encoding_methods = os.path.join('Encodings')
 
 # List of name of files for showing charts in benchmarking
@@ -48,7 +49,7 @@ with open("mesa.json") as json_file:  # Config file for API
     config_api = json.load(json_file)
 
 # Based file for calculating synthesis cost
-df_metrics = pd.read_excel(os.path.join('..', 'Data', 'synthesis_cost.xlsx'))
+df_metrics = pd.read_excel(os.path.join(path_root_data, 'synthesis_cost.xlsx'))
 
 
 # Removing old uploaded data
