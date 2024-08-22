@@ -1,19 +1,19 @@
 import os
-from pathlib import Path
-import pandas as pd
 import time
 import shutil
-import streamlit as st
 import string
 import json
 import requests
-from time import sleep
 import numpy as np
 import bitarray as ba
-import altair as alt
 import xor_code_python as xor
+from pathlib import Path
+from time import sleep
+import streamlit as st
+import pandas as pd
 import subprocess as sp
 import importlib
+import visualize
 
 # List Path of Directories
 path_root_data = os.path.join('..', 'Data')
@@ -493,85 +493,6 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
     return list_encoded, list_decoded, list_summary
 
 
-def visualize_uploaded(df_report):
-    """This function is used for visualizing the results (time, cost, size)
-    for uploaded file
-
-    Args:
-        df_report (dataframe): dataframe of detail results of uploaded file
-    """
-    chart1 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().encode(
-        alt.X('Transformation:N', axis=alt.Axis(labels=False, title='')),
-        alt.Y('Size:Q', title='Size (in bytes)'),
-        alt.Color('Transformation:N'),
-        tooltip=['Size:Q', 'Method', 'Transformation']
-    ).properties(title='Size')
-    text1 = chart1.mark_text(
-        align='center',
-        baseline='middle',
-        dy=-5
-    ).encode(
-        alt.Text('Size:Q', format=",.0f")
-    )
-    chartsize = alt.layer(chart1, text1, data=df_report).facet(
-        column='Method:N'
-    ).configure_axis(
-        domainWidth=0.8
-    ).configure_view(
-        stroke='transparent'
-    )
-
-    chart2 = alt.Chart(df_report, width=alt.Step(50)).mark_bar().encode(
-        alt.X('Transformation:N', axis=alt.Axis(labels=False, title='')),
-        alt.Y('Time:Q', title='Process Time (in seconds)'),
-        alt.Color('Transformation:N'),
-        tooltip=['Time:Q', 'Method', 'Transformation']
-    ).properties(title='Time')
-    text2 = chart2.mark_text(
-        align='center',
-        baseline='middle',
-        dy=-5
-    ).encode(
-        alt.Text('Time:Q', format=",.5f")
-    )
-
-    charttime = alt.layer(chart2, text2, data=df_report).facet(
-        column='Method:N'
-    ).configure_axis(
-        domainWidth=0.8
-    ).configure_view(
-        stroke='transparent'
-    )
-
-    chart3 = alt.Chart(
-        df_report, width=alt.Step(50)).mark_bar().mark_bar().encode(
-        alt.X('Transformation:N', axis=alt.Axis(labels=False, title='')),
-        alt.Y('Cost:Q', title='Cost (based on length of chars)'),
-        alt.Color('Transformation:N'),
-        tooltip=['Cost:Q', 'Method', 'Transformation']
-    ).properties(title='Cost')
-
-    text3 = chart3.mark_text(
-        align='center',
-        baseline='middle',
-        dy=-5
-    ).encode(
-        alt.Text('Cost:Q', format=",.0f")
-    )
-
-    chartcost = alt.layer(chart3, text3, data=df_report).facet(
-        column='Method:N'
-    ).configure_axis(
-        domainWidth=0.8
-    ).configure_view(
-        stroke='transparent'
-    )
-
-    st.altair_chart(chartsize, use_container_width=True)
-    st.altair_chart(charttime, use_container_width=True)
-    st.altair_chart(chartcost, use_container_width=True)
-
-
 def convert_text_data_to_binary(path_original_data):
     """This function is used to convert data to binary
 
@@ -611,148 +532,6 @@ def convert_df(df):
         save file to csv
     """
     return df.to_csv().encode('utf-8')
-
-
-def visualize_size_benchmark(df_measure_sum_concat):
-    """This function is used for visualizing the size multipliers from the
-    benchmarking dataset
-
-    Args:
-        df_measure_sum_concat (dataframe): summary dataframe from concanated
-        precalculated data with result of uploaded
-        file (benchmarking dataset)
-    """
-    # number of unique encoding methods in dataframe
-    num_method = df_measure_sum_concat['Method'].nunique()
-    chart = alt.Chart(df_measure_sum_concat).transform_density(
-        'Encoding_Multipliers',
-        as_=['Multipliers', 'density'],
-        extent=[0, 35],
-        groupby=['Method']
-    ).mark_area(orient='horizontal').encode(
-        y='Multipliers:Q',
-        color='Method:N',
-        x=alt.X(
-            'density:Q',
-            stack='center',
-            impute=None,
-            title=None,
-            axis=alt.Axis(labels=False, values=[0], grid=False, ticks=True),
-        ),
-        column=alt.Column(
-            'Method:N',
-            header=alt.Header(
-                titleOrient='bottom',
-                labelOrient='bottom',
-                labelPadding=0,
-            ),
-        )
-    ).properties(
-        title='Multipliers'
-    ).configure_facet(
-        spacing=0
-    ).configure_view(
-        stroke=None
-    )
-
-    cols = st.columns(num_method)
-    col = cols[0]
-    with col:
-        st.altair_chart(chart, use_container_width=True)
-
-
-def visualize_cost_benchmark(file_chosen, df_concat):
-    """This function is used for visualizing cost chart for chosen files from
-    benchmarking dataset
-
-    Args:
-        file_chosen (str): name of file that want to be showed
-        df_concat (dataframe): detail benchmarking dataset
-    """
-    col_1, col_2, col_3 = st.columns(3)
-    i = 0
-    for fc in file_chosen:
-        col_nr = (i % 3) + 1
-        chart = alt.Chart(df_concat).mark_bar().encode(
-            alt.X('Method:N', title='Method', axis=alt.Axis(labelAngle=-45)),
-            alt.Y('mean(Cost):Q', title='Cost'),
-            alt.Tooltip(['Method', 'Cost'])
-        ).transform_filter(
-            (alt.datum.Filename == fc) & (alt.datum.Transformation ==
-                                          'Encoding')
-        ).properties(title=fc)
-
-        text = chart.mark_text(
-            align='center',
-            baseline='middle',
-            dy=-5
-        ).encode(
-            alt.Text('mean(Cost):Q', format=",.0f")
-        )
-
-        chart = alt.layer(chart, text, data=df_concat).configure_axis(
-            domainWidth=0.8
-        ).configure_view(
-            stroke='transparent'
-        )
-
-        if col_nr == 1:
-            with col_1:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 2:
-            with col_2:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 3:
-            with col_3:
-                st.altair_chart(chart, use_container_width=True)
-        i += 1
-
-
-def visualize_time_benchmark(file_chosen, df_concat, filename_uploaded):
-    """This function is used for visualizing time charts for benchmarking
-
-    Args:
-        file_chosen (str): chosen filename will be used for filtering which
-        data will be shown
-        df_concat (dataframe): concanated detail precalculated data and data
-        from uploaded file
-        filename_uploaded (list): name of file that is contained in uploaded
-        file to differentiate the type of chart
-    """
-    col_1, col_2, col_3 = st.columns(3)
-    i = 0
-    for fc in file_chosen:
-        col_nr = (i % 3) + 1
-        if fc == filename_uploaded:
-            chart = alt.Chart(df_concat).mark_circle(size=60).encode(
-                alt.X('Method:N', title='Method',
-                      axis=alt.Axis(labelAngle=-45)),
-                alt.Y('Time:Q', title='Time (in seconds)'),
-                alt.Color('Transformation:N'),
-                tooltip=['Method', 'Filename', 'Time', 'Transformation']
-            ).transform_filter(
-                (alt.datum.Filename == fc)
-            ).properties(title=fc)
-        else:
-            chart = alt.Chart(df_concat).mark_boxplot(extent='min-max').encode(
-                alt.X('Method:N', title='Method',
-                      axis=alt.Axis(labelAngle=-45)),
-                alt.Y('Time:Q', title='Time (in seconds)'),
-                alt.Color('Transformation:N')
-            ).transform_filter(
-                (alt.datum.Filename == fc)
-            ).properties(title=fc)
-
-        if col_nr == 1:
-            with col_1:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 2:
-            with col_2:
-                st.altair_chart(chart, use_container_width=True)
-        if col_nr == 3:
-            with col_3:
-                st.altair_chart(chart, use_container_width=True)
-        i += 1
 
 
 def create_main_page():
@@ -841,7 +620,12 @@ def create_main_page():
         with st.expander("Expand Detail"):
             st.write('Detail Table')
             st.dataframe(df_report)
-        visualize_uploaded(df_report)
+        chartsize, charttime, chartcost = visualize.visualize_uploaded(
+            df_report)
+
+        st.altair_chart(chartsize, use_container_width=True)
+        st.altair_chart(charttime, use_container_width=True)
+        st.altair_chart(chartcost, use_container_width=True)
 
     elif choose_dna_encoding != [] and encoded_binary_path == '':
         st.error('Choose your file and length of storage first!')
@@ -883,16 +667,57 @@ def create_main_page():
         )
     st.markdown("<h3 style='text-align: center;" +
                 " color: black;'>File Size </h3>", unsafe_allow_html=True)
-    visualize_size_benchmark(df_measure_sum_concat)
+    chart = visualize.visualize_size_benchmark(df_measure_sum_concat)
+    num_method = df_measure_sum_concat['Method'].nunique()
+    cols = st.columns(num_method)
+    col = cols[0]
+    with col:
+        st.altair_chart(chart, use_container_width=True)
+
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>",
                 unsafe_allow_html=True)
     file_chosen = st.multiselect(
      'Select files that you want to review (This will affect Cost' +
-     ' and Time Charts)',
-     data_original)
-    visualize_cost_benchmark(file_chosen, df_concat)
+     ' and Time Charts)', data_original)
+
+    col_1, col_2, col_3 = st.columns(3)
+    i = 0
+    for fc in file_chosen:
+        col_nr = (i % 3) + 1
+        chart = visualize.visualize_cost_benchmark(fc, df_concat)
+        if col_nr == 1:
+            with col_1:
+                st.altair_chart(chart, use_container_width=True)
+        if col_nr == 2:
+            with col_2:
+                st.altair_chart(chart, use_container_width=True)
+        if col_nr == 3:
+            with col_3:
+                st.altair_chart(chart, use_container_width=True)
+        i += 1
+
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>",
                 unsafe_allow_html=True)
-    visualize_time_benchmark(file_chosen, df_concat, filename_uploaded)
+    col_1, col_2, col_3 = st.columns(3)
+    i = 0
+    for fc in file_chosen:
+        col_nr = (i % 3) + 1
+        if fc == filename_uploaded:
+            flag_is_the_same = True
+        else:
+            flag_is_the_same = False
+        chart = visualize.visualize_time_benchmark(
+            fc, df_concat, flag_is_the_same)
+
+        if col_nr == 1:
+            with col_1:
+                st.altair_chart(chart, use_container_width=True)
+        if col_nr == 2:
+            with col_2:
+                st.altair_chart(chart, use_container_width=True)
+        if col_nr == 3:
+            with col_3:
+                st.altair_chart(chart, use_container_width=True)
+        i += 1
