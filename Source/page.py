@@ -13,6 +13,7 @@ import streamlit as st
 import pandas as pd
 import subprocess as sp
 import importlib
+
 import visualize
 
 # List Path of Directories
@@ -90,24 +91,31 @@ def remove_cached_data():
 
 
 # Upload function general
-def upload_file(key_suffix, cache_folder_path):
+def upload_file(key_suffix):
     """This function is used for saving uploaded files
 
     Args:
         key_suffix (string): data type that was chosen by user
-        cache_folder_path (string): name of directory
 
     Returns:
         save_path_os (str): full path of uploaded file
         uploaded_filename (str): name of uploaded file
 
     """
-    save_path_os = ''
+    dict_file_type_cache = {'txt': path_uploaded_txt, 'jpg': path_uploaded_jpg,
+                            'wav': path_uploaded_wav}
+
+    cache_folder_path = dict_file_type_cache[key_suffix]
+
+    st.header('Choose your ' + key_suffix + ' data')
+    st.markdown('')
+
     imported_file = st.file_uploader(
         label='Upload your file', type=key_suffix, accept_multiple_files=False,
         key='Upload_file_' + key_suffix)
 
     uploaded_filename = ''
+    save_path_os = ''
 
     if imported_file is not None:
         time_uploaded = str(time.time())
@@ -126,69 +134,6 @@ def upload_file(key_suffix, cache_folder_path):
         st.write(file_details)
 
     return save_path_os, uploaded_filename
-
-
-def upload_txt():
-    """This function is used for uploading txt file
-
-    Returns:
-        save_path_os (str): full path of uploaded file
-        uploaded_filename (str): name of uploaded file
-    """
-
-    key_suffix = 'txt'
-    cache_folder_path = path_uploaded_txt
-
-    st.header('Choose your ' + key_suffix + ' data')
-    st.markdown('')
-
-    output = upload_file(key_suffix, cache_folder_path)
-    save_path = output[0]
-    file_uploaded_name = output[1]
-
-    return save_path, file_uploaded_name
-
-
-def upload_jpg():
-    """This function is used for uploading jpg file
-
-    Returns:
-        save_path_os (str): full path of uploaded file
-        uploaded_filename (str): name of uploaded file
-    """
-
-    key_suffix = 'jpg'
-    cache_folder_path = path_uploaded_jpg
-
-    st.header('Choose your ' + key_suffix + ' data')
-    st.markdown('')
-
-    output = upload_file(key_suffix, cache_folder_path)
-    save_path = output[0]
-    file_uploaded_name = output[1]
-
-    return save_path, file_uploaded_name
-
-
-def upload_wav():
-    """This function is used for uploading wav file
-
-    Returns:
-        save_path_os (str): full path of uploaded file
-        uploaded_filename (str): name of uploaded file
-    """
-
-    key_suffix = 'wav'
-    cache_folder_path = path_uploaded_wav
-
-    st.header('Choose your ' + key_suffix + ' data')
-    st.markdown('')
-
-    output = upload_file(key_suffix, cache_folder_path)
-    save_path = output[0]
-    file_uploaded_name = output[1]
-
-    return save_path, file_uploaded_name
 
 
 # Running API
@@ -551,18 +496,7 @@ def create_main_page():
     st.markdown('---')
 
     save_path = ''
-    if choose_file_type == 'txt':
-        output = upload_txt()
-        save_path = output[0]
-        uploaded_filename = output[1]
-    elif choose_file_type == 'jpg':
-        output = upload_jpg()
-        save_path = output[0]
-        uploaded_filename = output[1]
-    elif choose_file_type == 'wav':
-        output = upload_wav()
-        save_path = output[0]
-        uploaded_filename = output[1]
+    save_path, uploaded_filename = upload_file(key_suffix=choose_file_type)
 
     st.write('Your uploaded path data: ', save_path)
 
