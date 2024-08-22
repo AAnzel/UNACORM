@@ -531,12 +531,9 @@ def create_main_page():
         )
     st.markdown("<h3 style='text-align: center;" +
                 " color: black;'>File Size </h3>", unsafe_allow_html=True)
-    chart = visualize.visualize_size_benchmark(df_measure_sum_concat)
-    num_method = df_measure_sum_concat['Method'].nunique()
-    cols = st.columns(num_method)
-    col = cols[0]
-    with col:
-        st.altair_chart(chart, use_container_width=True)
+
+    chart = visualize.visualize_size_benchmark_plotly(df_measure_sum_concat)
+    st.plotly_chart(chart, use_container_width=True)
 
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>",
@@ -560,6 +557,11 @@ def create_main_page():
             with col_3:
                 st.altair_chart(chart, use_container_width=True)
         i += 1
+
+    if not file_chosen:
+        chart = visualize.visualize_cost_benchmark_plotly(
+            file_chosen, df_concat)
+        st.plotly_chart(chart, use_container_width=True)
 
     st.write('---')
     st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>",
