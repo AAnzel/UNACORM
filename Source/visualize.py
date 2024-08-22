@@ -1,4 +1,36 @@
 import altair as alt
+import plotly.express as px
+
+
+_DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
+
+
+def visualize_uploaded_plotly(df_report):
+    """This function is used for visualizing the results (time, cost, size)
+    for uploaded file
+
+    Args:
+        df_report (dataframe): dataframe of detail results of uploaded file
+    """
+
+    chart_size = px.bar(
+        df_report, x='Method', y='Size', color='Transformation',
+        title='Size (in bytes)', barmode='group', text_auto=True,
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE)  # ",.0f"
+
+    chart_time = px.bar(
+        df_report, x='Method', y='Time', color='Transformation',
+        title='Process Time (in seconds)', barmode='group',
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        text_auto=True)  # ",.0f"
+
+    chart_cost = px.bar(
+        df_report, x='Method', y='Cost', color='Transformation',
+        title='Cost (based on length of nucleotides)', barmode='group',
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        text_auto=True)
+
+    return chart_size, chart_time, chart_cost
 
 
 def visualize_uploaded(df_report):

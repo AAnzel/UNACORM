@@ -115,8 +115,8 @@ def upload_file(key_suffix):
             w.write(imported_file.getvalue())
 
         if save_path.exists():
-            st.success('Your file successfully uploaded!')
-        st.write(type(imported_file))
+            st.success('Your file is successfully uploaded!')
+        # st.write(type(imported_file))
         file_details = {"filename": imported_file.name,
                         "filetype": imported_file.type}
         st.write(file_details)
@@ -181,7 +181,7 @@ def encoding(encoding_method, binary, file_basename, save_path):
         output = sp.check_output("2D_Code.exe --encode --input=" + save_path +
                                  " --output=" + output_path)
         numblocks = output[output.find(b'to') + 3:output.find(b'to') + 3 +
-                           output[output.find(b'to')+3:].find(b' ')]
+                           output[output.find(b'to') + 3:].find(b' ')]
         numblocks = numblocks.decode("utf-8")
         generated_seq = open(output_path).readlines()
     elif encoding_method == 'XORBasedCode':
@@ -311,7 +311,7 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
                 f.write(i + '\n')
     encoded_size = os.path.getsize(file_path)
     list_encoded = [uploaded_filename, encoding_method, 'Encoding',
-                    encoded_size, cost, time_used, '.'+file_type]
+                    encoded_size, cost, time_used, '.' + file_type]
 
     modified_sequence = []
     i = 0
@@ -429,16 +429,14 @@ def create_main_page():
     save_path = ''
     save_path, uploaded_filename = upload_file(key_suffix=choose_file_type)
 
-    st.write('Your uploaded path data: ', save_path)
-
-    st.markdown('---')
+    st.write('Your uploaded path data:\t', save_path)
 
     if save_path != '':
         encoded_binary_path = convert_text_data_to_binary(save_path)
         original_file_size = os.path.getsize(save_path)
     else:
         encoded_binary_path = ''
-    st.write('Your encoded binary: ', encoded_binary_path)
+    st.write('Your encoded binary:\t', encoded_binary_path)
 
     st.markdown('---')
 
@@ -485,12 +483,13 @@ def create_main_page():
         with st.expander("Expand Detail"):
             st.write('Detail Table')
             st.dataframe(df_report)
-        chartsize, charttime, chartcost = visualize.visualize_uploaded(
-            df_report)
 
-        st.altair_chart(chartsize, use_container_width=True)
-        st.altair_chart(charttime, use_container_width=True)
-        st.altair_chart(chartcost, use_container_width=True)
+        (chart_size, chart_time,
+         chart_cost) = visualize.visualize_uploaded_plotly(df_report)
+
+        st.plotly_chart(chart_size, use_container_width=True)
+        st.plotly_chart(chart_time, use_container_width=True)
+        st.plotly_chart(chart_cost, use_container_width=True)
 
     elif choose_dna_encoding != [] and encoded_binary_path == '':
         st.error('Choose your file and length of storage first!')
