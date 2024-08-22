@@ -41,9 +41,6 @@ path_uploaded_list = [
     path_decoded_data, path_encoded_dna, path_decoded_dna,
     path_uploaded_decoded]
 
-# Based file for calculating synthesis cost
-df_metrics = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
-
 
 # Removing old uploaded data
 def remove_cached_data():
@@ -77,7 +74,6 @@ def remove_cached_data():
 
                     print('Successfully removed old data from uploaded' +
                           ' directory')
-
                 else:
                     pass
 
@@ -128,6 +124,7 @@ def upload_file(key_suffix):
     return save_path_os, uploaded_filename
 
 
+@st.cache_data
 def cost_encoding(max_nucleotide, oligos):
     """This function is used for calculating synthesizing cost
 
@@ -138,6 +135,10 @@ def cost_encoding(max_nucleotide, oligos):
     Returns:
         cost_total (number): synthesising cost
     """
+    # Based file for calculating synthesis cost
+    df_metrics = pd.read_csv(
+        os.path.join(path_root_data, 'synthesis_cost.csv'))
+
     if max_nucleotide <= 120:
         i = 0
     else:
