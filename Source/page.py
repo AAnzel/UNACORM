@@ -49,7 +49,7 @@ with open("mesa.json") as json_file:  # Config file for API
     config_api = json.load(json_file)
 
 # Based file for calculating synthesis cost
-df_metrics = pd.read_excel(os.path.join(path_root_data, 'synthesis_cost.xlsx'))
+df_metrics = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
 
 
 # Removing old uploaded data
