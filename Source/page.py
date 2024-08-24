@@ -397,19 +397,6 @@ def convert_text_data_to_binary(path_original_data):
     return bit_encoded_file
 
 
-@st.cache_data
-def convert_df(df):
-    """This function is used to save csv file from dataframe
-
-    Args:
-        df (dataframe): dataframe that will be saved into csv
-
-    Returns:
-        save file to csv
-    """
-    return df.to_csv().encode('utf-8')
-
-
 def create_main_page():
     """This function is used to wrap all functionalities
     """
@@ -510,8 +497,8 @@ def create_main_page():
     df_concat = pd.concat([df_report_1, df_measure], ignore_index=True)
     df_measure_sum_concat = pd.concat(
         [df_summary_1, df_measure_sum], ignore_index=True)
-    csv_sum = convert_df(df_measure_sum_concat)
-    csv_detail = convert_df(df_concat)
+    csv_sum = df_measure_sum_concat.to_csv().encode('utf-8')
+    csv_detail = df_concat.to_csv().encode('utf-8')
     st.dataframe(df_measure_sum_concat)
     st.download_button(
         label="Download",
