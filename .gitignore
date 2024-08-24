@@ -56,3 +56,6 @@ coverage.xml
 
 # Added by Aleksandar
 .DS_Store
+Data/Decoded
+Data/Encoded
+Data/uploaded
