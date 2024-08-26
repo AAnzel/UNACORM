@@ -5,7 +5,9 @@ from . import basereedsolomon
 
 class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
     def __init__(self, field_size: int, message_length: int, payload_length: int, symbol_size: int, p_factor: int, irr_poly=None, multi_processing=False, debug=False) -> None:
-        """Generalized Reed Solomon class. Can have arbitary message length as long as n%p and can be parralized by a factor of p
+        ''' Generalized Reed Solomon class. Can have arbitary message length as 
+            long as n%p and can be parralized by a factor of p.
+            
         Args:
             field_size (int): field characteristic
             message_length (int): message length
@@ -15,91 +17,101 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
             irr_poly (list, optional): irreducible polynominal over which the field is to be constructed. Defaults to None.
             multi_processing (boolean, optional): allows multiprocessing of some steps. Defaults to False.
             debug (bool, optional): determines whether steps should be printed to console. Defaults to True.
+            
         Raises:
             ValueError: _description_
-        """
+        
+        '''
         super().__init__(field_size, message_length, payload_length,
                          symbol_size, multi_processing, irr_poly, debug, p_factor)
         self.p = p_factor
         # gl.primitive_root(1)
         self.primitive = self.galois_field.primitive_element
 
-        self.helper.debug_print("get unity root")
+        self.helper.debug_print('get unity root')
         self.p_unity = self.helper.get_nth_unity_root_of_field(p_factor)
         self.generator_set = []
 
-        # handles cases where either k or r are not divisible by p, implies by extension the n may not be divisible by p
+        # handles cases where either k or r are not divisible by p, implies by 
+        # extension the n may not be divisible by p
         self.d = self.two_s % self.p  # remainder of r
         self.c = self.payload_length % self.p  # remainder of k
         self.num_of_padded_zeros = (self.p - self.c) if self.c != 0 else 0
 
         # adjust parameters to handle r not divisble by p
         if self.d != 0:
-            raise ValueError("r % p  != 0 is so far not implemented")
+            raise ValueError('r % p  != 0 is so far not implemented')
             self.T = self.calculate_t_matrix()
             self.V_inverse = np.linalg.inv(self.calculate_v_matrix())
             self.tv_transformation_matrix = self.return_transformation_values_for_f(
                 self.T, self.V_inverse)
 
         for index in range(0, p_factor):
-            self.helper.debug_print("init generator:", index)
+            self.helper.debug_print('init generator:', index)
             g_i = self.return_generalized_generator(index)
-            self.helper.debug_print("roots", g_i)
+            self.helper.debug_print('roots', g_i)
             self.generator_set.append(g_i)
-
         # divisibility of n, k and r should be checked
 
     def encode(self, message):
-        """_summary_
+        ''' _summary_
+        
         Args:
             message (list): _description_
+            
         Raises:
-            ValueError: triggers in case that the provided message symbol length is unequal to the indicated one
+            ValueError: triggers in case that the provided message symbol 
+            length is unequal to the indicated one
+            
         Returns:
             list: message with parity symbols attached
-        """
+        '''
         if len(message) != self.payload_length:
-            raise ValueError("Length not as specified")
-        self.helper.debug_print("encode input message:", message, len(message))
+            raise ValueError('Length not as specified')
+        self.helper.debug_print('encode input message:', message, len(message))
         if self.c != 0:
             # add conceptual zeros
             message = ([0]*self.num_of_padded_zeros) + message
 
-        self.helper.debug_print("before encode", message, len(message))
+        self.helper.debug_print('before encode', message, len(message))
         msg = self.encode_classic(message)
-        self.helper.debug_print("before cutoff", msg, len(msg))
+        self.helper.debug_print('before cutoff', msg, len(msg))
         # + msg[self.payload_length + self.num_of_padded_zeros:len(msg)]
         msg = [int(x)for x in msg[self.num_of_padded_zeros:len(msg)]]
         return msg
 
     def decode(self, recieved_msg):
-        """decodes a message with parity bits
+        ''' decodes a message with parity bits
         Args:
             recieved_msg (list): message with parity bits
         Raises:
             ValueError: raises error if recieved_msg is unequal to initalized message length
         Returns:
             list: returns section of the decoded message that corresponds to the info symbols
-        """
+        '''
         if len(recieved_msg) != (self.message_length):
             self.helper.debug_print(
-                "decode input message", recieved_msg, len(recieved_msg))
-            raise ValueError("Length not as specified")
+                'decode input message', recieved_msg, len(recieved_msg))
+            raise ValueError('Length not as specified')
         if self.c != 0:
             # add conceptual zeros
-            #recieved_msg =  recieved_msg[0:self.payload_length] +([0]*self.num_of_padded_zeros) + recieved_msg[self.payload_length:len(recieved_msg)]
+            #recieved_msg =  recieved_msg[0:self.payload_length] + 
+            #    ([0]*self.num_of_padded_zeros) + 
+            #    recieved_msg[self.payload_length:len(recieved_msg)]
             recieved_msg = ([0]*self.num_of_padded_zeros) + recieved_msg
         corrected_msg = self.decode_classic(recieved_msg)
-        self.helper.debug_print("after decode internal", corrected_msg)
+        self.helper.debug_print('after decode internal', corrected_msg)
         return self.return_info_symbols(corrected_msg)
 
     def encode_classic(self, message):
-        """performs encoding steps
+        ''' Performs encoding steps
+        
         Args:
             message (list): list of galois symbols in int representation
+            
         Returns:
             list: message list with added paroty symbols
-        """
+        '''
         # only used in case where self.d != 0
         coefficent_vector = []
 
@@ -107,26 +119,26 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
 
         message_matrix = self.input_arr_to_matrix(message)
         l = self.two_s//self.p
-        self.helper.debug_print("messgae matrix before", message_matrix)
+        self.helper.debug_print('messgae matrix before', message_matrix)
         # performs shift by x**l
         temp_message_matrix = []
         for row_id in range(0, message_matrix.shape[0]):
             msg_slice = np.copy(message_matrix[row_id])
             msg_slice = np.append(msg_slice, np.zeros(l, dtype=int))
-            self.helper.debug_print("msg_slice_poly", gl.Poly(
+            self.helper.debug_print('msg_slice_poly', gl.Poly(
                 msg_slice, field=self.galois_field))
             temp_message_matrix.append(msg_slice)
         message_matrix = np.array(temp_message_matrix)
-        self.helper.debug_print("message matrix after", message_matrix)
+        self.helper.debug_print('message matrix after', message_matrix)
         f_values = []
 
         fft = self.helper.fft_on_matrix_multi(
             message_matrix) if self.multi else self.helper.fft_on_matrix(message_matrix)
-        self.helper.debug_print("fft", self.galois_field(fft))
+        self.helper.debug_print('fft', self.galois_field(fft))
         for f_index in range(0, self.p):
             f_i = gl.Poly(fft[f_index], field=self.galois_field)
             self.helper.debug_print(
-                "fi", f_i, fft[f_index], f_i % self.generator_set[f_index], self.generator_set[f_index])
+                'fi', f_i, fft[f_index], f_i % self.generator_set[f_index], self.generator_set[f_index])
 
             # handles case when lth degree of polynominal is zero after modulo
             f_values_to_add = (
@@ -162,15 +174,15 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
                 f_values[adjustment_f_index] = (gl.Poly(
                     f_values[adjustment_f_index], field=self.galois_field) + gamma_remainder).coeffs
 
-            self.helper.debug_print("coffs", coefficent_vector)
-            self.helper.debug_print("gamma", gamma_adjustments)
-            self.helper.debug_print("h adj", h_adjustments)
-        self.helper.debug_print("fvalue", f_values)
+            self.helper.debug_print('coffs', coefficent_vector)
+            self.helper.debug_print('gamma', gamma_adjustments)
+            self.helper.debug_print('h adj', h_adjustments)
+        self.helper.debug_print('fvalue', f_values)
         parity_values = []
 
         ifft = self.helper.ifft_on_matrix(
             f_values) if self.multi else self.helper.ifft_on_matrix(f_values)
-        self.helper.debug_print("ifft", ifft)
+        self.helper.debug_print('ifft', ifft)
         for h_index in range(0, self.p):
             h_i = ifft[h_index]
             # calculates adjusted h
@@ -180,38 +192,40 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
 
             parity_values.append(h_i)
 
-        self.helper.debug_print("parity_values", parity_values)
+        self.helper.debug_print('parity_values', parity_values)
         # for parity_value_index in range(0,l):
         #    for parity_array_index in range(0,self.p):
         #        output_message.append(int(parity_values[self.p-parity_array_index-1][parity_value_index]))
         output_message = self.append_parity_symbols(
             output_message, parity_values)
-        self.helper.debug_print("output message", output_message)
+        self.helper.debug_print('output message', output_message)
 
         return output_message
 
     def decode_classic(self, recieved_msg):
-        """performs the decoding steps
+        ''' Performs the decoding steps
+        
         Args:
             recieved_msg (list): message list with parity symbols
+            
         Returns:
             list: corrected message 
-        """
+        '''
         syndromes = self.calc_syndrome(recieved_msg)
 
         if np.all(syndromes == self.galois_field(0)):
             return recieved_msg
-        self.helper.debug_print("syndromes", syndromes)
+        self.helper.debug_print('syndromes', syndromes)
 
         galois_lfsr = gl.berlekamp_massey(
-            self.galois_field(syndromes), "galois")
+            self.galois_field(syndromes), 'galois')
         error_locator_polynominal = galois_lfsr.feedback_poly
         error_evaluator_polynominal = gl.Poly(
             galois_lfsr.state, field=self.galois_field)
-        self.helper.debug_print("berlekamp", galois_lfsr)
-        self.helper.debug_print("error locator poly",
+        self.helper.debug_print('berlekamp', galois_lfsr)
+        self.helper.debug_print('error locator poly',
                                 error_locator_polynominal)
-        self.helper.debug_print("error evaluator poly",
+        self.helper.debug_print('error evaluator poly',
                                 error_evaluator_polynominal)
 
         error_locations = self.modified_chien_search(
@@ -222,39 +236,46 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
 
         error_magnitude = self.modified_forney(
             error_locator_polynominal, error_evaluator_polynominal, error_locations)
-        self.helper.debug_print("err mag", error_magnitude)
+        self.helper.debug_print('err mag', error_magnitude)
         correction_msg = self.galois_field([0] * len(recieved_msg))
         for index in range(0, len(error_locations_index)):
             correction_msg[error_locations_index[index]
                            ] = error_magnitude[index]
 
-        self.helper.debug_print("err", error_locations)
+        self.helper.debug_print('err', error_locations)
 
         return [int(symbol) for symbol in (self.galois_field(recieved_msg) + correction_msg)]
 
     def primitive_element_adjusted(self, index):
-        """returns the primitive element adjusted
+        ''' Returns the primitive element adjusted
+        
         Args:
             index (int): index in order to adjust primitive element
+            
         Returns:
-            galois element: value of the primitive adjusted elment acording to the index value
-        """
+            galois element: value of the primitive adjusted elment acording to 
+            the index value
+        '''
         factor_unity = index % self.p
         factor_primitive = divmod(index, self.p)[0]
         return self.p_unity**factor_unity * self.primitive**factor_primitive
 
     def return_generalized_generator(self, index):
-        """returns a generator polynominal
+        ''' Returns a generator polynominal
+        
         Args:
-            index (int): indicates which generator polynominal should be generated range is 0 - p-1
+            index (int): indicates which generator polynominal should be 
+            generated range is 0 - p-1
+            
         Raises:
             ValueError: if index is is outside 0 - p-1
+            
         Returns:
             galois poly: _description_
-        """
+        '''
         if index >= self.p:
             raise ValueError(
-                "Generator polynominals can only be generated from 0 to p-1")
+                'Generator polynominals can only be generated from 0 to p-1')
         # index is first value that qualifies i%self.p == index condition
         output_poly = gl.Poly([1, -self.primitive**index],
                               field=self.galois_field)
@@ -266,12 +287,14 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
         return output_poly
 
     def input_arr_to_matrix(self, _arr):
-        """splits input message into p components up
+        ''' Splits input message into p components up
+        
         Args:
             _arr (list): input message
+            
         Returns:
             list: list consisting of input message split up into p lists
-        """
+        '''
         output = []
         p = self.p
         intermediate_arr = []
@@ -283,16 +306,18 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
         return np.array(np.transpose(output))
 
     def calc_syndrome(self, recieved_codeword):
-        """calculates syndrome values based on the divided codewords
+        ''' Calculates syndrome values based on the divided codewords
+        
         Args:
             recieved_codeword (list): recieved codeword
+            
         Returns:
             list: list consisting of galois elements
-        """
+        '''
         output_syndromes = []
         m = len(recieved_codeword) // self.p
         self.helper.debug_print(
-            "recieved codeword before syndrome", self.galois_field(recieved_codeword), m)
+            'recieved codeword before syndrome', self.galois_field(recieved_codeword), m)
 
         divided_codeword = []
         for l_index in range(0, self.p):
@@ -304,10 +329,10 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
             divided_codeword.append(syndrome[::-1])
 
         fourier_transformed_syndromes = []
-        self.helper.debug_print("divided codeword", divided_codeword)
+        self.helper.debug_print('divided codeword', divided_codeword)
         fft = self.helper.fft_on_matrix_multi(
             divided_codeword) if self.multi else self.helper.fft_on_matrix(divided_codeword)
-        self.helper.debug_print("fft_decode", self.galois_field(fft))
+        self.helper.debug_print('fft_decode', self.galois_field(fft))
         for F_i in range(0, self.p):
             fourier_transformed_syndromes.append(fft[F_i])
 
@@ -316,21 +341,24 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
             fourier_poly = gl.Poly(
                 fourier_transformed_syndromes[s_i % self.p], field=self.galois_field)
             self.helper.debug_print(
-                "dec fourier_poly", fourier_poly, primitive_root)
+                'dec fourier_poly', fourier_poly, primitive_root)
             output_syndromes.append(fourier_poly(primitive_root))
             self.helper.debug_print(
-                "s_i", s_i, s_i % self.p, primitive_root, fourier_poly(primitive_root))
+                's_i', s_i, s_i % self.p, primitive_root, fourier_poly(primitive_root))
 
         return output_syndromes
 
     # modified version for parallelization
     def modified_chien_search(self, error_locator_poly):
-        """performs chien search on the divided codeword 
+        ''' Performs chien search on the divided codeword 
+        
         Args:
-            error_locator_poly (list): list containing the coefficents of the error locator polynominal
+            error_locator_poly (list): list containing the coefficents of the 
+            error locator polynominal
+            
         Returns:
             list: list containing the error locations as galois elements
-        """
+        '''
         error_locations = []
 
         m = (self.message_length + self.num_of_padded_zeros) // self.p
@@ -345,22 +373,24 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
                             self.primitive ** -(j_ai_index*i)
                 modified_a_values.append(a_i)
             ifft = np.fft.ifft(self.galois_field(modified_a_values))
-            self.helper.debug_print("modified a", modified_a_values)
-            self.helper.debug_print("ifft_dec", ifft)
+            self.helper.debug_print('modified a', modified_a_values)
+            self.helper.debug_print('ifft_dec', ifft)
             for w_index in range(0, self.p):
                 if ifft[w_index] == self.galois_field(0):
                     error_locations.append(self.p * i + w_index)
         return error_locations
 
     def modified_forney(self, error_location_poly, error_evaluator_poly, error_loc):
-        """calculates the error magintudes
+        ''' Calculates the error magintudes
+        
         Args:
             error_location_poly (list): error location polynominal as a list of coefficents
             error_evaluator_poly (galois Poly): error evaluator polynominal
             error_loc (list): error locations
+            
         Returns:
             list: list containing the error magnitudes as galois elements
-        """
+        '''
         error_magnitudes = []
         for r in error_loc:
             a_i = self.primitive_element_adjusted(r)
@@ -370,12 +400,14 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
         return error_magnitudes
 
     def return_info_symbols(self, msg):
-        """slices a message in order to return the k information symbols
+        ''' Slices a message in order to return the k information symbols
+        
         Args:
             msg (list): codeword
+            
         Returns:
             list: containing the infor symbols
-        """
+        '''
         return msg[self.num_of_padded_zeros:self.num_of_padded_zeros + self.payload_length]
 
     def calculate_t_matrix(self):
@@ -413,13 +445,15 @@ class Generalized_Reed_Solomon(basereedsolomon.Base_Reed_Solomon):
         return self.galois_field(np.matrix(output_matrix))
 
     def append_parity_symbols(self, message, parity_symbols):
-        """appends parity symbols to the message
+        ''' Appends parity symbols to the message
+        
         Args:
             message (list): consists of galois elements
             parity_symbols (list):  consists of galois elements
+            
         Returns:
             list: message with parity symbols
-        """
+        '''
         output_msg = message
         output_symbols = []
         parity_symbols = parity_symbols

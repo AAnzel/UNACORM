@@ -1,24 +1,13 @@
-import time
-import multiprocessing
 import numpy as np
-import reedSolomon
 
 
 class parallelReed():
-    #cores = 8
-    #pool = None
     inner_encoder = None
     outer_encoder = None
 
     def __init__(self, inner_encoder, outer_encoder):
         self.inner_encoder = inner_encoder
         self.outer_encoder = outer_encoder
-        # Count number of cpu cores
-        #self.cores = multiprocessing.cpu_count()
-
-        # create Pool
-        # self.pool = multiprocessing.Pool(
-        #    processes=(self.cores*4))
 
     def encodeInner(input_vec, encoder, pos, return_dict):
         output_vec = encoder.encode(input_vec)
@@ -37,19 +26,12 @@ class parallelReed():
         return_dict[pos] = decoder.symbol_array_to_array(output_vec)
 
     def encode(self, inputList, return_dict):
-        print(len(inputList))
         # start outer encode
         for x, block in enumerate(inputList):
             parallelReed.encodeOuter(
                 block[119:713, 3:33].tolist(), self.outer_encoder, x, return_dict)
-            # self.pool.apply(
-            #    self.encodeOuter, (block[119:713, 3:33], self.outer_encoder, x, return_dict))
 
-        # stop the pool at the end
-        # self.pool.close()
-        # self.pool.join()
-
-        # fill in results
+        # fill in results (pairty symbols?)
         for x, block in enumerate(inputList):
             block[0:119, 3:33] = return_dict.get(x)[594:713]
 
@@ -63,26 +45,12 @@ class parallelReed():
                 column[0:3] = index
                 indexCount += 1
                 increaseIndex(index)
-                # Test for wrong indecies in the decoding, test was succesfull
-                # if ((indexCount % 713) == 223) or ((indexCount % 713) == 566):
-                #    print("Skipped increase at:", indexCount)
-                # elif ((indexCount % 713) == 224) or ((indexCount % 713) == 567):
-                #    increaseIndex(index)
-                #    increaseIndex(index)
-                # else:
-                #    increaseIndex(index)
 
         # start inner encode
         for x, block in enumerate(inputList):
             for y, column in enumerate(block):
                 parallelReed.encodeInner(
                     column[0:33].tolist(), self.inner_encoder, ((x * 713) + y), return_dict)
-                # self.pool.apply(self.encodeInner, (self, column,
-                #                self.inner_encoder, x, return_dict))
-
-        # stop the pool at the end
-        # self.pool.close()
-        # self.pool.join()
 
         # fill in results
         for x, block in enumerate(inputList):
@@ -97,12 +65,6 @@ class parallelReed():
             for y, column in enumerate(block):
                 parallelReed.decodeInner(
                     column.tolist(), self.inner_encoder, ((x * 713) + y), return_dict)
-                # self.pool.apply_async(func=parallelReed.decodeInner, args=(
-                #    column, self.inner_encoder, x, return_dict))
-
-        # stop the pool at the end
-        # self.pool.close()
-        # self.pool.join()
 
         # fill in results
         for x, block in enumerate(inputList):
@@ -141,38 +103,10 @@ class parallelReed():
                         newList[block][pos] = column
                         usedIndex.append(index)
 
-        # 3. fill in unused rows
-        # TODO test if we need that
-        '''
-        maxIndex = len(inputList) * 713
-        listIndex = 0
-        for index in range(0, maxIndex + 1):
-            if index not in usedIndex:
-                if listIndex < len(unusedColumns):
-                    print("Filled at spot: ", index)
-                    block = index // 713
-                    pos = index % 713
-                    if pos == 0:
-                        pos = 712
-                        block -= 1
-                    else:
-                        pos -= 1
-                    newList[block][pos] = unusedColumns[listIndex]
-                    listIndex += 1
-                else:
-                    break
-        '''
-
         # start outer decode
         for x, block in enumerate(newList):
             parallelReed.decodeOuter(
                 np.concatenate((block[119:713, 3:33], block[0:119, 3:33])).tolist(), self.outer_encoder, x, return_dict)
-            # self.pool.apply_async(func=parallelReed.encodeOuter, args=(
-            #    block[119:713, 3:33], self.outer_encoder, x, return_dict))
-
-        # stop the pool at the end
-        # self.pool.close()
-        # self.pool.join()
 
         # fill in results
         for x, block in enumerate(inputList):
@@ -182,19 +116,13 @@ class parallelReed():
 
     # Input should be a list of arrays with array-size (713x39)
     def startRsCode(self, inputList, codingType):
-        start_time = time.time()  # TODO remove the time
-
         # create manager/dict for return values
-        manager = multiprocessing.Manager()
-        return_dict = manager.dict()
+        return_dict = {}
 
         if(codingType == 0):
             self.encode(inputList, return_dict)
         else:
             self.decode(inputList, return_dict)
-
-        print("--- %s seconds ---" %
-              (time.time() - start_time))  # TODO remove the time
 
 
 def increaseIndex(index):

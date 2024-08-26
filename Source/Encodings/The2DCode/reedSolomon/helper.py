@@ -1,5 +1,4 @@
 import galois as gl
-import numpy as np
 from functools import partial
 
 
@@ -31,13 +30,13 @@ def ifft_step(p_unity, matrix, characteristic, exponent, irr_poly, iteration_ste
 
 class Galois_Helper():
     def __init__(self, _field, pool, debug_mode) -> None:
-        """helper class in order to perform some galois field calculations
+        ''' Helper class in order to perform some galois field calculations
 
         Args:
             _field (galois field): galois field
             pool (int): pool to perform multithreading
             debug_mode (boolean): allows priniting out of steps
-        """
+        '''
         self.field = _field
         self.pool = pool
         self.base_field = gl.Field(_field.characteristic)
@@ -53,7 +52,7 @@ class Galois_Helper():
         return i
 
     def get_nth_unity_root_of_field(self, n):
-        """return nth root of unity
+        ''' Returns the nth root of unity
 
         Args:
             n (int): _description_
@@ -63,15 +62,15 @@ class Galois_Helper():
 
         Returns:
             _type_: _description_
-        """
+        '''
         power_of_one = (self.field.characteristic ** self.field.degree) - \
             1  # self.get_power_of_field_element(self.field(1))
         if power_of_one % n != 0:
-            raise ValueError("failure in getting nth root")
+            raise ValueError('failure in getting nth root')
         return self.field.primitive_element**(power_of_one//n)
 
     def fft_on_matrix_multi(self, matrix):
-        print("multi active")
+        print('multi active')
         n = len(matrix)
         output = []
 
@@ -107,7 +106,7 @@ class Galois_Helper():
                        self.field.characteristic,
                        self.field.degree,
                        self.field.irreducible_poly.coeffs.tolist())
-        print("matrix", matrix)
+        print('matrix', matrix)
         output = self.pool.map(func, list(range(0, n)))
 
         return output

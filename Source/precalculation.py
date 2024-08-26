@@ -4,20 +4,21 @@ import time
 import string
 import numpy as np
 import bitarray as ba
-import xor_code_python as xor
-import subprocess as sp
 import importlib
 import streamlit as st
 from pathlib import Path
 
+import xor_code_python as xor
+import Encodings.The2DCode as code_2d
+
 # List of files and directories
-df_metrics = pd.read_excel('synthesis_cost.xlsx')
-path_original_data = os.path.join('..', 'Data', 'Original', 'Test')  # after test, 'Test' at the end should be removed
-path_original_decoded = os.path.join('..', 'Data', 'Original', 'decoded')
-path_encoded_data = os.path.join('..', 'Data', 'Encoded_DNA')
-path_decoded_data = os.path.join('..', 'Data', 'Decoded_DNA')
-path_encoded_dna = os.path.join('..', 'Data', 'Encoded_DNA', 'DNA')
-path_decoded_dna = os.path.join('..', 'Data', 'Decoded_DNA', 'DNA')
+path_root_data = os.path.join('..', 'Data')
+path_original_data = os.path.join(path_root_data, 'Original', 'Test')  # after test, 'Test' at the end should be removed
+path_original_decoded = os.path.join(path_root_data, 'Original', 'decoded')
+path_encoded_data = os.path.join(path_root_data, 'Encoded_DNA')
+path_decoded_data = os.path.join(path_root_data, 'Decoded_DNA')
+path_encoded_dna = os.path.join(path_root_data, 'Encoded_DNA', 'DNA')
+path_decoded_dna = os.path.join(path_root_data, 'Decoded_DNA', 'DNA')
 existed_summary = pd.read_pickle('data/pre_measure_stat_sum1.pkl')  # pickel file for summary data
 existed_detail = pd.read_pickle('data/pre_measure1.pkl')   # pickel file for detail data
 path_encoding_methods = os.path.join('Encodings')
@@ -25,6 +26,9 @@ path_encoding_methods = os.path.join('Encodings')
 existing_encoding = []
 for encoding_method in os.listdir(path_encoding_methods):
     existing_encoding.append(encoding_method)
+
+constructor_2d_code = code_2d.encoder.api()
+df_metrics = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
 
 
 def cost_encoding(max_nt, oligos):
@@ -72,11 +76,7 @@ def encoding(encoding_method, binary, file_basename, save_path):
     """
     numblocks = 0
     if encoding_method == 'The2DCode':
-        output_path = os.path.join(path_encoded_dna, file_basename + '_' + encoding_method + '.txt')
-        output = sp.check_output("2D_Code.exe --encode --input=" + save_path + " --output=" + output_path)
-        numblocks = output[output.find(b'to')+3:output.find(b'to')+3+output[output.find(b'to')+3:].find(b' ')]
-        numblocks = numblocks.decode("utf-8")
-        generated_seq = open(output_path).readlines()
+        generated_seq = constructor_2d_code.encode('', binary)
     elif encoding_method == 'XORBasedCode':
         generated_seq = xor.encode('', binary)
     else:
@@ -96,7 +96,7 @@ def check_text_equal(path_original_file, path_decoded_file):
         status (str): the result of comparison (Same or Different)
     """
     if os.path.isfile(path_original_file):
-        with open(path_original_file, 'rb') as fd_original_file,\
+        with open(path_original_file, 'rb') as fd_original_file, \
                 open(path_decoded_file, 'rb') as fd_decoded_file:
             binary_array_original = ba.bitarray()
             binary_array_decoded = ba.bitarray()
@@ -168,7 +168,6 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
     enc_output = encoding(encoding_method, binary, file_basename, save_path)
     time_used = time.time() - start_time
     generated_seq = enc_output[0]
-    numblocks = enc_output[1]
     len_oligos = len(generated_seq)
     max_nt = 0
     generated_seq_upper = []
@@ -183,10 +182,9 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
     file_name = file_basename + '_' + encoding_method + '.txt'
 
     file_path = os.path.join(path_encoded_dna, file_name)
-    if encoding_method != 'The2DCode':
-        with open(file_path, 'w') as f:
-            for i in generated_seq_upper:
-                f.write(i + '\n')
+    with open(file_path, 'w') as f:
+        f.writelines(generated_seq)
+    
     encoded_size = os.path.getsize(file_path)
     list_encoded = [file_basename, encoding_method, 'Encoding', '.'+file_type, encoded_size, cost, time_used,
                     original_size]
@@ -202,13 +200,9 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
 
     size = os.path.getsize(file_path)
 
-    decoded_path = ''
     start_time = time.time()
     if encoding_method == 'The2DCode':
-        decoded_path = os.path.join(path_original_decoded, file_basename + '_' + encoding_method + '.' + file_type)
-        os.system("2D_Code.exe --decode --numblocks=" + numblocks + " --input=" + file_path + " --output="
-                  + decoded_path)
-        decoded_seq = ''
+        decoded_seq = constructor_2d_code.decode('', modified_sequence)
     elif encoding_method == 'XORBasedCode':
         decoded_seq = xor.decode('', modified_sequence)
     else:

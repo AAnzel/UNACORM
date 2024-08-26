@@ -4,12 +4,12 @@ import string
 import shutil
 import importlib
 import bitarray as ba
-import subprocess as sp
 import pandas as pd
 import numpy as np
 import streamlit as st
 
 import xor_code_python as xor
+import Encodings.The2DCode as code_2d
 
 import mesa_call
 
@@ -33,6 +33,9 @@ for file_name in os.listdir(path_original_data):
     path = os.path.join(path_original_data, file_name)
     if os.path.isfile(path):
         data_original.append(os.path.splitext(file_name)[0])
+
+
+constructor_2d_code = code_2d.encoder.api()
 
 
 def remove_cached_data():
@@ -127,14 +130,7 @@ def encoding(encoding_method, binary, file_basename, save_path):
     """
     numblocks = 0
     if encoding_method == 'The2DCode':
-        output_path = os.path.join(path_encoded_dna, file_basename + '_' +
-                                   encoding_method + '.txt')
-        output = sp.check_output("2D_Code.exe --encode --input=" + save_path +
-                                 " --output=" + output_path)
-        numblocks = output[output.find(b'to') + 3:output.find(b'to') + 3 +
-                           output[output.find(b'to') + 3:].find(b' ')]
-        numblocks = numblocks.decode("utf-8")
-        generated_seq = open(output_path).readlines()
+        generated_seq = constructor_2d_code.encode('', binary)
     elif encoding_method == 'XORBasedCode':
         generated_seq = xor.encode('', binary)
     else:
@@ -238,7 +234,7 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
     enc_output = encoding(encoding_method, binary, file_basename, save_path)
     time_used = time.time() - start_time  # getting length of encoding process
     generated_seq = enc_output[0]
-    numblocks = enc_output[1]
+    # numblocks = enc_output[1]
     len_oligos = len(generated_seq)
     max_nucleotide = 0
     generated_seq_upper = []
@@ -254,26 +250,22 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
     cost = cost_encoding(max_nucleotide, len_oligos)
 
     file_name = file_basename + '_' + encoding_method + '.txt'
-
     file_path = os.path.join(path_encoded_dna, file_name)
-    if encoding_method != 'The2DCode':
-        with open(file_path, 'w') as f:
-            for i in generated_seq_upper:
-                f.write(i + '\n')
+
+    with open(file_path, 'w') as f:
+        f.writelines(generated_seq_upper)
+
     encoded_size = os.path.getsize(file_path)
     list_encoded = [uploaded_filename, encoding_method, 'Encoding',
                     encoded_size, cost, time_used, '.' + file_type]
 
     modified_sequence = []
     i = 0
-    if encoding_method == 'The2DCode':
-        modified_sequence = generated_seq
-    else:
-        while i < len(generated_seq_upper):
-            seq = [str(generated_seq_upper[i])]
-            result = mesa_call.api_call(seq, storage_length)
-            modified_sequence.append(result)
-            i += 1
+    while i < len(generated_seq_upper):
+        seq = [str(generated_seq_upper[i])]
+        result = mesa_call.api_call(seq, storage_length)
+        modified_sequence.append(result)
+        i += 1
 
     file_path = os.path.join(path_decoded_dna, file_name)
     with open(file_path, 'w') as f:
@@ -285,11 +277,7 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
     decoded_path = ''
     start_time = time.time()
     if encoding_method == 'The2DCode':
-        decoded_path = os.path.join(path_uploaded_decoded, file_basename +
-                                    '_' + encoding_method + '.' + file_type)
-        os.system("2D_Code.exe --decode --numblocks=" + numblocks +
-                  " --input=" + file_path + " --output=" + decoded_path)
-        decoded_seq = ''
+        decoded_seq = constructor_2d_code.decode('', modified_sequence)
     elif encoding_method == 'XORBasedCode':
         decoded_seq = xor.decode('', modified_sequence)
     else:

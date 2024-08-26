@@ -1,7 +1,9 @@
 
-class dna_wheel:
-    # self.pair_to_number is a dictonary with the base pair as key and the unique identifier in GF(47) as value
-    # self.number_to_pair is pair_to_number with reversed key and value pairs
+class dnaWheel():
+    ''' A dictionary with base pairs as keys and unique identifier as values.
+        Pair_to_number maps a base pair to a galoise field value of 0 to 46.
+        Number_to_pair maps a galoise field value of 0 to 46 to a base pair.
+    '''
 
     def __init__(self) -> None:
         self.pair_to_number = {'ATC': 22,
