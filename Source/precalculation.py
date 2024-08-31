@@ -10,7 +10,9 @@ from pathlib import Path
 
 import xor_code_python as xor
 import Encodings.The2DCode as code_2d
-import Encodings.NOREC4DNA
+from Encodings.NOREC4DNA import unified_dna_lt
+from Encodings.NOREC4DNA import unified_dna_online  # Include this one
+from Encodings.NOREC4DNA import unified_dna_raptor  # Include this one
 
 
 # List of files and directories
@@ -83,9 +85,11 @@ def encoding(encoding_method, binary, file_basename, save_path):
         generated_seq = xor.encode('', binary)
     elif encoding_method == 'SimpleCode':
         method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
+    elif encoding_method == 'RepetitionCode':
+        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
         generated_seq = method.encode('', binary)
     elif encoding_method == 'NOREC4DNA':
-        NOREC4DNA.unified
+        generated_seq = unified_dna_lt.encode(save_path, binary)[0]
     else:
         pass
     return generated_seq, numblocks
@@ -214,6 +218,11 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
     elif encoding_method == 'SimpleCode':
         method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
         generated_seq = method.encode('', binary)
+    elif encoding_method == 'RepetitionCode':
+        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
+        generated_seq = method.encode('', binary)
+    elif encoding_method == 'NOREC4DNA':
+        generated_seq = unified_dna_lt.encode(save_path, binary)[0]
     else:
         pass
 
