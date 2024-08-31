@@ -280,10 +280,12 @@ def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
         decoded_seq = constructor_2d_code.decode('', modified_sequence)
     elif encoding_method == 'XORBasedCode':
         decoded_seq = xor.decode('', modified_sequence)
-    else:
+    elif encoding_method == 'SimpleCode':
         method = importlib.import_module(
             f'Encodings.{encoding_method}.src.transform')
         decoded_seq = method.decode('', modified_sequence)
+    else:
+        pass
 
     time_used = time.time() - start_time
     cost = 0

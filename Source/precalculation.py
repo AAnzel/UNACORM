@@ -10,6 +10,8 @@ from pathlib import Path
 
 import xor_code_python as xor
 import Encodings.The2DCode as code_2d
+import Encodings.NOREC4DNA
+
 
 # List of files and directories
 path_root_data = os.path.join('..', 'Data')
@@ -79,9 +81,13 @@ def encoding(encoding_method, binary, file_basename, save_path):
         generated_seq = constructor_2d_code.encode('', binary)
     elif encoding_method == 'XORBasedCode':
         generated_seq = xor.encode('', binary)
-    else:
+    elif encoding_method == 'SimpleCode':
         method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
         generated_seq = method.encode('', binary)
+    elif encoding_method == 'NOREC4DNA':
+        NOREC4DNA.unified
+    else:
+        pass
     return generated_seq, numblocks
 
 
@@ -184,7 +190,7 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
     file_path = os.path.join(path_encoded_dna, file_name)
     with open(file_path, 'w') as f:
         f.writelines(generated_seq)
-    
+
     encoded_size = os.path.getsize(file_path)
     list_encoded = [file_basename, encoding_method, 'Encoding', '.'+file_type, encoded_size, cost, time_used,
                     original_size]
@@ -205,9 +211,11 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
         decoded_seq = constructor_2d_code.decode('', modified_sequence)
     elif encoding_method == 'XORBasedCode':
         decoded_seq = xor.decode('', modified_sequence)
-    else:
+    elif encoding_method == 'SimpleCode':
         method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
-        decoded_seq = method.decode('', modified_sequence)
+        generated_seq = method.encode('', binary)
+    else:
+        pass
 
     time_used = time.time() - start_time
     cost = 0

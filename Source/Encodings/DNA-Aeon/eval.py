@@ -47,13 +47,13 @@ if __name__ == '__main__':
     config = {
         "general": {
             "sync": 4,
-            "as_fasta": true
+            "as_fasta": 'true'
         },
         "decode": {
             "input": out_path,
             "output": out_zip_name,
             "length": length
-    }
+    }}
     with open(conf_file_path, "w") as conf_file:
         json.dump(config, conf_file)
     if os.path.exists(norec_out_path):

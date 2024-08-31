@@ -1,0 +1,1 @@
+{"general": {"sync": 4, "as_fasta": "true"}, "decode": {"input": "/home/wintermute/projects/arithmetic_modulator_error_correction/data/dorn_encoded_mod.fasta", "output": "dorn_decoded_auto.zip", "length": 172}}
