@@ -145,7 +145,8 @@ def check_text_equal(path_original_file, path_decoded_file):
 
 
 def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
-    """This function is used for specifying condition of comparison for different encoding method
+    """This function is used for specifying condition of comparison for
+    different encoding method
 
     Args:
         save_path (string): path of uploaded file
@@ -280,23 +281,33 @@ def generate_summary(df_report, encoding_method, binary, file_basename,
     Returns:
         _type_: _description_
     """
-    df = df_report[(df_report['Filename'] == file_basename) & (df_report['Method'] == encoding_method) &
-                   (df_report['Type'] == '.'+string_file_extension)]
+    df = df_report[
+        (df_report['Filename'] == file_basename) &
+        (df_report['Method'] == encoding_method) &
+        (df_report['Type'] == '.' + string_file_extension)]
     original_size = os.path.getsize(path)
     encoded_string_file_name = file_basename + '_' + encoding_method + '.txt'
     encoded_path = os.path.join(path_encoded_dna, encoded_string_file_name)
     encoded_size = os.path.getsize(encoded_path)
     decoded_string_file_name = file_basename + '_' + encoding_method + '.npy'
-    decoded_binary_path = os.path.join(path_decoded_data, decoded_string_file_name)
+    decoded_binary_path = os.path.join(path_decoded_data,
+                                       decoded_string_file_name)
     decoded_seq = np.load(decoded_binary_path)
-    decoded_path = os.path.join(path_original_decoded, file_basename + '_' + encoding_method + '.' + string_file_extension)
-    status = compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq)
-    df_agg = df.groupby(['Filename', 'Method', 'Transformation', 'Type']).agg({'Time': 'mean', 'Size': 'mean', 'Cost':
-                                                                               'mean'}).reset_index()
-    df_agg_sum = df_agg.groupby(['Filename', 'Method', 'Type']).agg({'Time': 'sum', 'Size': 'sum', 'Cost': 'sum'})\
-        .reset_index()
-    df_agg_sum.rename(columns={'Time': 'Sum_Mean_Time', 'Size': 'Sum_Size', 'Cost': 'Sum_Cost'}, inplace=True)
-    df_agg_sum['Encoding_Multipliers'] = encoded_size/original_size
+    decoded_path = os.path.join(
+        path_original_decoded,
+        file_basename + '_' + encoding_method + '.' + string_file_extension)
+    status = compare2ori(save_path, decoded_path, encoding_method, binary,
+                         decoded_seq)
+    df_agg = df.groupby(
+        ['Filename', 'Method', 'Transformation', 'Type']).agg(
+            {'Time': 'mean', 'Size': 'mean', 'Cost': 'mean'}).reset_index()
+    df_agg_sum = df_agg.groupby(
+        ['Filename', 'Method', 'Type']).agg(
+            {'Time': 'sum', 'Size': 'sum', 'Cost': 'sum'}).reset_index()
+    df_agg_sum.rename(
+        columns={'Time': 'Sum_Mean_Time', 'Size': 'Sum_Size',
+                 'Cost': 'Sum_Cost'}, inplace=True)
+    df_agg_sum['Encoding_Multipliers'] = encoded_size / original_size
     df_agg_sum['Similarity'] = status
     print(df_agg_sum)
     return df_agg_sum
@@ -334,8 +345,8 @@ def run_precalculation(int_num_of_iteration):
     Args:
         num_of_iteration (int): number of iteration for each file
     """
-    bool_summary_exists = True if os.path.exists(path_existing_summary) else False  # noqa
-    bool_detail_exists = True if os.path.exists(path_existing_detail) else False  # noqa
+    bool_summary_exists = os.path.exists(path_existing_summary)
+    bool_detail_exists = os.path.exists(path_existing_detail)
 
     if bool_summary_exists:
         df_existing_summary = pd.read_pickle(path_existing_summary)
@@ -415,22 +426,21 @@ def run_precalculation(int_num_of_iteration):
     st.dataframe(df_existing_summary)
     st.write('Do you want to merge both new data into pickle file?')
     if st.button('Merge new data to pickel'):
-        detail_concat = pd.concat([df_report, df_existing_detail], ignore_index=True)
-        save_file_detail = Path('data/detail_updated.pkl')
-        detail_concat.to_pickle(save_file_detail)  # path should be changed to 'data/pre_measure1.pkl'
-        summary_concat = pd.concat([df_summary, df_existing_summary], ignore_index=True)
-        save_file_summary = Path('data/summary_updated.pkl')  # should be changed to 'data/pre_measure_stat_sum1.pkl'
-        summary_concat.to_pickle(save_file_summary)
-        if save_file_detail.exists() and save_file_summary.exists():
+        detail_concat = pd.concat([df_report, df_existing_detail],
+                                  ignore_index=True)
+        detail_concat.to_pickle(path_existing_detail)
+        summary_concat = pd.concat([df_summary, df_existing_summary],
+                                   ignore_index=True)
+        summary_concat.to_pickle(path_existing_summary)
+        if os.path.exists(path_existing_detail) and os.path.exists(
+                path_existing_summary):
             st.success('New data has been successfully merged')
-            st.header('New Detail Data')
-            new_summary = pd.read_pickle(save_file_summary)
-            st.dataframe(new_summary)
             st.header('New Summary Data')
-            new_summary = pd.read_pickle(save_file_summary)
-            st.dataframe(new_summary)
+            st.dataframe(pd.read_pickle(path_existing_summary))
+            st.header('New Detail Data')
+            st.dataframe(pd.read_pickle(path_existing_detail))
         else:
-            st.error('There was an error while uploading the pickel file')
+            st.error('There was an error while uploading the pickle file')
 
 
 run_precalculation(1)  # 2 times iteration
