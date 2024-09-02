@@ -4,18 +4,22 @@ import time
 import string
 import numpy as np
 import bitarray as ba
-import importlib
 import streamlit as st
 from pathlib import Path
 
-import xor_code_python as xor
-import Encodings.The2DCode as code_2d
-from Encodings.NOREC4DNA import unified_dna_lt
-from Encodings.NOREC4DNA import unified_dna_online  # Include this one
-from Encodings.NOREC4DNA import unified_dna_raptor  # Include this one
+# Importing Encodings
+import xor_code_python as encoding_xor
+from Encodings.The2DCode.encoder import api as api_encoding_2d
+from Encodings.SimpleCode.src import transform as encoding_simple
+from Encodings.RepetitionCode.src import transform as encoding_repetition
+from Encodings.NOREC4DNA import unified_dna_lt as encoding_lt
+from Encodings.NOREC4DNA import unified_dna_online as encoding_online # Include this one # noqa
+from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # Include this one # noqa
+
+encoding_2d = api_encoding_2d()  # We have to initialize the constructor
 
 
-# List of files and directories
+# Defining paths for important files and directories
 path_root_data = os.path.join('..', 'Data')
 path_original_data = os.path.join(path_root_data, 'Original', 'Test')  # after test, 'Test' at the end should be removed
 path_original_decoded = os.path.join(path_root_data, 'Original', 'decoded')
@@ -23,16 +27,21 @@ path_encoded_data = os.path.join(path_root_data, 'Encoded_DNA')
 path_decoded_data = os.path.join(path_root_data, 'Decoded_DNA')
 path_encoded_dna = os.path.join(path_root_data, 'Encoded_DNA', 'DNA')
 path_decoded_dna = os.path.join(path_root_data, 'Decoded_DNA', 'DNA')
-existed_summary = pd.read_pickle('data/pre_measure_stat_sum1.pkl')  # pickel file for summary data
-existed_detail = pd.read_pickle('data/pre_measure1.pkl')   # pickel file for detail data
+path_existing_detail = os.path.join('data', 'pre_measure.pkl')
+path_existing_summary = os.path.join('data', 'pre_measure_stat.pkl')
+df_existing_detail = pd.read_pickle(path_existing_detail)
+df_existing_summary = pd.read_pickle(path_existing_summary)
 path_encoding_methods = os.path.join('Encodings')
 
 existing_encoding = []
 for encoding_method in os.listdir(path_encoding_methods):
     existing_encoding.append(encoding_method)
 
-constructor_2d_code = code_2d.encoder.api()
 df_metrics = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
+
+# ============================================================================
+# Function definitions start here
+# ============================================================================
 
 
 def cost_encoding(max_nt, oligos):
@@ -80,16 +89,15 @@ def encoding(encoding_method, binary, file_basename, save_path):
     """
     numblocks = 0
     if encoding_method == 'The2DCode':
-        generated_seq = constructor_2d_code.encode('', binary)
+        generated_seq = encoding_2d.encode('', binary)
     elif encoding_method == 'XORBasedCode':
-        generated_seq = xor.encode('', binary)
+        generated_seq = encoding_xor.encode('', binary)
     elif encoding_method == 'SimpleCode':
-        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
+        generated_seq = encoding_simple.encode('', binary)
     elif encoding_method == 'RepetitionCode':
-        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
-        generated_seq = method.encode('', binary)
+        generated_seq = encoding_repetition.encode('', binary)
     elif encoding_method == 'NOREC4DNA':
-        generated_seq = unified_dna_lt.encode(save_path, binary)[0]
+        generated_seq = encoding_lt.encode(save_path, binary)[0]
     else:
         pass
     return generated_seq, numblocks
@@ -212,22 +220,22 @@ def pipeline(encoding_method, binary, file_basename, file_type, save_path, origi
 
     start_time = time.time()
     if encoding_method == 'The2DCode':
-        decoded_seq = constructor_2d_code.decode('', modified_sequence)
+        decoded_seq = encoding_2d.decode('', modified_sequence)
     elif encoding_method == 'XORBasedCode':
-        decoded_seq = xor.decode('', modified_sequence)
+        decoded_seq = encoding_xor.decode('', modified_sequence)
     elif encoding_method == 'SimpleCode':
-        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
-        generated_seq = method.encode('', binary)
+        decoded_seq = encoding_simple.decode('', modified_sequence)
     elif encoding_method == 'RepetitionCode':
-        method = importlib.import_module(f'Encodings.{encoding_method}.src.transform')
-        generated_seq = method.encode('', binary)
+        decoded_seq = encoding_repetition.decode('', modified_sequence)
     elif encoding_method == 'NOREC4DNA':
-        generated_seq = unified_dna_lt.encode(save_path, binary)[0]
+        decoded_seq = encoding_lt.decode(save_path, modified_sequence)[0]
     else:
         pass
 
     time_used = time.time() - start_time
     cost = 0
+
+    print(encoding_method)
 
     file_name = file_basename + '_' + encoding_method + '.npy'
 
@@ -319,8 +327,8 @@ def run_precalculation(num_of_iteration):
             file_ext = os.path.splitext(list_file)[1]
             file_type = file_ext[1:len(file_ext)]
             for encoding_method in existing_encoding:
-                if len(existed_summary[(existed_summary["Filename"] == file_name) &
-                                       (existed_summary["Method"] == encoding_method)]) == 0:
+                if len(df_existing_summary[(df_existing_summary["Filename"] == file_name) &
+                                       (df_existing_summary["Method"] == encoding_method)]) == 0:
                     print(file_name, file_type, encoding_method)
                     path_original = os.path.join(path_original_data, list_file)
                     OriFileSize = os.path.getsize(path_original)
@@ -347,18 +355,18 @@ def run_precalculation(num_of_iteration):
     st.header('Recently calculated details')
     st.dataframe(df_report)
     st.header('Existed precalculated details')
-    st.dataframe(existed_detail)
+    st.dataframe(df_existing_detail)
 
     st.header('Recently calculated summary')
     st.dataframe(df_summary)
     st.header('Existed precalculated summary')
-    st.dataframe(existed_summary)
+    st.dataframe(df_existing_summary)
     st.write('Do you want to merge both new data into pickel file?')
     if st.button('Merge new data to pickel'):
-        detail_concat = pd.concat([df_report, existed_detail], ignore_index=True)
+        detail_concat = pd.concat([df_report, df_existing_detail], ignore_index=True)
         save_file_detail = Path('data/detail_updated.pkl')
         detail_concat.to_pickle(save_file_detail)  # path should be changed to 'data/pre_measure1.pkl'
-        summary_concat = pd.concat([df_summary, existed_summary], ignore_index=True)
+        summary_concat = pd.concat([df_summary, df_existing_summary], ignore_index=True)
         save_file_summary = Path('data/summary_updated.pkl')  # should be changed to 'data/pre_measure_stat_sum1.pkl'
         summary_concat.to_pickle(save_file_summary)
         if save_file_detail.exists() and save_file_summary.exists():
@@ -373,4 +381,4 @@ def run_precalculation(num_of_iteration):
             st.error('There was an error while uploading the pickel file')
 
 
-run_precalculation(2)  # 2 times iteration
+run_precalculation(1)  # 2 times iteration
