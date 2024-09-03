@@ -208,6 +208,7 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
     string_file_extension = os.path.splitext(string_file_name)[1][1:]
     print(path_input_file, string_input_file_basename, string_file_extension)
 
+    # We time the encoding process
     int_start_time = time.time()
     list_dna_sequences = list_encode_decode(
         string_encoding_method, np_bit_array, path_input_file, True)
@@ -234,6 +235,7 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
     list_modified_sequence = list_dna_sequences
     # TODO ===================================================================
 
+    # We time the decoding process
     int_start_time = time.time()
     np_decoded_dna_sequences = list_encode_decode(
         string_encoding_method, list_modified_sequence, path_input_file, False)
