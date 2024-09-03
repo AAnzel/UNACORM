@@ -6,7 +6,6 @@ import string
 import numpy as np
 import bitarray as ba
 import streamlit as st
-from pathlib import Path
 
 # Importing Encodings
 import xor_code_python as encoding_xor
@@ -95,7 +94,7 @@ def encoding(encoding_method, binary, file_basename, save_path):
     elif encoding_method == 'RepetitionCode':
         generated_seq = encoding_repetition.encode('', binary)
     elif encoding_method == 'NOREC4DNA':
-        generated_seq = encoding_lt.encode(save_path, binary)[0]  # TODO: Fix
+        generated_seq = encoding_lt.encode(save_path, binary)[0]  # ! Fix
     else:
         pass
 
@@ -241,7 +240,7 @@ def pipeline(encoding_method, binary, file_basename, string_file_extension,
         decoded_seq = encoding_simple.decode('', modified_sequence)
     elif encoding_method == 'RepetitionCode':
         decoded_seq = encoding_repetition.decode('', modified_sequence)
-    elif encoding_method == 'NOREC4DNA':  # TODO: Fix
+    elif encoding_method == 'NOREC4DNA':  # ! Fix
         decoded_seq = encoding_lt.decode(save_path, modified_sequence)[0]
     else:
         pass
@@ -443,4 +442,9 @@ def run_precalculation(int_num_of_iteration):
             st.error('There was an error while uploading the pickle file')
 
 
-run_precalculation(1)  # 2 times iteration
+def main():
+    run_precalculation(1)  # 2 times iteration
+
+
+if __name__ == '__main__':
+    main()
