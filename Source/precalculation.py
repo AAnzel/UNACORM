@@ -70,35 +70,48 @@ def cost_encoding(max_nt, oligos):
     return cost_total
 
 
-def encoding(encoding_method, binary, file_basename, save_path):
+def list_encode_decode(str_encoding_method, list_np_data, path_file,
+                       bool_encode):
     """This function is used for encoding the binary data into DNA sequences
 
     Args:
         encoding_method (str): chosen encoding method
-        binary (array): binary data sequence
-        file_basename (str): name of file that contains timestamp
-        save_path (str): path of the original un-encoded file
+        list_np_data (list or np.array): data to encode or decode
+        path_file (os.path): path of the original un-encoded file
+        bool_encode (bool): if true encoding is performed, if false then
+        decoding
 
     Returns:
         generated_seq (list): encoded dna list
-        numblocks (int): number of blocks from 2D Code that will be used for
-        decoding
     """
-    numblocks = 0
-    if encoding_method == 'The2DCode':
-        generated_seq = encoding_2d.encode('', binary)
-    elif encoding_method == 'XORBasedCode':
-        generated_seq = encoding_xor.encode('', binary)
-    elif encoding_method == 'SimpleCode':
-        generated_seq = encoding_simple.encode('', binary)
-    elif encoding_method == 'RepetitionCode':
-        generated_seq = encoding_repetition.encode('', binary)
-    elif encoding_method == 'NOREC4DNA':
-        generated_seq = encoding_lt.encode(save_path, binary)[0]  # ! Fix
+    if bool_encode:
+        if str_encoding_method == 'The2DCode':
+            generated_seq = encoding_2d.encode('', list_np_data)
+        elif str_encoding_method == 'XORBasedCode':
+            generated_seq = encoding_xor.encode('', list_np_data)
+        elif str_encoding_method == 'SimpleCode':
+            generated_seq = encoding_simple.encode('', list_np_data)
+        elif str_encoding_method == 'RepetitionCode':
+            generated_seq = encoding_repetition.encode('', list_np_data)
+        elif str_encoding_method == 'NOREC4DNA':  # ! Fix
+            generated_seq = encoding_lt.encode(path_file, list_np_data)[0]
+        else:
+            pass
     else:
-        pass
+        if str_encoding_method == 'The2DCode':
+            generated_seq = encoding_2d.decode('', list_np_data)
+        elif str_encoding_method == 'XORBasedCode':
+            generated_seq = encoding_xor.decode('', list_np_data)
+        elif str_encoding_method == 'SimpleCode':
+            generated_seq = encoding_simple.decode('', list_np_data)
+        elif str_encoding_method == 'RepetitionCode':
+            generated_seq = encoding_repetition.decode('', list_np_data)
+        elif str_encoding_method == 'NOREC4DNA':  # ! Fix
+            generated_seq = encoding_lt.decode(path_file, list_np_data)[0]
+        else:
+            pass
 
-    return generated_seq, numblocks
+    return generated_seq
 
 
 def check_text_equal(path_original_file, path_decoded_file):
@@ -134,7 +147,6 @@ def check_text_equal(path_original_file, path_decoded_file):
             binary_numpy_decoded = np.frombuffer(
                 binary_array_decoded.unpack(), dtype=bool)
 
-            status = ''
             if np.array_equal(binary_numpy_original, binary_numpy_decoded):
                 status = 'Same'
             else:
@@ -177,7 +189,7 @@ def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
 
 def pipeline(encoding_method, binary, file_basename, string_file_extension,
              save_path, original_size):
-    """This function is used for integrating the process for uploaded file
+    """This function is used for integrating the process for one file
 
     Args:
         encoding_method (str): chosen encoding method
@@ -193,10 +205,11 @@ def pipeline(encoding_method, binary, file_basename, string_file_extension,
         list_decoded [list]: list of result from decoding process including
         time, cost, and size
     """
-    start_time = time.time()
-    enc_output = encoding(encoding_method, binary, file_basename, save_path)
-    time_used = time.time() - start_time
-    generated_seq = enc_output[0]
+    int_start_time = time.time()
+    generated_seq = list_encode_decode(encoding_method, binary, save_path,
+                                       True)
+    int_time_used = time.time() - int_start_time
+
     len_oligos = len(generated_seq)
     max_nt = 0
     generated_seq_upper = []
@@ -217,7 +230,7 @@ def pipeline(encoding_method, binary, file_basename, string_file_extension,
     encoded_size = os.path.getsize(file_path)
     list_encoded = [
         file_basename, encoding_method, 'Encoding',
-        '.' + string_file_extension, encoded_size, cost, time_used,
+        '.' + string_file_extension, encoded_size, cost, int_time_used,
         original_size]
 
     modified_sequence = []
@@ -232,24 +245,11 @@ def pipeline(encoding_method, binary, file_basename, string_file_extension,
     size = os.path.getsize(file_path)
 
     start_time = time.time()
-    if encoding_method == 'The2DCode':
-        decoded_seq = encoding_2d.decode('', modified_sequence)
-    elif encoding_method == 'XORBasedCode':
-        decoded_seq = encoding_xor.decode('', modified_sequence)
-    elif encoding_method == 'SimpleCode':
-        decoded_seq = encoding_simple.decode('', modified_sequence)
-    elif encoding_method == 'RepetitionCode':
-        decoded_seq = encoding_repetition.decode('', modified_sequence)
-    elif encoding_method == 'NOREC4DNA':  # ! Fix
-        decoded_seq = encoding_lt.decode(save_path, modified_sequence)[0]
-    else:
-        pass
-
+    decoded_seq = list_encode_decode(encoding_method, modified_sequence,
+                                     save_path, False)
     time_used = time.time() - start_time
+
     cost = 0
-
-    print(encoding_method)
-
     string_file_name = file_basename + '_' + encoding_method + '.npy'
 
     file_path = os.path.join(path_decoded_data, string_file_name)
@@ -322,8 +322,8 @@ def np_data_to_bitarray(path_original_file):
         binary_numpy_content (np.array): bit array representing the original
         file
     """
-    if os.path.isfile(path_original_data):
-        with open(path_original_data, 'rb') as fd_file:
+    if os.path.isfile(path_original_file):
+        with open(path_original_file, 'rb') as fd_file:
             binary_array_content = ba.bitarray()
             binary_array_content.fromfile(fd_file)
             binary_numpy_content = np.frombuffer(
