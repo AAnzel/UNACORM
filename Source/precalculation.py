@@ -29,43 +29,43 @@ path_existing_detail = os.path.join('data', 'pre_measure.pkl')
 path_existing_summary = os.path.join('data', 'pre_measure_stat.pkl')
 path_encoding_methods = os.path.join('Encodings')
 
-list_encoding_methods = []
-list_pass_methods = ['NOREC4DNA', 'DNA-Aeon']
-for string_encoding_method in os.listdir(path_encoding_methods):
-    if string_encoding_method not in list_pass_methods and os.path.isdir(
-            os.path.join(path_encoding_methods, string_encoding_method)):
-        list_encoding_methods.append(string_encoding_method)
-
-df_metrics = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
+_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
+_DF_METRICS = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
 
 # ============================================================================
 # Function definitions start here
 # ============================================================================
 
 
-def cost_encoding(max_nt, oligos):
+def cost_encoding(list_dna_sequences):
     """This function is used for calculating synthesizing cost
 
     Args:
-        max_nt (int): max nucleutide from dna sequences
-        oligos (int): number of oligos
+        list_dna_sequences (list): list of DNA sequences
 
     Returns:
-        cost_total (number): synthesising cost
+        cost_total (int): synthesising cost
     """
-    i = 0 if max_nt <= 120 else 1
+    int_num_of_oligos = len(list_dna_sequences)
+    int_max_nucleotides = 0
+    for seq in list_dna_sequences:
+        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
+        if nt > int_max_nucleotides:
+            int_max_nucleotides = nt
 
-    if oligos >= 2 and oligos <= 100:
+    i = 0 if int_max_nucleotides <= 120 else 1
+
+    if int_num_of_oligos >= 2 and int_num_of_oligos <= 100:
         j = 1
-    elif oligos >= 101 and oligos <= 500:
+    elif int_num_of_oligos >= 101 and int_num_of_oligos <= 500:
         j = 2
-    elif oligos >= 501 and oligos <= 1000:
+    elif int_num_of_oligos >= 501 and int_num_of_oligos <= 1000:
         j = 3
     else:
         j = 4
 
-    cost = df_metrics.iloc[i, j]
-    cost_total = cost * oligos
+    cost = _DF_METRICS.iloc[i, j]
+    cost_total = cost * int_num_of_oligos
 
     return cost_total
 
@@ -123,7 +123,7 @@ def check_text_equal(path_original_file, path_decoded_file):
         path_decoded_file (str): path of processed decoded file
 
     Returns:
-        status (str): the result of comparison (Same or Different)
+        string_status (str): the result of comparison (Same or Different)
     """
 
     if not os.path.exists(path_original_file):
@@ -148,11 +148,11 @@ def check_text_equal(path_original_file, path_decoded_file):
                 binary_array_decoded.unpack(), dtype=bool)
 
             if np.array_equal(binary_numpy_original, binary_numpy_decoded):
-                status = 'Same'
+                string_status = 'Same'
             else:
-                status = 'Different'
+                string_status = 'Different'
 
-    return status
+    return string_status
 
 
 def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
@@ -187,17 +187,15 @@ def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
     return status
 
 
-def pipeline(encoding_method, binary, file_basename, string_file_extension,
-             save_path, original_size):
+def pipeline(string_encoding_method, np_bit_array, string_file_name,
+             int_original_size):
     """This function is used for integrating the process for one file
 
     Args:
-        encoding_method (str): chosen encoding method
-        binary (array): numpy binary array of uploaded file
-        file_basename (str): name of file
-        string_file_extension (str): file extension
-        save_path (str): path of uploaded data
-        original_size (number): size of original file
+        string_encoding_method (str): chosen encoding method
+        np_bit_array (array): numpy np_bit_array array of uploaded file
+        path_input_file (str): path of uploaded data
+        int_original_size (number): size of original file
 
     Returns:
         list_encoded [list]: list of result from encoding process including
@@ -205,58 +203,55 @@ def pipeline(encoding_method, binary, file_basename, string_file_extension,
         list_decoded [list]: list of result from decoding process including
         time, cost, and size
     """
+    path_input_file = os.path.join(path_original_data, string_file_name)
+    string_input_file_basename = os.path.splitext(string_file_name)[0]
+    string_file_extension = os.path.splitext(string_file_name)[1][1:]
+    print(path_input_file, string_input_file_basename, string_file_extension)
+
     int_start_time = time.time()
-    generated_seq = list_encode_decode(encoding_method, binary, save_path,
-                                       True)
-    int_time_used = time.time() - int_start_time
+    list_dna_sequences = list_encode_decode(
+        string_encoding_method, np_bit_array, path_input_file, True)
+    int_time_encoding = time.time() - int_start_time
 
-    len_oligos = len(generated_seq)
-    max_nt = 0
-    generated_seq_upper = []
-    for seq in generated_seq:
-        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
-        generated_seq_upper.append(seq.upper())
-        if nt > max_nt:
-            max_nt = nt
-    print('len_oligos = ' + str(len_oligos) + ' max_nt = ' + str(max_nt))
-    cost = cost_encoding(max_nt, len_oligos)
+    int_cost_encoding = cost_encoding(list_dna_sequences)
 
-    string_file_name = file_basename + '_' + encoding_method + '.txt'
+    string_encoded_file_name = string_input_file_basename + '_' + \
+        string_encoding_method + '.txt'
+    path_encoded_file = os.path.join(path_encoded_dna,
+                                     string_encoded_file_name)
+    with open(path_encoded_file, 'w') as f:
+        f.writelines(list_dna_sequences)
 
-    file_path = os.path.join(path_encoded_dna, string_file_name)
-    with open(file_path, 'w') as f:
-        f.writelines(generated_seq)
+    int_encoded_file_size = os.path.getsize(path_encoded_file)
 
-    encoded_size = os.path.getsize(file_path)
     list_encoded = [
-        file_basename, encoding_method, 'Encoding',
-        '.' + string_file_extension, encoded_size, cost, int_time_used,
-        original_size]
+        string_input_file_basename, string_encoding_method, 'Encoding',
+        '.' + string_file_extension, int_encoded_file_size, int_cost_encoding,
+        int_time_encoding, int_original_size]
 
-    modified_sequence = []
-    i = 0
-    modified_sequence = generated_seq
+    # TODO ===================================================================
+    list_modified_sequence = []  # TODO: Add a flag to call MESA and generalize
+    list_modified_sequence = list_dna_sequences
+    # TODO ===================================================================
 
-    file_path = os.path.join(path_decoded_dna, string_file_name)
-    with open(file_path, 'w') as f:
-        for i in modified_sequence:
-            f.write(i)
+    int_start_time = time.time()
+    np_decoded_dna_sequences = list_encode_decode(
+        string_encoding_method, list_modified_sequence, path_input_file, False)
+    int_time_decoding = time.time() - int_start_time
 
-    size = os.path.getsize(file_path)
+    int_cost_decoding = 0
+    string_decoded_file_name = string_input_file_basename + '_' + \
+        string_encoding_method + '.npy'
 
-    start_time = time.time()
-    decoded_seq = list_encode_decode(encoding_method, modified_sequence,
-                                     save_path, False)
-    time_used = time.time() - start_time
+    path_decoded_file = os.path.join(path_decoded_data,
+                                     string_decoded_file_name)
+    np.save(path_decoded_file, np_decoded_dna_sequences)
+    int_decoded_file_size = os.path.getsize(path_decoded_file)
 
-    cost = 0
-    string_file_name = file_basename + '_' + encoding_method + '.npy'
-
-    file_path = os.path.join(path_decoded_data, string_file_name)
-    np.save(file_path, decoded_seq)
     list_decoded = [
-        file_basename, encoding_method, 'Decoding',
-        '.' + string_file_extension, size, cost, time_used, original_size]
+        string_input_file_basename, string_encoding_method, 'Decoding',
+        '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
+        int_time_decoding, int_original_size]
 
     return list_encoded, list_decoded
 
@@ -365,6 +360,12 @@ def run_precalculation(int_num_of_iteration):
         columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',
                  'Cost', 'Time', 'OriFile_Size'])
 
+    list_encoding_methods = []
+    for string_encoding_method in os.listdir(path_encoding_methods):
+        if string_encoding_method not in _LIST_PASS_METHODS and os.path.isdir(
+                os.path.join(path_encoding_methods, string_encoding_method)):
+            list_encoding_methods.append(string_encoding_method)
+
     # We list original files
     for string_file in os.listdir(path_original_data):
         path_one_file = os.path.join(path_original_data, string_file)
@@ -385,17 +386,15 @@ def run_precalculation(int_num_of_iteration):
                 ) != 0
 
             if not bool_file_is_processed:
-                print(string_file_name, string_file_extension,
-                      string_encoding_method)
+                print(path_one_file, string_encoding_method)
 
-                OriFileSize = os.path.getsize(path_one_file)
+                int_file_size_bytes = os.path.getsize(path_one_file)
                 np_binary_encoding = np_data_to_bitarray(path_one_file)
 
                 for int_i in range(int_num_of_iteration):
                     output = pipeline(
                         string_encoding_method, np_binary_encoding,
-                        string_file_name, string_file_extension, path_one_file,
-                        OriFileSize)
+                        string_file, int_file_size_bytes)
                     list_encoded = output[0]
                     list_decoded = output[1]
                     # list_summary = output[2]
