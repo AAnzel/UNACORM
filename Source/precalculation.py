@@ -19,7 +19,7 @@ from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # Include 
 
 # Defining paths for important files and directories
 path_root_data = os.path.join('..', 'Data')
-path_original_data = os.path.join(path_root_data, 'Original', 'Test')  # after test, 'Test' at the end should be removed
+path_original_data = os.path.join(path_root_data, 'Original', 'Test')  # TODO: Remove 'Test' # noqa
 path_original_decoded = os.path.join(path_root_data, 'Original', 'decoded')
 path_encoded_data = os.path.join(path_root_data, 'Encoded_DNA')
 path_decoded_data = os.path.join(path_root_data, 'Decoded_DNA')
@@ -312,18 +312,16 @@ def generate_summary(df_report, encoding_method, binary, file_basename,
     return df_agg_sum
 
 
-def convert_text_data_to_binary(path_original_data):
+def np_data_to_bitarray(path_original_file):
     """This function is used to convert data to binary
 
     Args:
-        path_original_data (str): path of original uploaded file
+        path_original_file (os.path): path of the original file
 
     Returns:
-        bit_encoded_file (str): path of generated binary from uploaded file
+        binary_numpy_content (np.array): bit array representing the original
+        file
     """
-    file_basename = os.path.basename(path_original_data)
-    string_file_no_extension = os.path.splitext(file_basename)[0]
-    encoded_filename = string_file_no_extension + ".npy"
     if os.path.isfile(path_original_data):
         with open(path_original_data, 'rb') as fd_file:
             binary_array_content = ba.bitarray()
@@ -331,11 +329,11 @@ def convert_text_data_to_binary(path_original_data):
             binary_numpy_content = np.frombuffer(
                 binary_array_content.unpack(), dtype=bool)
 
-            np.save(os.path.join(path_encoded_data, string_file_no_extension), binary_numpy_content, allow_pickle=False)
+    else:
+        raise FileNotFoundError(
+            errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
 
-    bit_encoded_file = os.path.join(path_encoded_data, encoded_filename)
-
-    return bit_encoded_file
+    return binary_numpy_content
 
 
 def run_precalculation(int_num_of_iteration):
@@ -391,9 +389,7 @@ def run_precalculation(int_num_of_iteration):
                       string_encoding_method)
 
                 OriFileSize = os.path.getsize(path_one_file)
-                path_binary_encoding = convert_text_data_to_binary(
-                    path_one_file)
-                np_binary_encoding = np.load(path_binary_encoding)
+                np_binary_encoding = np_data_to_bitarray(path_one_file)
 
                 for int_i in range(int_num_of_iteration):
                     output = pipeline(
