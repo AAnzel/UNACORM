@@ -29,7 +29,7 @@ path_existing_detail = os.path.join('data', 'pre_measure.pkl')
 path_existing_summary = os.path.join('data', 'pre_measure_stat.pkl')
 path_encoding_methods = os.path.join('Encodings')
 
-_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
+_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon', 'The2DCode']
 _DF_METRICS = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
 
 # ============================================================================
@@ -185,51 +185,52 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
     return list_encoded, list_decoded, np_decoded_dna_sequences
 
 
-def generate_summary(df_report, encoding_method, binary, file_basename,
-                     string_file_extension, save_path):
+def generate_summary(df_report, dict_same_files):
     """This function is used for generating summary dataframe from detail
     dataframe (from 10 times running pipeline)
 
     Args:
         df_report (DataFrame): detailed df containing previous runs of one
         encoding method
-        encoding_method (str): chosen encoding method
-        binary (array): numpy binary array of uploaded file
-        file_basename (str): name of file
-        string_file_extension (str): file extension
-        storage_length (int): chosen length of storage in hour
-        save_path (str): path of uploaded data
+        dict_same_files (dict): A dict containing if encoding/decoding process
+        produced the same or different files for one encoding method
 
     Returns:
         _type_: _description_
     """
 
-    original_size = os.path.getsize(save_path)
-    encoded_string_file_name = file_basename + '_' + encoding_method + '.txt'
-    encoded_path = os.path.join(path_encoded_dna, encoded_string_file_name)
-    encoded_size = os.path.getsize(encoded_path)
-    decoded_string_file_name = file_basename + '_' + encoding_method + '.npy'
-    decoded_binary_path = os.path.join(path_decoded_data,
-                                       decoded_string_file_name)
-    decoded_seq = np.load(decoded_binary_path)
-    decoded_path = os.path.join(
-        path_original_decoded,
-        file_basename + '_' + encoding_method + '.' + string_file_extension)
-    status = compare2ori(save_path, decoded_path, encoding_method, binary,
-                         decoded_seq)
-    df_agg = df_report.groupby(
+    #['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost', 'Time', 'OriFile_Size']
+
+    df_summary = df_report.copy(deep=True)
+    df_encoding_multipliers = df_report[[
+        'Filename', 'Method', 'Transformation', 'Type', 'Size',
+        'OriFile_Size']].copy(deep=True)
+    df_encoding_multipliers['Encoding_Multipliers'] = df_encoding_multipliers[
+        'Size'] / df_encoding_multipliers['OriFile_Size']
+    df_encoding_multipliers = df_encoding_multipliers.loc[
+        df_summary['Transformation'] == 'Encoding']
+    df_encoding_multipliers.drop(
+        ['Transformation', 'Size', 'OriFile_Size'], axis=1, inplace=True)
+
+    df_summary.drop(['Size', 'OriFile_Size'], axis=1, inplace=True)
+    df_summary = df_summary.groupby(
         ['Filename', 'Method', 'Transformation', 'Type']).agg(
-            {'Time': 'mean', 'Size': 'mean', 'Cost': 'mean'}).reset_index()
-    df_agg_sum = df_agg.groupby(
+            {'Time': 'mean', 'Cost': 'mean'}).reset_index()
+    df_summary = df_summary.groupby(
         ['Filename', 'Method', 'Type']).agg(
-            {'Time': 'sum', 'Size': 'sum', 'Cost': 'sum'}).reset_index()
-    df_agg_sum.rename(
-        columns={'Time': 'Sum_Mean_Time', 'Size': 'Sum_Size',
-                 'Cost': 'Sum_Cost'}, inplace=True)
-    df_agg_sum['Encoding_Multipliers'] = encoded_size / original_size
-    df_agg_sum['Similarity'] = status
-    print(df_agg_sum)
-    return df_agg_sum
+            {'Time': 'sum', 'Cost': 'sum'}).reset_index()
+    df_summary.rename(
+        columns={'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Cost'}, inplace=True)
+
+    print(df_summary)
+    df_summary = df_summary.merge(
+        df_encoding_multipliers, on=['Filename', 'Method', 'Type'],
+        how='outer')
+
+    df_summary = df_summary.merge(
+        pd.DataFrame(dict_same_files), on=['Filename', 'Method'], how='outer')
+
+    return df_summary
 
 
 def np_data_to_bitarray(path_original_file):
@@ -244,15 +245,18 @@ def np_data_to_bitarray(path_original_file):
     """
     if os.path.isfile(path_original_file):
         with open(path_original_file, 'rb') as fd_file:
-            binary_array_content = ba.bitarray()
-            binary_array_content.fromfile(fd_file)
-            binary_numpy_content = np.frombuffer(
-                binary_array_content.unpack(), dtype=bool)
+            np_binary_array_content = ba.bitarray()
+            np_binary_array_content.fromfile(fd_file)
+            np_binary_numpy_content = np.frombuffer(
+                np_binary_array_content.unpack(), dtype=bool)
+            # ! Add: We should save the binary representation and use that for
+            # ! OriFile_Size instead of the size of the input file
+            # ! Otherwise, encoding multiplier is just wrong
     else:
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
 
-    return binary_numpy_content
+    return np_binary_numpy_content
 
 
 def run_precalculation(int_num_of_iteration):
@@ -284,16 +288,14 @@ def run_precalculation(int_num_of_iteration):
             list_encoding_methods.append(string_encoding_method)
 
     list_results = []
-    list_same_files = []
+    dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
     # We list original files
     for string_file in os.listdir(path_original_data):
         path_one_file = os.path.join(path_original_data, string_file)
+        string_file_name = os.path.splitext(string_file)[0]
 
         if not os.path.isfile(path_one_file):
             continue
-
-        string_file_name = os.path.splitext(string_file)[0]
-        string_file_extension = os.path.splitext(string_file)[1][1:]
 
         for string_encoding_method in list_encoding_methods:
             # We check if we already processed the file with a specific
@@ -319,18 +321,18 @@ def run_precalculation(int_num_of_iteration):
                     list_results.append(list_encoded_info)
                     list_results.append(list_decoded_info)
 
-                    list_same_files.append('Same' if np.array_equal(
-                        np_binary_encoding, np_decoded_array) else 'Different')
+                    dict_same_files['Filename'].append(string_file_name)
+                    dict_same_files['Method'].append(string_encoding_method)
+                    dict_same_files['Similarity'].append(
+                        'Same' if
+                        np.array_equal(np_binary_encoding, np_decoded_array)
+                        else 'Different')
 
     df_new_detail = pd.DataFrame(
         list_results, columns=['Filename', 'Method', 'Transformation', 'Type',
                                'Size', 'Cost', 'Time', 'OriFile_Size'])
 
-    print(list_same_files)
-
-    df_new_summary = generate_summary(
-        df_new_detail, string_encoding_method, np_binary_encoding,
-        string_file_name, string_file_extension, path_one_file)
+    df_new_summary = generate_summary(df_new_detail, dict_same_files)
 
     st.header('Recently calculated details')
     st.dataframe(df_new_detail)
