@@ -114,79 +114,6 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
     return generated_seq
 
 
-def check_text_equal(path_original_file, path_decoded_file):
-    """This function is used for checking if the original file is equal as
-    the processed decoded file
-
-    Args:
-        path_original_file (str): path of original file
-        path_decoded_file (str): path of processed decoded file
-
-    Returns:
-        string_status (str): the result of comparison (Same or Different)
-    """
-
-    if not os.path.exists(path_original_file):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
-    if not os.path.exists(path_decoded_file):
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), path_decoded_file)
-
-    if os.path.isfile(path_original_file):
-        with open(path_original_file, 'rb') as fd_original_file, \
-                open(path_decoded_file, 'rb') as fd_decoded_file:
-            binary_array_original = ba.bitarray()
-            binary_array_decoded = ba.bitarray()
-
-            binary_array_original.fromfile(fd_original_file)
-            binary_array_decoded.fromfile(fd_decoded_file)
-
-            binary_numpy_original = np.frombuffer(
-                binary_array_original.unpack(), dtype=bool)
-            binary_numpy_decoded = np.frombuffer(
-                binary_array_decoded.unpack(), dtype=bool)
-
-            if np.array_equal(binary_numpy_original, binary_numpy_decoded):
-                string_status = 'Same'
-            else:
-                string_status = 'Different'
-
-    return string_status
-
-
-def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
-    """This function is used for specifying condition of comparison for
-    different encoding method
-
-    Args:
-        save_path (string): path of uploaded file
-        decoded_path (strung): path of generated decoded file
-        encoding_method (str): chosen encoding method
-        binary (array): binary array of uploaded file
-        decoded_seq (array): binary array of generated decoded file
-
-    Returns:
-        status (str): result of comparison (Same or Different)
-    """
-    if encoding_method == 'The2DCode':
-        status = check_text_equal(save_path, decoded_path)
-    else:
-        if len(binary) == len(decoded_seq):
-            i = 0
-            status = 'Same'
-            while i < len(binary) and status == 'Same':
-                if binary[i] == decoded_seq[i]:
-                    status = 'Same'
-                else:
-                    status = 'Different'
-                i += 1
-        else:
-            status = 'Different'
-
-    return status
-
-
 def pipeline(string_encoding_method, np_bit_array, string_file_name,
              int_original_size):
     """This function is used for integrating the process for one file
@@ -255,11 +182,11 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
         '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
         int_time_decoding, int_original_size]
 
-    return list_encoded, list_decoded
+    return list_encoded, list_decoded, np_decoded_dna_sequences
 
 
 def generate_summary(df_report, encoding_method, binary, file_basename,
-                     string_file_extension, save_path, path):
+                     string_file_extension, save_path):
     """This function is used for generating summary dataframe from detail
     dataframe (from 10 times running pipeline)
 
@@ -272,16 +199,12 @@ def generate_summary(df_report, encoding_method, binary, file_basename,
         string_file_extension (str): file extension
         storage_length (int): chosen length of storage in hour
         save_path (str): path of uploaded data
-        path (str): path of evaluated file
 
     Returns:
         _type_: _description_
     """
-    df = df_report[
-        (df_report['Filename'] == file_basename) &
-        (df_report['Method'] == encoding_method) &
-        (df_report['Type'] == '.' + string_file_extension)]
-    original_size = os.path.getsize(path)
+
+    original_size = os.path.getsize(save_path)
     encoded_string_file_name = file_basename + '_' + encoding_method + '.txt'
     encoded_path = os.path.join(path_encoded_dna, encoded_string_file_name)
     encoded_size = os.path.getsize(encoded_path)
@@ -294,7 +217,7 @@ def generate_summary(df_report, encoding_method, binary, file_basename,
         file_basename + '_' + encoding_method + '.' + string_file_extension)
     status = compare2ori(save_path, decoded_path, encoding_method, binary,
                          decoded_seq)
-    df_agg = df.groupby(
+    df_agg = df_report.groupby(
         ['Filename', 'Method', 'Transformation', 'Type']).agg(
             {'Time': 'mean', 'Size': 'mean', 'Cost': 'mean'}).reset_index()
     df_agg_sum = df_agg.groupby(
@@ -325,7 +248,6 @@ def np_data_to_bitarray(path_original_file):
             binary_array_content.fromfile(fd_file)
             binary_numpy_content = np.frombuffer(
                 binary_array_content.unpack(), dtype=bool)
-
     else:
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
@@ -355,19 +277,14 @@ def run_precalculation(int_num_of_iteration):
             columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',
                      'Cost', 'Time', 'OriFile_Size'])
 
-    df_summary = pd.DataFrame(
-        columns=['Filename', 'Method', 'Type', 'Sum_Mean_Time', 'Sum_Size',
-                 'Sum_Cost', 'Encoding_Multipliers', 'Similarity'])
-    df_report = pd.DataFrame(
-        columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',
-                 'Cost', 'Time', 'OriFile_Size'])
-
     list_encoding_methods = []
     for string_encoding_method in os.listdir(path_encoding_methods):
         if string_encoding_method not in _LIST_PASS_METHODS and os.path.isdir(
                 os.path.join(path_encoding_methods, string_encoding_method)):
             list_encoding_methods.append(string_encoding_method)
 
+    list_results = []
+    list_same_files = []
     # We list original files
     for string_file in os.listdir(path_original_data):
         path_one_file = os.path.join(path_original_data, string_file)
@@ -394,38 +311,42 @@ def run_precalculation(int_num_of_iteration):
                 np_binary_encoding = np_data_to_bitarray(path_one_file)
 
                 for int_i in range(int_num_of_iteration):
-                    output = pipeline(
+                    (list_encoded_info, list_decoded_info,
+                     np_decoded_array) = pipeline(
                         string_encoding_method, np_binary_encoding,
                         string_file, int_file_size_bytes)
-                    list_encoded = output[0]
-                    list_decoded = output[1]
-                    # list_summary = output[2]
-                    df_report.loc[len(df_report)] = list_decoded
-                    df_report.loc[len(df_report)] = list_encoded
 
-                df_one_encoding_method_summary = generate_summary(
-                    df_report, string_encoding_method, np_binary_encoding,
-                    string_file_name, string_file_extension, path_one_file,
-                    path_one_file)
-                df_summary = pd.concat(
-                    [df_summary, df_one_encoding_method_summary],
-                    ignore_index=True)
+                    list_results.append(list_encoded_info)
+                    list_results.append(list_decoded_info)
+
+                    list_same_files.append('Same' if np.array_equal(
+                        np_binary_encoding, np_decoded_array) else 'Different')
+
+    df_new_detail = pd.DataFrame(
+        list_results, columns=['Filename', 'Method', 'Transformation', 'Type',
+                               'Size', 'Cost', 'Time', 'OriFile_Size'])
+
+    print(list_same_files)
+
+    df_new_summary = generate_summary(
+        df_new_detail, string_encoding_method, np_binary_encoding,
+        string_file_name, string_file_extension, path_one_file)
 
     st.header('Recently calculated details')
-    st.dataframe(df_report)
+    st.dataframe(df_new_detail)
     st.header('Existed precalculated details')
     st.dataframe(df_existing_detail)
 
     st.header('Recently calculated summary')
-    st.dataframe(df_summary)
+    st.dataframe(df_new_summary)
     st.header('Existed precalculated summary')
     st.dataframe(df_existing_summary)
     st.write('Do you want to merge both new data into pickle file?')
     if st.button('Merge new data to pickel'):
-        detail_concat = pd.concat([df_report, df_existing_detail],
+        detail_concat = pd.concat([df_new_detail, df_existing_detail],
                                   ignore_index=True)
         detail_concat.to_pickle(path_existing_detail)
-        summary_concat = pd.concat([df_summary, df_existing_summary],
+        summary_concat = pd.concat([df_new_summary, df_existing_summary],
                                    ignore_index=True)
         summary_concat.to_pickle(path_existing_summary)
         if os.path.exists(path_existing_detail) and os.path.exists(
