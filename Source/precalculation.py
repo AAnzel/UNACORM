@@ -19,18 +19,19 @@ from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # Include 
 
 # Defining paths for important files and directories
 path_root_data = os.path.join('..', 'Data')
+path_cache_data = os.path.join(path_root_data, 'cache_data')
 path_original_data = os.path.join(path_root_data, 'Original', 'Test')  # TODO: Remove 'Test' # noqa
-path_original_decoded = os.path.join(path_root_data, 'Original', 'decoded')
-path_encoded_data = os.path.join(path_root_data, 'Encoded_DNA')
-path_decoded_data = os.path.join(path_root_data, 'Decoded_DNA')
-path_encoded_dna = os.path.join(path_root_data, 'Encoded_DNA', 'DNA')
-path_decoded_dna = os.path.join(path_root_data, 'Decoded_DNA', 'DNA')
-path_existing_detail = os.path.join('data', 'pre_measure.pkl')
-path_existing_summary = os.path.join('data', 'pre_measure_stat.pkl')
+path_original_translated = os.path.join(
+    path_root_data, 'Original_Translated')  # This is where we keep boolean
+# representations of the original data
+path_encoded_data = os.path.join(path_root_data, 'Encoded')
+path_decoded_data = os.path.join(path_root_data, 'Decoded')
+path_existing_detail = os.path.join(path_cache_data, 'pre_detail.pkl')
+path_existing_summary = os.path.join(path_cache_data, 'pre_summary.pkl')
 path_encoding_methods = os.path.join('Encodings')
 
 _LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon', 'The2DCode']
-_DF_METRICS = pd.read_csv(os.path.join(path_root_data, 'synthesis_cost.csv'))
+_DF_METRICS = pd.read_csv(os.path.join(path_cache_data, 'synthesis_cost.csv'))
 
 # ============================================================================
 # Function definitions start here
@@ -145,7 +146,7 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
 
     string_encoded_file_name = string_input_file_basename + '_' + \
         string_encoding_method + '.txt'
-    path_encoded_file = os.path.join(path_encoded_dna,
+    path_encoded_file = os.path.join(path_encoded_data,
                                      string_encoded_file_name)
     with open(path_encoded_file, 'w') as f:
         f.writelines(list_dna_sequences)
@@ -233,30 +234,36 @@ def generate_summary(df_report, dict_same_files):
     return df_summary
 
 
-def np_data_to_bitarray(path_original_file):
+def np_data_to_binary_array(path_original_file, string_file_name):
     """This function is used to convert data to binary
 
     Args:
         path_original_file (os.path): path of the original file
+        string_file_name (string): name of the file without extension
 
     Returns:
         binary_numpy_content (np.array): bit array representing the original
         file
     """
+    np_binary_numpy_content = None
+    int_translated_file_size = 0
+
     if os.path.isfile(path_original_file):
         with open(path_original_file, 'rb') as fd_file:
             np_binary_array_content = ba.bitarray()
             np_binary_array_content.fromfile(fd_file)
             np_binary_numpy_content = np.frombuffer(
                 np_binary_array_content.unpack(), dtype=bool)
-            # ! Add: We should save the binary representation and use that for
-            # ! OriFile_Size instead of the size of the input file
-            # ! Otherwise, encoding multiplier is just wrong
+
+            path_translated_file = os.path.join(path_original_translated,
+                                                string_file_name + '.npy')
+            np.save(path_translated_file, np_binary_numpy_content)
+            int_translated_file_size = os.path.getsize(path_translated_file)
     else:
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
 
-    return np_binary_numpy_content
+    return np_binary_numpy_content, int_translated_file_size
 
 
 def run_precalculation(int_num_of_iteration):
@@ -309,8 +316,9 @@ def run_precalculation(int_num_of_iteration):
             if not bool_file_is_processed:
                 print(path_one_file, string_encoding_method)
 
-                int_file_size_bytes = os.path.getsize(path_one_file)
-                np_binary_encoding = np_data_to_bitarray(path_one_file)
+                (np_binary_encoding,
+                 int_file_size_bytes) = np_data_to_binary_array(
+                    path_one_file, string_file_name)
 
                 for int_i in range(int_num_of_iteration):
                     (list_encoded_info, list_decoded_info,

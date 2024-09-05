@@ -12,6 +12,7 @@ This programme implements to main methods:
 
 # imports
 
+import os
 import csv
 from random import randint
 
@@ -35,7 +36,7 @@ def encode(file_name, binary):
     :return: string [A, T, C, G]
     """
     # populate the Huffman code dictionary
-    read_huff("data/huff3.dict")
+    read_huff(os.path.join(os.path.dirname(__file__), 'data', 'huff3.dict'))
     # print("s0 (binary):" + str(len(binary)))
     s1 = S0_to_S1(binary, file_name)
     # print("s1:" + str(len(s1)))
@@ -57,7 +58,7 @@ def decode(name, dnastr):
     :return: array [O, 1]
     """
     # populate the Huffman code dictionary
-    read_huff("data/huff3.dict")
+    read_huff(os.path.join(os.path.dirname(__file__), 'data', 'huff3.dict'))
     # This also sorts the overlapping nucleotide strings w
     # which is essential for real world applications
     Fi = Findex_to_Fi(dnastr)
