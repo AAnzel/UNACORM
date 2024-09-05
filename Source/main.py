@@ -132,7 +132,8 @@ def create_main_page():
 
     st.warning('The length of processing time depends on your chosen methods.')
 
-    string_chosen_storage_length = st.text_input('Choose your length of storage (in hours)')
+    string_chosen_storage_length = st.text_input(
+        'Choose your length of storage (in hours)')
 
     df_new_detail = pd.DataFrame(
         columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',

@@ -14,8 +14,8 @@ from Encodings.The2DCode import encoder as encoding_2d
 from Encodings.SimpleCode.src import transform as encoding_simple
 from Encodings.RepetitionCode.src import transform as encoding_repetition
 from Encodings.NOREC4DNA import unified_dna_lt as encoding_lt
-from Encodings.NOREC4DNA import unified_dna_online as encoding_online # Include this one # noqa
-from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # Include this one # noqa
+from Encodings.NOREC4DNA import unified_dna_online as encoding_online # TODO: Include this one # noqa
+from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # TODO: Include this one # noqa
 
 # Importing MESA
 import mesa_call
