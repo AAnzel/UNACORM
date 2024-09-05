@@ -28,7 +28,7 @@ def run_requests(res_all, entry_list, c, payload, header, url):
     start_time = time.time()
     try:
         for j in range(0, len(entry_list)):
-            payload['sequence'] = entry_list[j]
+            payload['sequence'] = entry_list
             res = requests.post(url, data=json.dumps(payload), headers=header)
             res_all.append(res)
             c += 1
@@ -62,11 +62,11 @@ def api_call(encoded_dna, storage_length):
     c = 0
     res_all = list()
     time_used = run_requests(res_all, entry_list, c, payload, header, url)
-    print(time_used)
+    # print(time_used)
 
     for ent in res_all:
         result = ent.json()
 
-    for key, value in result.items():
+    for key, _ in result.items():
         modified_sequence = result[key]["res"]["modified_sequence"]
     return modified_sequence

@@ -3,15 +3,11 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
-from utilities import PATH_CACHE_DATA, PATH_ROOT_DATA
+from utilities import PATH_ORIGINAL_DATA, LIST_ENCODING_METHODS
+from utilities import PATH_EXISTING_SUMMARY, PATH_EXISTING_DETAIL
 from utilities import np_data_to_binary_array, pipeline, df_generate_summary
 
 _NUMBER_OF_EXPERIMENT_RUNS = 4
-_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
-_PATH_ORIGINAL_DATA = os.path.join(PATH_ROOT_DATA, 'Original', 'Test')  # TODO: Remove 'Test' # noqa
-_PATH_EXISTING_DETAIL = os.path.join(PATH_CACHE_DATA, 'pre_detail.pkl')
-_PATH_EXISTING_SUMMARY = os.path.join(PATH_CACHE_DATA, 'pre_summary.pkl')
-_PATH_ENCODING_METHODS = os.path.join('Encodings')
 
 
 def run_precalculation(int_num_of_iteration):
@@ -23,43 +19,37 @@ def run_precalculation(int_num_of_iteration):
     string_progress_text = ''
     st_progress_bar = st.progress(0, text=string_progress_text)
 
-    bool_summary_exists = os.path.exists(_PATH_EXISTING_SUMMARY)
-    bool_detail_exists = os.path.exists(_PATH_EXISTING_DETAIL)
+    bool_summary_exists = os.path.exists(PATH_EXISTING_SUMMARY)
+    bool_detail_exists = os.path.exists(PATH_EXISTING_DETAIL)
 
     if bool_summary_exists:
-        df_existing_summary = pd.read_pickle(_PATH_EXISTING_SUMMARY)
+        df_existing_summary = pd.read_pickle(PATH_EXISTING_SUMMARY)
     else:
         df_existing_summary = pd.DataFrame(
             columns=['Filename', 'Method', 'Type', 'Sum_Mean_Time_s',
                      'Sum_Cost_$', 'Encoding_Multipliers', 'Similarity'])
     if bool_detail_exists:
-        df_existing_detail = pd.read_pickle(_PATH_EXISTING_DETAIL)
+        df_existing_detail = pd.read_pickle(PATH_EXISTING_DETAIL)
     else:
         df_existing_detail = pd.DataFrame(
             columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',
                      'Cost', 'Time', 'OriFile_Size', 'Similarity'])
 
-    list_encoding_methods = []
-    for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
-        if string_encoding_method not in _LIST_PASS_METHODS and os.path.isdir(
-                os.path.join(_PATH_ENCODING_METHODS, string_encoding_method)):
-            list_encoding_methods.append(string_encoding_method)
-
     list_results = []
     dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
-    list_original_files = os.listdir(_PATH_ORIGINAL_DATA)
-    int_total_runs = len(list_original_files) * len(list_encoding_methods) *\
+    list_original_files = os.listdir(PATH_ORIGINAL_DATA)
+    int_total_runs = len(list_original_files) * len(LIST_ENCODING_METHODS) *\
         int_num_of_iteration
     # We list original files
     int_counter = 1
     for string_file in list_original_files:
-        path_one_file = os.path.join(_PATH_ORIGINAL_DATA, string_file)
+        path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
         string_file_name = os.path.splitext(string_file)[0]
 
         if not os.path.isfile(path_one_file):
             continue
 
-        for string_encoding_method in list_encoding_methods:
+        for string_encoding_method in LIST_ENCODING_METHODS:
             # We check if we already processed the file with a specific
             # encoding method
             bool_file_is_processed = len(
@@ -100,7 +90,7 @@ def run_precalculation(int_num_of_iteration):
     df_new_detail = df_new_detail.merge(
         pd.DataFrame(dict_same_files), on=['Filename', 'Method'], how='inner')
 
-    df_new_summary = df_generate_summary(df_new_detail, dict_same_files)
+    df_new_summary = df_generate_summary(df_new_detail)
 
     st_progress_bar.empty()
     st.header('Recently calculated details')
@@ -116,13 +106,13 @@ def run_precalculation(int_num_of_iteration):
     if st.button('Merge new data to pickel'):
         df_detail_concat = pd.concat(
             [df_new_detail, df_existing_detail], ignore_index=True)
-        df_detail_concat.to_pickle(_PATH_EXISTING_DETAIL)
+        df_detail_concat.to_pickle(PATH_EXISTING_DETAIL)
         df_summary_concat = pd.concat(
             [df_new_summary, df_existing_summary], ignore_index=True)
-        df_summary_concat.to_pickle(_PATH_EXISTING_SUMMARY)
+        df_summary_concat.to_pickle(PATH_EXISTING_SUMMARY)
 
-        if os.path.exists(_PATH_EXISTING_DETAIL) and os.path.exists(
-                _PATH_EXISTING_SUMMARY):
+        if os.path.exists(PATH_EXISTING_DETAIL) and os.path.exists(
+                PATH_EXISTING_SUMMARY):
             st.success('New data has been successfully merged')
             st.header('New Detail Data')
             st.dataframe(df_detail_concat)

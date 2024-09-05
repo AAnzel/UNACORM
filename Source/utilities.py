@@ -22,15 +22,26 @@ import mesa_call
 
 # Defining paths for important files and directories
 PATH_ROOT_DATA = os.path.join('..', 'Data')
+PATH_ORIGINAL_DATA = os.path.join(PATH_ROOT_DATA, 'Original', 'Test')  # TODO: Remove 'Test' # noqa
 PATH_CACHE_DATA = os.path.join(PATH_ROOT_DATA, 'cache_data')
+PATH_EXISTING_DETAIL = os.path.join(PATH_CACHE_DATA, 'pre_detail.pkl')
+PATH_EXISTING_SUMMARY = os.path.join(PATH_CACHE_DATA, 'pre_summary.pkl')
 _PATH_ORIGINAL_TRANSLATED = os.path.join(
     PATH_ROOT_DATA, 'Translated_Binary')  # This is where we keep boolean
 # representations of the original data
 _PATH_ENCODED_DATA = os.path.join(PATH_ROOT_DATA, 'Encoded')
 _PATH_DECODED_DATA = os.path.join(PATH_ROOT_DATA, 'Decoded')
 _PATH_UPLOADED_DATA = os.path.join(PATH_ROOT_DATA, 'Uploaded')
+_PATH_ENCODING_METHODS = os.path.join('Encodings')
 
 _DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
+
+_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
+LIST_ENCODING_METHODS = []
+for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
+    if string_encoding_method not in _LIST_PASS_METHODS and os.path.isdir(
+            os.path.join(_PATH_ENCODING_METHODS, string_encoding_method)):
+        LIST_ENCODING_METHODS.append(string_encoding_method)
 
 
 def remove_cached_data():
@@ -38,6 +49,7 @@ def remove_cached_data():
     uploaded older than 1 hour ago.
     """
 
+    # TODO: Implement cleaning for Encoded, Decoded, and Uploaded directories
     SAVE_TIME = 3600  # 3600 seconds = 1h
     time_limit = time.time() - SAVE_TIME
 
@@ -202,9 +214,19 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
     if not bool_simulate_error:
         list_modified_sequences = list_dna_sequences
     else:
-        list_modified_sequences = [
-            mesa_call.api_call(str(string_one_sequence), int_storage_length)
-            for string_one_sequence in list_dna_sequences]
+        string_progress_text = ''
+        st_progress_bar = st.progress(0, text=string_progress_text)
+        int_num_of_sequences = len(list_dna_sequences)
+        for int_i in range(int_num_of_sequences):
+            st_progress_bar.progress(
+                (int_i + 1) / int_num_of_sequences,
+                text=('Sequence ' + str(int_i + 1) + ' of ' +
+                      str(int_num_of_sequences)))
+            list_modified_sequences.append(
+                mesa_call.api_call([list_dna_sequences[int_i]],
+                                   int_storage_length))
+
+        st_progress_bar.empty()
 
     # We time the decoding process
     int_start_time = time.time()
@@ -231,15 +253,13 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
 
 
 @st.cache_data
-def df_generate_summary(df_report, dict_same_files):
+def df_generate_summary(df_report):
     """This function is used for generating summary dataframe from detail
     dataframe (from 10 times running pipeline)
 
     Args:
         df_report (DataFrame): detailed df containing previous runs of one
         encoding method
-        dict_same_files (dict): A dict containing if encoding/decoding process
-        produced the same or different files for one encoding method
 
     Returns:
         _type_: _description_
