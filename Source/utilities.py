@@ -194,6 +194,9 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
         string_encoding_method, np_bit_array, path_input_file, True)
     int_time_encoding = time.time() - int_start_time
 
+    list_dna_sequences = [string_dna.upper()
+                          for string_dna in list_dna_sequences]
+
     int_cost_encoding = int_calculate_encoding_cost(list_dna_sequences)
 
     string_encoded_file_name = string_input_file_basename + '_' + \

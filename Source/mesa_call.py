@@ -11,8 +11,8 @@ with open("mesa.json") as json_file:  # Config file for API
 
 
 # Running API
-def run_requests(res_all, list_one_dna_strand, c, dict_payload, dict_header,
-                 string_url):
+def run_requests(int_current, res_all, list_one_dna_strand, c, dict_payload,
+                 dict_header, string_url):
     """This function is used for running the MESA API
 
     Args:
@@ -27,19 +27,21 @@ def run_requests(res_all, list_one_dna_strand, c, dict_payload, dict_header,
         time_used (number): length of API run
     """
     start_time = time.time()
-    try:
-        for j in range(0, len(list_one_dna_strand)):
-            dict_payload['sequence'] = list_one_dna_strand
+
+    for j in range(int_current, len(list_one_dna_strand)):
+        dict_payload['sequence'] = list_one_dna_strand
+        try:
             res = requests.post(string_url, data=json.dumps(dict_payload),
                                 headers=dict_header)
             res_all.append(res)
             c += 1
-    except Exception:
-        print("Max retries, going to sleep for 100 sec.")
-        print("j= " + str(j))
-        time.sleep(100)
-        run_requests(j, res_all, list_one_dna_strand, c, dict_payload,
-                     dict_header, string_url)
+        except Exception:
+            print("Max retries, going to sleep for 100 sec.")
+            print("j= " + str(j))
+            time.sleep(100)
+            run_requests(j, res_all, list_one_dna_strand, c, dict_payload,
+                         dict_header, string_url)
+
     time_used = time.time() - start_time
 
     return time_used
@@ -65,7 +67,7 @@ def api_call(encoded_dna, storage_length):
     c = 0
     res_all = list()
     time_used = run_requests(
-        res_all, list_one_dna_strand, c, dict_payload, dict_header,
+        0, res_all, list_one_dna_strand, c, dict_payload, dict_header,
         string_url)
     # print(time_used)
     dict_result = {}
