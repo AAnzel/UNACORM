@@ -1,41 +1,36 @@
 import os
+import errno
+import shutil
+import pandas as pd
 import time
 import string
-import shutil
-import importlib
-import bitarray as ba
-import pandas as pd
 import numpy as np
+import bitarray as ba
 import streamlit as st
 
-import xor_code_python as xor
-import Encodings.The2DCode as code_2d
+# Importing Encodings
+import xor_code_python as encoding_xor
+from Encodings.The2DCode import encoder as encoding_2d
+from Encodings.SimpleCode.src import transform as encoding_simple
+from Encodings.RepetitionCode.src import transform as encoding_repetition
+from Encodings.NOREC4DNA import unified_dna_lt as encoding_lt
+from Encodings.NOREC4DNA import unified_dna_online as encoding_online # Include this one # noqa
+from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # Include this one # noqa
 
+# Importing MESA
 import mesa_call
 
-# List Path of Directories
-path_root_data = os.path.join('..', 'Data')
-path_uploaded = os.path.join(path_root_data, 'uploaded')
-path_uploaded_txt = os.path.join(path_uploaded, 'txt')
-path_uploaded_jpg = os.path.join(path_uploaded, 'jpg')
-path_uploaded_wav = os.path.join(path_uploaded, 'wav')
-path_uploaded_decoded = os.path.join(path_uploaded, 'decoded')
-path_encoded_data = os.path.join(path_root_data, 'Encoded')
-path_decoded_data = os.path.join(path_root_data, 'Decoded')
-path_encoded_dna = os.path.join(path_root_data, 'Encoded', 'DNA')
-path_decoded_dna = os.path.join(path_root_data, 'Decoded', 'DNA')
-path_original_data = os.path.join(path_root_data, 'Original')
-path_encoding_methods = os.path.join('Encodings')
+# Defining paths for important files and directories
+PATH_ROOT_DATA = os.path.join('..', 'Data')
+PATH_CACHE_DATA = os.path.join(PATH_ROOT_DATA, 'cache_data')
+_PATH_ORIGINAL_TRANSLATED = os.path.join(
+    PATH_ROOT_DATA, 'Translated_Binary')  # This is where we keep boolean
+# representations of the original data
+_PATH_ENCODED_DATA = os.path.join(PATH_ROOT_DATA, 'Encoded')
+_PATH_DECODED_DATA = os.path.join(PATH_ROOT_DATA, 'Decoded')
+_PATH_UPLOADED_DATA = os.path.join(PATH_ROOT_DATA, 'Uploaded')
 
-# List of name of files for showing charts in benchmarking
-data_original = []
-for file_name in os.listdir(path_original_data):
-    path = os.path.join(path_original_data, file_name)
-    if os.path.isfile(path):
-        data_original.append(os.path.splitext(file_name)[0])
-
-
-constructor_2d_code = code_2d.encoder.api()
+_DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
 
 
 def remove_cached_data():
@@ -45,32 +40,28 @@ def remove_cached_data():
 
     SAVE_TIME = 3600  # 3600 seconds = 1h
     time_limit = time.time() - SAVE_TIME
-    # List of directories for uploaded file
-    path_uploaded_list = [
-        path_uploaded_txt, path_uploaded_jpg, path_uploaded_wav,
-        path_encoded_data, path_decoded_data, path_encoded_dna,
-        path_decoded_dna, path_uploaded_decoded]
 
     # Traversing directories for uploaded files and deleting everything from it
-    for dir in path_uploaded_list:
-        for file_name in os.listdir(dir):
-            path = os.path.join(dir, file_name)
-            if 'gitkeep' in file_name or os.path.isdir(path):
+    for string_dir in os.listdir(_PATH_UPLOADED_DATA):
+        if not os.path.isdir(string_dir):
+            continue
+
+        for string_file in os.listdir(string_dir):
+            path_file = os.path.join(string_dir, string_file)
+            if 'gitkeep' in string_file or os.path.isdir(path_file):
                 continue
             else:
-                file_path = os.path.join(dir, file_name)
-
                 # Check if file is older than 1h, and if yes, delete it
-                if os.stat(file_path).st_mtime < time_limit:
+                if os.stat(path_file).st_mtime < time_limit:
                     try:
-                        if os.path.isfile(file_path) or\
-                                os.path.islink(file_path):
-                            os.unlink(file_path)
-                        elif os.path.isdir(file_path):
-                            shutil.rmtree(file_path)
+                        if os.path.isfile(path_file) or\
+                                os.path.islink(path_file):
+                            os.unlink(path_file)
+                        elif os.path.isdir(path_file):
+                            shutil.rmtree(path_file)
                     except OSError as e:
-                        print('Failed to delete ' + file_path + '. Reason: '
-                              + e)
+                        print('Failed to delete ' + path_file + '. Reason: '
+                              + str(e))
 
                     print('Successfully removed old data from uploaded' +
                           ' directory')
@@ -79,260 +70,240 @@ def remove_cached_data():
 
 
 @st.cache_data
-def cost_encoding(max_nucleotide, oligos):
+def int_calculate_encoding_cost(list_dna_sequences):
     """This function is used for calculating synthesizing cost
 
     Args:
-        max_nucleotide (int): max nucleutide from dna sequences
-        oligos (int): number of oligos
+        list_dna_sequences (list): list of DNA sequences
 
     Returns:
-        cost_total (number): synthesising cost
+        int_cost_total (int): synthesising cost
     """
-    # Based file for calculating synthesis cost
-    df_metrics = pd.read_csv(
-        os.path.join(path_root_data, 'synthesis_cost.csv'))
+    int_num_of_oligos = len(list_dna_sequences)
+    int_max_nucleotides = 0
+    for string_seq in list_dna_sequences:
+        int_nucleotide_number = len(string_seq.translate(
+            {ord(c): None for c in string.whitespace}))
+        if int_nucleotide_number > int_max_nucleotides:
+            int_max_nucleotides = int_nucleotide_number
 
-    if max_nucleotide <= 120:
-        i = 0
-    else:
-        i = 1
+    i = 0 if int_max_nucleotides <= 120 else 1
 
-    if oligos >= 2 and oligos <= 100:
+    if int_num_of_oligos >= 2 and int_num_of_oligos <= 100:
         j = 1
-    elif oligos >= 101 and oligos <= 500:
+    elif int_num_of_oligos >= 101 and int_num_of_oligos <= 500:
         j = 2
-    elif oligos >= 501 and oligos <= 1000:
+    elif int_num_of_oligos >= 501 and int_num_of_oligos <= 1000:
         j = 3
     else:
         j = 4
 
-    cost = df_metrics.iloc[i, j]
-    cost_total = cost * oligos
+    int_cost_total = _DF_METRICS.iloc[i, j] * int_num_of_oligos
 
-    return cost_total
+    return int_cost_total
 
 
 @st.cache_data
-def encoding(encoding_method, binary, file_basename, save_path):
-    """This function is used for encoding the binary
+def list_encode_decode(str_encoding_method, list_np_data, path_file,
+                       bool_encode):
+    """This function is used for encoding the binary data into DNA sequences
 
     Args:
         encoding_method (str): chosen encoding method
-        binary (array): binary sequence of uploaded file
-        file_basename (str): name of file that contains timestamp
-        save_path (str): path of original uploaded file
-
-    Returns:
-        generated_seq (list): encoded dna list
-        numblocks (int): number of blocks from 2D Code that will be used for
+        list_np_data (list or np.array): data to encode or decode
+        path_file (os.path): path of the original un-encoded file
+        bool_encode (bool): if true encoding is performed, if false then
         decoding
-    """
-    numblocks = 0
-    if encoding_method == 'The2DCode':
-        generated_seq = constructor_2d_code.encode('', binary)
-    elif encoding_method == 'XORBasedCode':
-        generated_seq = xor.encode('', binary)
-    else:
-        method = importlib.import_module(
-            f'Encodings.{encoding_method}.src.transform')
-        generated_seq = method.encode('', binary)
-
-    return generated_seq, numblocks
-
-
-def check_text_equal(path_original_file, path_decoded_file):
-    """This function is used for checking if the original file is equal than
-    generated decoded file
-
-    Args:
-        path_original_file (str): path of original uploaded file
-        path_decoded_file (str): path of generated decoded file
 
     Returns:
-        status (str): the result of comparison (Same or Different)
+        list_generated_seq (list): encoded dna list
     """
+    list_generated_seq = []
 
-    if os.path.isfile(path_original_file):
-        with open(path_original_file, 'rb') as fd_original_file, \
-                open(path_decoded_file, 'rb') as fd_decoded_file:
-            binary_array_original = ba.bitarray()
-            binary_array_decoded = ba.bitarray()
-
-            binary_array_original.fromfile(fd_original_file)
-            binary_array_decoded.fromfile(fd_decoded_file)
-
-            binary_numpy_original = np.frombuffer(
-                binary_array_original.unpack(), dtype=bool)
-            binary_numpy_decoded = np.frombuffer(
-                binary_array_decoded.unpack(), dtype=bool)
-
-            status = ''
-            if np.array_equal(binary_numpy_original, binary_numpy_decoded):
-                status = 'Same'
-            else:
-                status = 'Different'
-
-    return status
-
-
-def compare2ori(save_path, decoded_path, encoding_method, binary, decoded_seq):
-    """This function is used for specifying condition of comparison for
-    different encoding method
-
-    Args:
-        save_path (string): path of uploaded file
-        decoded_path (strung): path of generated decoded file
-        encoding_method (str): chosen encoding method
-        binary (array): binary array of uploaded file
-        decoded_seq (array): binary array of generated decoded file
-
-    Returns:
-        status (str): result of comparison (Same or Different)
-    """
-    if encoding_method == 'The2DCode':
-        status = check_text_equal(save_path, decoded_path)
-    else:
-        if len(binary) == len(decoded_seq):
-            i = 0
-            status = 'Same'
-            while i < len(binary) and status == 'Same':
-                if binary[i] == decoded_seq[i]:
-                    status = 'Same'
-                else:
-                    status = 'Different'
-                i += 1
+    if bool_encode:
+        if str_encoding_method == 'The2DCode':
+            list_generated_seq = encoding_2d.encode('', list_np_data)
+        elif str_encoding_method == 'XORBasedCode':
+            list_generated_seq = encoding_xor.encode('', list_np_data)
+        elif str_encoding_method == 'SimpleCode':
+            list_generated_seq = encoding_simple.encode('', list_np_data)
+        elif str_encoding_method == 'RepetitionCode':
+            list_generated_seq = encoding_repetition.encode('', list_np_data)
+        elif str_encoding_method == 'NOREC4DNA':  # ! Fix
+            list_generated_seq = encoding_lt.encode(path_file, list_np_data)[0]
         else:
-            status = 'Different'
+            pass
+    else:
+        if str_encoding_method == 'The2DCode':
+            list_generated_seq = encoding_2d.decode('', list_np_data)
+        elif str_encoding_method == 'XORBasedCode':
+            list_generated_seq = encoding_xor.decode('', list_np_data)
+        elif str_encoding_method == 'SimpleCode':
+            list_generated_seq = encoding_simple.decode('', list_np_data)
+        elif str_encoding_method == 'RepetitionCode':
+            list_generated_seq = encoding_repetition.decode('', list_np_data)
+        elif str_encoding_method == 'NOREC4DNA':  # ! Fix
+            list_generated_seq = encoding_lt.decode(path_file, list_np_data)[0]
+        else:
+            pass
 
-    return status
+    return list_generated_seq
 
 
 @st.cache_data
-def pipeline(encoding_method, binary, file_basename, file_type, storage_length,
-             save_path, uploaded_filename):
-    """This function is used for integrating the process for uploaded file
+def pipeline(string_encoding_method, np_bit_array, path_input_file,
+             string_file_name, int_original_size, bool_simulate_error,
+             int_storage_length):
+    """This function is used for integrating the process for one file
 
     Args:
-        encoding_method (str): chosen encoding method
-        binary (array): numpy binary array of uploaded file
-        file_basename (str): name of file that contains timestamp
-        file_type (str): file extension
-        storage_length (int): chosen length of storage in hour
-        save_path (str): path of uploaded data
-        uploaded_filename (str): uploaded file name without timestamp and
-        extension
+        string_encoding_method (str): chosen encoding method
+        np_bit_array (array): numpy np_bit_array array of uploaded file
+        path_input_file (str): path of uploaded data
+        string_file_name (str): the base name of the file with extension
+        int_original_size (number): size of original file
+        bool_simulate_error (bool): if True, MESA call is invoked and error
+        simulation initiated. If False, DNA sequences are not modified
+        int_storage_length (int): number of years for simulating DNA
+        degradation. Used only if bool_simulate_error is True
 
     Returns:
         list_encoded [list]: list of result from encoding process including
         time, cost, and size
         list_decoded [list]: list of result from decoding process including
         time, cost, and size
-        list_summary [list]: list of summary from encoding and decoding process
     """
-    start_time = time.time()
-    enc_output = encoding(encoding_method, binary, file_basename, save_path)
-    time_used = time.time() - start_time  # getting length of encoding process
-    generated_seq = enc_output[0]
-    # numblocks = enc_output[1]
-    len_oligos = len(generated_seq)
-    max_nucleotide = 0
-    generated_seq_upper = []
-    # getting maximum nucleotide
-    for seq in generated_seq:
-        # nucleotide is nt
-        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
-        generated_seq_upper.append(seq.upper())
-        if nt > max_nucleotide:
-            max_nucleotide = nt
-    print('len_oligos = ' + str(len_oligos) + ' max_nucleotide = ' +
-          str(max_nucleotide))
-    cost = cost_encoding(max_nucleotide, len_oligos)
+    string_input_file_basename = os.path.splitext(string_file_name)[0]
+    string_file_extension = os.path.splitext(string_file_name)[1][1:]
 
-    file_name = file_basename + '_' + encoding_method + '.txt'
-    file_path = os.path.join(path_encoded_dna, file_name)
+    # We time the encoding process
+    int_start_time = time.time()
+    list_dna_sequences = list_encode_decode(
+        string_encoding_method, np_bit_array, path_input_file, True)
+    int_time_encoding = time.time() - int_start_time
 
-    with open(file_path, 'w') as f:
-        f.writelines(generated_seq_upper)
+    int_cost_encoding = int_calculate_encoding_cost(list_dna_sequences)
 
-    encoded_size = os.path.getsize(file_path)
-    list_encoded = [uploaded_filename, encoding_method, 'Encoding',
-                    encoded_size, cost, time_used, '.' + file_type]
+    string_encoded_file_name = string_input_file_basename + '_' + \
+        string_encoding_method + '.txt'
+    path_encoded_file = os.path.join(_PATH_ENCODED_DATA,
+                                     string_encoded_file_name)
+    with open(path_encoded_file, 'w') as f:
+        f.writelines(list_dna_sequences)
 
-    modified_sequence = []
-    i = 0
-    while i < len(generated_seq_upper):
-        seq = [str(generated_seq_upper[i])]
-        result = mesa_call.api_call(seq, storage_length)
-        modified_sequence.append(result)
-        i += 1
+    int_encoded_file_size = os.path.getsize(path_encoded_file)
 
-    file_path = os.path.join(path_decoded_dna, file_name)
-    with open(file_path, 'w') as f:
-        for i in modified_sequence:
-            f.write(i)
+    list_encoded = [
+        string_input_file_basename, string_encoding_method, 'Encoding',
+        '.' + string_file_extension, int_encoded_file_size, int_cost_encoding,
+        int_time_encoding, int_original_size]
 
-    size = os.path.getsize(file_path)
-
-    decoded_path = ''
-    start_time = time.time()
-    if encoding_method == 'The2DCode':
-        decoded_seq = constructor_2d_code.decode('', modified_sequence)
-    elif encoding_method == 'XORBasedCode':
-        decoded_seq = xor.decode('', modified_sequence)
-    elif encoding_method == 'SimpleCode':
-        method = importlib.import_module(
-            f'Encodings.{encoding_method}.src.transform')
-        decoded_seq = method.decode('', modified_sequence)
+    list_modified_sequences = []
+    if not bool_simulate_error:
+        list_modified_sequences = list_dna_sequences
     else:
-        pass
+        list_modified_sequences = [
+            mesa_call.api_call(str(string_one_sequence), int_storage_length)
+            for string_one_sequence in list_dna_sequences]
 
-    time_used = time.time() - start_time
-    cost = 0
+    # We time the decoding process
+    int_start_time = time.time()
+    np_decoded_dna_sequences = list_encode_decode(
+        string_encoding_method, list_modified_sequences, path_input_file,
+        False)
+    int_time_decoding = time.time() - int_start_time
 
-    file_name = file_basename + '_' + encoding_method + '.npy'
+    int_cost_decoding = 0
+    string_decoded_file_name = string_input_file_basename + '_' + \
+        string_encoding_method + '.npy'
 
-    file_path = os.path.join(path_decoded_data, file_name)
-    np.save(file_path, decoded_seq)
-    list_decoded = [uploaded_filename, encoding_method, 'Decoding', size,
-                    cost, time_used, '.' + file_type]
+    path_decoded_file = os.path.join(_PATH_DECODED_DATA,
+                                     string_decoded_file_name)
+    np.save(path_decoded_file, np_decoded_dna_sequences)
+    int_decoded_file_size = os.path.getsize(path_decoded_file)
 
-    status = compare2ori(save_path, decoded_path, encoding_method, binary,
-                         decoded_seq)
-    sum_size = list_encoded[3] + list_decoded[3]
-    sum_cost = list_encoded[4] + list_decoded[4]
-    sum_time_used = list_encoded[5] + list_decoded[5]
-    # summary list
-    list_summary = [uploaded_filename, encoding_method, sum_size, sum_cost,
-                    sum_time_used, '.'+file_type, status, encoded_size]
-    if uploaded_filename not in data_original:
-        data_original.append(uploaded_filename)
-    return list_encoded, list_decoded, list_summary
+    list_decoded = [
+        string_input_file_basename, string_encoding_method, 'Decoding',
+        '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
+        int_time_decoding, int_original_size]
+
+    return list_encoded, list_decoded, np_decoded_dna_sequences
 
 
-def convert_text_data_to_binary(path_original_data):
+@st.cache_data
+def df_generate_summary(df_report, dict_same_files):
+    """This function is used for generating summary dataframe from detail
+    dataframe (from 10 times running pipeline)
+
+    Args:
+        df_report (DataFrame): detailed df containing previous runs of one
+        encoding method
+        dict_same_files (dict): A dict containing if encoding/decoding process
+        produced the same or different files for one encoding method
+
+    Returns:
+        _type_: _description_
+    """
+    df_summary = df_report.copy(deep=True)
+    df_encoding_multipliers = df_report[[
+        'Filename', 'Method', 'Transformation', 'Type', 'Size',
+        'OriFile_Size']].copy(deep=True)
+    df_encoding_multipliers['Encoding_Multipliers'] = df_encoding_multipliers[
+        'Size'] / df_encoding_multipliers['OriFile_Size']
+    df_encoding_multipliers = df_encoding_multipliers.loc[
+        df_summary['Transformation'] == 'Encoding']
+    df_encoding_multipliers.drop(
+        ['Transformation', 'Size', 'OriFile_Size'], axis=1, inplace=True)
+    df_encoding_multipliers = df_encoding_multipliers.groupby(
+        ['Filename', 'Method', 'Type']).agg(
+            {'Encoding_Multipliers': 'first'}).reset_index()
+
+    df_summary.drop(['Size', 'OriFile_Size'], axis=1, inplace=True)
+
+    df_summary = df_summary.groupby(
+        ['Filename', 'Method', 'Transformation', 'Type', 'Similarity']).agg(
+            {'Time': 'mean', 'Cost': 'mean'}).reset_index()
+    df_summary = df_summary.groupby(
+        ['Filename', 'Method', 'Type', 'Similarity']).agg(
+            {'Time': 'sum', 'Cost': 'sum'}).reset_index()
+    df_summary.rename(
+        columns={'Time': 'Sum_Mean_Time_s', 'Cost': 'Sum_Cost_$'},
+        inplace=True)
+    df_summary = df_summary.merge(
+        df_encoding_multipliers,
+        on=['Filename', 'Method', 'Type'], how='inner')
+
+    return df_summary
+
+
+@st.cache_data
+def np_data_to_binary_array(path_original_file, string_file_name):
     """This function is used to convert data to binary
 
     Args:
-        path_original_data (str): path of original uploaded file
+        path_original_file (os.path): path of the original file
+        string_file_name (string): name of the file without extension
 
     Returns:
-        bit_encoded_file (str): path of generated binary from uploaded file
+        binary_numpy_content (np.array): bit array representing the original
+        file
     """
-    # If we have a file, we convert it into numpy byte file (.npy)
-    file_basename = os.path.basename(path_original_data)
-    string_file_no_extension = os.path.splitext(file_basename)[0]
-    encoded_filename = string_file_no_extension + ".npy"
-    if os.path.isfile(path_original_data):
-        with open(path_original_data, 'rb') as fd_file:
-            binary_array_content = ba.bitarray()
-            binary_array_content.fromfile(fd_file)
-            binary_numpy_content = np.frombuffer(
-                binary_array_content.unpack(), dtype=bool)
+    np_binary_numpy_content = None
+    int_translated_file_size = 0
 
-            np.save(os.path.join(path_encoded_data, string_file_no_extension),
-                    binary_numpy_content, allow_pickle=False)
+    if os.path.isfile(path_original_file):
+        with open(path_original_file, 'rb') as fd_file:
+            np_binary_array_content = ba.bitarray()
+            np_binary_array_content.fromfile(fd_file)
+            np_binary_numpy_content = np.frombuffer(
+                np_binary_array_content.unpack(), dtype=bool)
 
-    bit_encoded_file = os.path.join(path_encoded_data, encoded_filename)
+            path_translated_file = os.path.join(_PATH_ORIGINAL_TRANSLATED,
+                                                string_file_name + '.npy')
+            np.save(path_translated_file, np_binary_numpy_content)
+            int_translated_file_size = os.path.getsize(path_translated_file)
+    else:
+        raise FileNotFoundError(
+            errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
 
-    return bit_encoded_file
+    return np_binary_numpy_content, int_translated_file_size
