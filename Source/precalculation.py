@@ -45,14 +45,15 @@ def cost_encoding(list_dna_sequences):
         list_dna_sequences (list): list of DNA sequences
 
     Returns:
-        cost_total (int): synthesising cost
+        int_cost_total (int): synthesising cost
     """
     int_num_of_oligos = len(list_dna_sequences)
     int_max_nucleotides = 0
-    for seq in list_dna_sequences:
-        nt = len(seq.translate({ord(c): None for c in string.whitespace}))
-        if nt > int_max_nucleotides:
-            int_max_nucleotides = nt
+    for string_seq in list_dna_sequences:
+        int_nucleotide_number = len(string_seq.translate(
+            {ord(c): None for c in string.whitespace}))
+        if int_nucleotide_number > int_max_nucleotides:
+            int_max_nucleotides = int_nucleotide_number
 
     i = 0 if int_max_nucleotides <= 120 else 1
 
@@ -65,10 +66,9 @@ def cost_encoding(list_dna_sequences):
     else:
         j = 4
 
-    cost = _DF_METRICS.iloc[i, j]
-    cost_total = cost * int_num_of_oligos
+    int_cost_total = _DF_METRICS.iloc[i, j] * int_num_of_oligos
 
-    return cost_total
+    return int_cost_total
 
 
 def list_encode_decode(str_encoding_method, list_np_data, path_file,
@@ -83,36 +83,38 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         decoding
 
     Returns:
-        generated_seq (list): encoded dna list
+        list_generated_seq (list): encoded dna list
     """
+    list_generated_seq = []
+
     if bool_encode:
         if str_encoding_method == 'The2DCode':
-            generated_seq = encoding_2d.encode('', list_np_data)
+            list_generated_seq = encoding_2d.encode('', list_np_data)
         elif str_encoding_method == 'XORBasedCode':
-            generated_seq = encoding_xor.encode('', list_np_data)
+            list_generated_seq = encoding_xor.encode('', list_np_data)
         elif str_encoding_method == 'SimpleCode':
-            generated_seq = encoding_simple.encode('', list_np_data)
+            list_generated_seq = encoding_simple.encode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
-            generated_seq = encoding_repetition.encode('', list_np_data)
+            list_generated_seq = encoding_repetition.encode('', list_np_data)
         elif str_encoding_method == 'NOREC4DNA':  # ! Fix
-            generated_seq = encoding_lt.encode(path_file, list_np_data)[0]
+            list_generated_seq = encoding_lt.encode(path_file, list_np_data)[0]
         else:
             pass
     else:
         if str_encoding_method == 'The2DCode':
-            generated_seq = encoding_2d.decode('', list_np_data)
+            list_generated_seq = encoding_2d.decode('', list_np_data)
         elif str_encoding_method == 'XORBasedCode':
-            generated_seq = encoding_xor.decode('', list_np_data)
+            list_generated_seq = encoding_xor.decode('', list_np_data)
         elif str_encoding_method == 'SimpleCode':
-            generated_seq = encoding_simple.decode('', list_np_data)
+            list_generated_seq = encoding_simple.decode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
-            generated_seq = encoding_repetition.decode('', list_np_data)
+            list_generated_seq = encoding_repetition.decode('', list_np_data)
         elif str_encoding_method == 'NOREC4DNA':  # ! Fix
-            generated_seq = encoding_lt.decode(path_file, list_np_data)[0]
+            list_generated_seq = encoding_lt.decode(path_file, list_np_data)[0]
         else:
             pass
 
-    return generated_seq
+    return list_generated_seq
 
 
 def pipeline(string_encoding_method, np_bit_array, string_file_name,
@@ -134,7 +136,6 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
     path_input_file = os.path.join(path_original_data, string_file_name)
     string_input_file_basename = os.path.splitext(string_file_name)[0]
     string_file_extension = os.path.splitext(string_file_name)[1][1:]
-    print(path_input_file, string_input_file_basename, string_file_extension)
 
     # We time the encoding process
     int_start_time = time.time()
@@ -186,7 +187,7 @@ def pipeline(string_encoding_method, np_bit_array, string_file_name,
     return list_encoded, list_decoded, np_decoded_dna_sequences
 
 
-def generate_summary(df_report, dict_same_files):
+def df_generate_summary(df_report, dict_same_files):
     """This function is used for generating summary dataframe from detail
     dataframe (from 10 times running pipeline)
 
@@ -199,9 +200,6 @@ def generate_summary(df_report, dict_same_files):
     Returns:
         _type_: _description_
     """
-
-    #['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost', 'Time', 'OriFile_Size']
-
     df_summary = df_report.copy(deep=True)
     df_encoding_multipliers = df_report[[
         'Filename', 'Method', 'Transformation', 'Type', 'Size',
@@ -212,24 +210,23 @@ def generate_summary(df_report, dict_same_files):
         df_summary['Transformation'] == 'Encoding']
     df_encoding_multipliers.drop(
         ['Transformation', 'Size', 'OriFile_Size'], axis=1, inplace=True)
+    df_encoding_multipliers = df_encoding_multipliers.groupby(
+        ['Filename', 'Method', 'Type']).agg(
+            {'Encoding_Multipliers': 'first'}).reset_index()
 
     df_summary.drop(['Size', 'OriFile_Size'], axis=1, inplace=True)
+
     df_summary = df_summary.groupby(
-        ['Filename', 'Method', 'Transformation', 'Type']).agg(
+        ['Filename', 'Method', 'Transformation', 'Type', 'Similarity']).agg(
             {'Time': 'mean', 'Cost': 'mean'}).reset_index()
     df_summary = df_summary.groupby(
-        ['Filename', 'Method', 'Type']).agg(
+        ['Filename', 'Method', 'Type', 'Similarity']).agg(
             {'Time': 'sum', 'Cost': 'sum'}).reset_index()
     df_summary.rename(
         columns={'Time': 'Sum_Mean_Time', 'Cost': 'Sum_Cost'}, inplace=True)
-
-    print(df_summary)
     df_summary = df_summary.merge(
-        df_encoding_multipliers, on=['Filename', 'Method', 'Type'],
-        how='outer')
-
-    df_summary = df_summary.merge(
-        pd.DataFrame(dict_same_files), on=['Filename', 'Method'], how='outer')
+        df_encoding_multipliers,
+        on=['Filename', 'Method', 'Type'], how='inner')
 
     return df_summary
 
@@ -314,8 +311,6 @@ def run_precalculation(int_num_of_iteration):
                 ) != 0
 
             if not bool_file_is_processed:
-                print(path_one_file, string_encoding_method)
-
                 (np_binary_encoding,
                  int_file_size_bytes) = np_data_to_binary_array(
                     path_one_file, string_file_name)
@@ -332,15 +327,15 @@ def run_precalculation(int_num_of_iteration):
                     dict_same_files['Filename'].append(string_file_name)
                     dict_same_files['Method'].append(string_encoding_method)
                     dict_same_files['Similarity'].append(
-                        'Same' if
-                        np.array_equal(np_binary_encoding, np_decoded_array)
-                        else 'Different')
+                        np.array_equal(np_binary_encoding, np_decoded_array))
 
     df_new_detail = pd.DataFrame(
         list_results, columns=['Filename', 'Method', 'Transformation', 'Type',
                                'Size', 'Cost', 'Time', 'OriFile_Size'])
+    df_new_detail = df_new_detail.merge(
+        pd.DataFrame(dict_same_files), on=['Filename', 'Method'], how='inner')
 
-    df_new_summary = generate_summary(df_new_detail, dict_same_files)
+    df_new_summary = df_generate_summary(df_new_detail, dict_same_files)
 
     st.header('Recently calculated details')
     st.dataframe(df_new_detail)
@@ -351,27 +346,28 @@ def run_precalculation(int_num_of_iteration):
     st.dataframe(df_new_summary)
     st.header('Existed precalculated summary')
     st.dataframe(df_existing_summary)
-    st.write('Do you want to merge both new data into pickle file?')
+    st.write('Do you want to merge new data into pickle file?')
     if st.button('Merge new data to pickel'):
-        detail_concat = pd.concat([df_new_detail, df_existing_detail],
-                                  ignore_index=True)
-        detail_concat.to_pickle(path_existing_detail)
-        summary_concat = pd.concat([df_new_summary, df_existing_summary],
-                                   ignore_index=True)
-        summary_concat.to_pickle(path_existing_summary)
+        df_detail_concat = pd.concat(
+            [df_new_detail, df_existing_detail], ignore_index=True)
+        df_detail_concat.to_pickle(path_existing_detail)
+        df_summary_concat = pd.concat(
+            [df_new_summary, df_existing_summary], ignore_index=True)
+        df_summary_concat.to_pickle(path_existing_summary)
+
         if os.path.exists(path_existing_detail) and os.path.exists(
                 path_existing_summary):
             st.success('New data has been successfully merged')
-            st.header('New Summary Data')
-            st.dataframe(pd.read_pickle(path_existing_summary))
             st.header('New Detail Data')
-            st.dataframe(pd.read_pickle(path_existing_detail))
+            st.dataframe(df_detail_concat)
+            st.header('New Summary Data')
+            st.dataframe(df_summary_concat)
         else:
             st.error('There was an error while uploading the pickle file')
 
 
 def main():
-    run_precalculation(1)  # 2 times iteration
+    run_precalculation(4)  # 2 times iteration
 
 
 if __name__ == '__main__':
