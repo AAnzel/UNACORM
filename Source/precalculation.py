@@ -30,7 +30,8 @@ path_existing_detail = os.path.join(path_cache_data, 'pre_detail.pkl')
 path_existing_summary = os.path.join(path_cache_data, 'pre_summary.pkl')
 path_encoding_methods = os.path.join('Encodings')
 
-_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon', 'The2DCode']
+_NUMBER_OF_EXPERIMENT_RUNS = 4
+_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
 _DF_METRICS = pd.read_csv(os.path.join(path_cache_data, 'synthesis_cost.csv'))
 
 # ============================================================================
@@ -269,6 +270,9 @@ def run_precalculation(int_num_of_iteration):
     Args:
         num_of_iteration (int): number of iteration for each file
     """
+    string_progress_text = ''
+    st_progress_bar = st.progress(0, text=string_progress_text)
+
     bool_summary_exists = os.path.exists(path_existing_summary)
     bool_detail_exists = os.path.exists(path_existing_detail)
 
@@ -293,8 +297,12 @@ def run_precalculation(int_num_of_iteration):
 
     list_results = []
     dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
+    list_original_files = os.listdir(path_original_data)
+    int_total_runs = len(list_original_files) * len(list_encoding_methods) *\
+        int_num_of_iteration
     # We list original files
-    for string_file in os.listdir(path_original_data):
+    int_counter = 1
+    for string_file in list_original_files:
         path_one_file = os.path.join(path_original_data, string_file)
         string_file_name = os.path.splitext(string_file)[0]
 
@@ -316,6 +324,12 @@ def run_precalculation(int_num_of_iteration):
                     path_one_file, string_file_name)
 
                 for int_i in range(int_num_of_iteration):
+                    st_progress_bar.progress(
+                        int_counter / int_total_runs,
+                        text=(string_file + '_' + string_encoding_method +
+                              '_' + str(int_i)))
+                    int_counter += 1
+
                     (list_encoded_info, list_decoded_info,
                      np_decoded_array) = pipeline(
                         string_encoding_method, np_binary_encoding,
@@ -337,6 +351,7 @@ def run_precalculation(int_num_of_iteration):
 
     df_new_summary = df_generate_summary(df_new_detail, dict_same_files)
 
+    st_progress_bar.empty()
     st.header('Recently calculated details')
     st.dataframe(df_new_detail)
     st.header('Existed precalculated details')
@@ -367,7 +382,7 @@ def run_precalculation(int_num_of_iteration):
 
 
 def main():
-    run_precalculation(4)  # 2 times iteration
+    run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
 
 
 if __name__ == '__main__':
