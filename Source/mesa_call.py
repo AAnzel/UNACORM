@@ -4,39 +4,42 @@ import requests
 
 
 # Attributes for API calling
-url = 'https://mesa.mosla.de/api/all'
-header = {'content-type': 'application/json;charset=UTF-8'}
+string_url = 'https://mesa.mosla.de/api/all'
+dict_header = {'content-type': 'application/json;charset=UTF-8'}
 with open("mesa.json") as json_file:  # Config file for API
-    config_api = json.load(json_file)
+    dict_config_api = json.load(json_file)
 
 
 # Running API
-def run_requests(res_all, entry_list, c, payload, header, url):
+def run_requests(res_all, list_one_dna_strand, c, dict_payload, dict_header,
+                 string_url):
     """This function is used for running the MESA API
 
     Args:
         res_all (list): container for API result
-        entry_list (list): encoded dna sequence
+        list_one_dna_strand (list): encoded dna sequence
         c (int): initial number for length of dna list
-        payload (dict): API config
-        header (dict): API header
-        url (str): MESA API URL
+        dict_payload (dict): API config
+        dict_header (dict): API dict_header
+        string_url (str): MESA API URL
 
     Returns:
         time_used (number): length of API run
     """
     start_time = time.time()
     try:
-        for j in range(0, len(entry_list)):
-            payload['sequence'] = entry_list
-            res = requests.post(url, data=json.dumps(payload), headers=header)
+        for j in range(0, len(list_one_dna_strand)):
+            dict_payload['sequence'] = list_one_dna_strand
+            res = requests.post(string_url, data=json.dumps(dict_payload),
+                                headers=dict_header)
             res_all.append(res)
             c += 1
     except Exception:
         print("Max retries, going to sleep for 100 sec.")
         print("j= " + str(j))
         time.sleep(100)
-        run_requests(j, res_all, entry_list, c, payload, header, url)
+        run_requests(j, res_all, list_one_dna_strand, c, dict_payload,
+                     dict_header, string_url)
     time_used = time.time() - start_time
 
     return time_used
@@ -53,20 +56,25 @@ def api_call(encoded_dna, storage_length):
     Returns:
         modified_sequence (str): modified sequence sequence
     """
-    entry_list = encoded_dna
-    payload = config_api
-    payload['asHTML'] = False
-    payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
-    payload["err_simulation_order"]["Storage/PCR"][0][
+    list_one_dna_strand = encoded_dna
+    dict_payload = dict_config_api
+    dict_payload['asHTML'] = False
+    dict_payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
+    dict_payload["err_simulation_order"]["Storage/PCR"][0][
         "cycles"] = storage_length
     c = 0
     res_all = list()
-    time_used = run_requests(res_all, entry_list, c, payload, header, url)
+    time_used = run_requests(
+        res_all, list_one_dna_strand, c, dict_payload, dict_header,
+        string_url)
     # print(time_used)
+    dict_result = {}
+    string_modified_sequence = ''
 
     for ent in res_all:
-        result = ent.json()
+        dict_result = ent.json()
 
-    for key, _ in result.items():
-        modified_sequence = result[key]["res"]["modified_sequence"]
-    return modified_sequence
+    for key, _ in dict_result.items():
+        string_modified_sequence = dict_result[key]["res"]["modified_sequence"]
+
+    return string_modified_sequence
