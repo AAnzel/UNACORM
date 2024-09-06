@@ -113,7 +113,6 @@ def create_main_page():
     path_input_file, string_input_file = upload_file(
         string_key_suffix=string_chosen_file_type)
     string_file_name = os.path.splitext(string_input_file)[0]
-    print(string_input_file, string_file_name)
 
     st.write('Your uploaded path data:\t', path_input_file)
 

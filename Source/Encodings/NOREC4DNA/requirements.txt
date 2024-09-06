@@ -18,4 +18,7 @@ progressbar2
 crcmod
 crccheck
 watchdog
+cython
 pybloomfiltermmap3
+pybloomfilter
+
