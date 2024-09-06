@@ -17,6 +17,8 @@ COPY . /app
 
 RUN conda env create -f environment.yml
 
+RUN conda activate dna_project_env
+
 RUN conda clean --all --yes
 
 WORKDIR /app/Source/Encodings/NOREC4DNA
