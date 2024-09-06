@@ -1,6 +1,7 @@
 import plotly.express as px
 
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
+_STRING_PLOTLY_THEME = 'plotly_dark'
 
 
 def visualize_uploaded_plotly(df_report):
@@ -14,19 +15,20 @@ def visualize_uploaded_plotly(df_report):
     chart_size = px.bar(
         df_report, x='Method', y='Size', color='Transformation',
         title='Size (in bytes)', barmode='group', text_auto=True,
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE)  # ",.0f"
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        template=_STRING_PLOTLY_THEME)  # ",.0f"
 
     chart_time = px.bar(
         df_report, x='Method', y='Time', color='Transformation',
         title='Process Time (in seconds)', barmode='group',
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True)  # ",.0f"
+        text_auto=True, template=_STRING_PLOTLY_THEME)  # ",.0f"
 
     chart_cost = px.bar(
         df_report, x='Method', y='Cost', color='Transformation',
         title='Cost (based on length of nucleotides)', barmode='group',
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True)
+        text_auto=True, template=_STRING_PLOTLY_THEME)
 
     return chart_size, chart_time, chart_cost
 
@@ -41,7 +43,8 @@ def visualize_size_benchmark_plotly(df_measure_sum_concat):
         file (benchmarking dataset)
     """
     chart_multiplier = px.box(
-        df_measure_sum_concat, y="Encoding_Multipliers", x='Method')
+        df_measure_sum_concat, y="Encoding_Multipliers", x='Method',
+        template=_STRING_PLOTLY_THEME)
     chart_multiplier.update_traces(marker_color='white')
     return chart_multiplier
 
@@ -62,7 +65,8 @@ def visualize_cost_benchmark_plotly(file_chosen, df_concat):
         df_tmp,
         x='Method', y='Cost', color='Transformation', facet_col='Filename',
         title='Cost (based on length of nucleotides)', barmode='group',
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, text_auto=True)
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, text_auto=True,
+        template=_STRING_PLOTLY_THEME)
 
     return chart_cost
 
@@ -81,6 +85,7 @@ def visualize_time_benchmark_plotly(file_chosen, df_concat):
     chart_time = px.box(
         df_tmp, x='Method', y='Time', color='Transformation',
         title='Process Time (in seconds)', facet_col='Filename',
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE)  # ",.0f"
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        template=_STRING_PLOTLY_THEME)  # ",.0f"
 
     return chart_time
