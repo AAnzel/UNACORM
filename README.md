@@ -1,5 +1,127 @@
-# DNA_Encodings
-Projektarbeit DNA Encodings
+Badges Placeholder
 
-To run the process using upload file, run streamlit run main.py from Source directory
-To run the precalculation, run streamlit run precalculation.py
+# UNACORM --- DNA Encodings
+
+**The Unified DNA Encodings Platform**
+
+## Manuscript
+
+This tool is created for the following paper:
+
+***"A Unified Evaluation Tool for DNA Storage Codes"*** by Chisom Ezekannagha^, Aleksandar Anžel^, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael
+Schwarz, Dominik Heider, and Georges Hattab
+
+^ --- These authors contributed equally to this work
+
+Please cite the paper as:
+```latex
+bibtex placeholder
+```
+
+DOI badge Placeholder
+
+---
+Abstract:
+
+> Abstract placeholder
+
+
+## Dependancies
+
+The code is written in Python 3.12.2 and tested on Linux with the libraries included in the following Anaconda environment: [environment.yml](environment.yml). Some DNA encoding methods have their own dependencies, located in the following files:
+* [Source/Encodings/XORBasedCode/requirements.txt](Source/Encodings/XORBasedCode/requirements.txt)
+* [Source/Encodings/The2DCode/requirements.txt](Source/Encodings/The2DCode/requirements.txt)
+* [Source/Encodings/The2DCode/requirements.txt](Source/Encodings/The2DCode/requirements.txt)
+* [Source/Encodings/NOREC4DNA/requirements.txt](Source/Encodings/NOREC4DNA/requirements.txt)
+
+
+## Data
+
+| Location | Description |
+|---|---|
+| [Data/](Data/) | contains all data used to evaluate encodings and store intermediary data representations |
+| [Data/Original/](Data/Original/) | contains the original data used to benchmark all encodings |
+| [Data/Encoded/](Data/Encoded/) | the directory is empty and used only when benchmarking encoding methods to save the encoded original data |
+| [Data/Decoded/](Data/Decoded/) | the directory is empty and used only when benchmarking encoding methods to save the decoded previously encoded data |
+| [Data/Uploaded/](Data/Uploaded/) | the directory is empty and used only for storing user-uploaded data |
+| [Data/cache_data/](Data/cache_data/) | contains cached data |
+| [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) | contains cached benchmark data of 10 runs for each DNA encoding and each original file |
+| [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_detail.pkl) | contains cached benchmark data that represents the summary of [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs |
+| [Data/cache_data/huff3.dict](Data/cache_data/huff3.dict) | contains cached codebook for the 2D code |
+| [Data/cache_data/synthesis_cost.csv](Data/cache_data/synthesis_cost.csv) | contains cached synthesis cost |
+
+The cached benchmark data can be re-calculated using [Source/precalculation.py](/Source/precalculation.py) script and the following command:
+
+```bash
+# The user should be placed inside the Source/ directory
+streamlit run precalculation.py
+```
+
+The data located in [Data/Original/](Data/Original/) was used to test and benchmark all DNA encoding methods. The directory contains the following files:
+
+| Type | Location | Source |
+|---|---|---|
+| TXT | [Data/Original/Anna_Karenina.txt](Data/Original/Anna_Karenina.txt) | [https://www.gutenberg.org/ebooks/1399](https://www.gutenberg.org/ebooks/1399)
+| TXT | [Data/Original/Around_the_World_in_Eighty_Days.txt](Data/Original/Around_the_World_in_Eighty_Days.txt) | [https://www.gutenberg.org/ebooks/103](https://www.gutenberg.org/ebooks/103)
+| TXT | [Data/Original/The_Picture_of_Dorian_Gray.txt](Data/Original/The_Picture_of_Dorian_Gray.txt) | [https://www.gutenberg.org/ebooks/174](https://www.gutenberg.org/ebooks/174)
+| TXT | [Data/Original/The_Republic_Plato.txt](Data/Original/The_Republic_Plato.txt) | [https://www.gutenberg.org/ebooks/1497](https://www.gutenberg.org/ebooks/1497)
+| TXT | [Data/Original/Ulysses.txt](Data/Original/Ulysses.txt) | [https://www.gutenberg.org/ebooks/4300](https://www.gutenberg.org/ebooks/4300)
+| WAV | [Data/Original/bbc_house.wav](Data/Original/bbc_house.wav) | [https://sound-effects.bbcrewind.co.uk/search?q=07005179](https://sound-effects.bbcrewind.co.uk/search?q=07005179)
+| WAV | [Data/Original/bbc_peregrine_falcon.wav](Data/Original/bbc_peregrine_falcon.wav) | [https://sound-effects.bbcrewind.co.uk/search?q=NHU05015024](https://sound-effects.bbcrewind.co.uk/search?q=NHU05015024)
+| JPG | [Data/Original/La_Jeunesse.jpg](Data/Original/La_Jeunesse.jpg) | [https://www.metmuseum.org/art/collection/search/10054](https://www.metmuseum.org/art/collection/search/10054)
+| JPG | [Data/Original/Vue_de_la_Buena_Vista.jpg](Data/Original/Vue_de_la_Buena_Vista.jpg) | [https://commons.wikimedia.org/w/index.php?title=File:Les_merveilles_de_l%27industrie,_1873_%22Vue_de_la_Buena_Vista,_plantation_de_Don_Justo_Cantero,_dnas_l%27ille_de_Cuba%22_(4727225688).jpg&oldid=889592425](https://commons.wikimedia.org/w/index.php?title=File:Les_merveilles_de_l%27industrie,_1873_%22Vue_de_la_Buena_Vista,_plantation_de_Don_Justo_Cantero,_dnas_l%27ille_de_Cuba%22_(4727225688).jpg&oldid=889592425)
+
+## Code
+| Location | Description |
+|---|---|
+| [Source/](Source/) | contains all scripts necessary to run the tool |
+| [Source/Encodings](Source/Encodings) | contains all DNA encodings, each in its own separate directory |
+| [Source/main.py](/Source/main.py) | contains the code that builds the main layout and connects all pages of the platform's dashboard |
+| [Source/utilities.py](/Source/utilities.py) | contains the code that implements main functionalities of the platform |
+| [Source/visualize.py](/Source/visualize.py) | contains the code that implements visualization functionalities of the platform |
+| [Source/precalculation.py](/Source/precalculation.py) | contains the code that precalculates the benchmark files [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) and [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) |
+| [Source/mesa_call.py](/Source/mesa_call.py) | contains the code that implements MESA API calls using  [Source/mesa.json](/Source/mesa.json) configuration |
+
+
+## Installation & Running
+### Stable
+The easiest way to install the tool is to use our latest Docker image by building a docker container and running it locally.  Below is a sequence of instructions (for Linux-based systems) to run the container:
+
+```bash
+# how to install docker container and run it locally
+# ===== NOT TESTED =====
+
+git clone https://github.com/AAnzel/DNA_Encodings.git
+cd DNA_Encodings/
+docker build -t dna-encodings-local:stable .
+docker run --publish 8501:8501 --detach --name dna-encodings-local:stable
+```
+
+You can start using the tool by opening a web browser and typing in [http://localhost:8501/](http://localhost:8501/) as the address. If you run the docker container, you have to use the IP address or hostname instead of localhost.
+
+### Unstable
+The platform can also be installed without the docker container. This process requires users to install Anaconda or Miniconda package managers. Users can install Conda using the instructions on the following link [https://docs.anaconda.com/miniconda/#quick-command-line-install](https://docs.anaconda.com/miniconda/#quick-command-line-install). If Conda is installed, the following sequence of instructions (for Linux-based systems) installs all dependencies and runs the dashboard:
+
+```bash
+git clone https://github.com/AAnzel/DNA_Encodings.git
+cd DNA_Encodings/
+conda create -f environment.yml
+pip install -r Source/Encodings/XORBasedCode/requirements.txt
+pip install -r Source/Encodings/The2DCode/requirements.txt
+pip install -r Source/Encodings/NOREC4DNA/requirements.txt
+cd Source/Encodings/XORBasedCode
+python setup.py install
+cd ../NOREC4DNA
+python setup.py install
+cd ../../
+streamlit run main.py
+```
+
+## License
+
+Licensed under the GNU General Public License, Version 3.0 ([LICENSE](./LICENSE) or https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+### Contribution
+
+Any contribution intentionally submitted for inclusion in the work by you, shall be licensed under the GNU GPLv3.
+

@@ -126,7 +126,7 @@ def create_main_page():
     st.markdown('---')
 
     st.header('DNA Encoding')
-    string_chosen_dna_encoding = st.multiselect(
+    list_chosen_dna_encoding = st.multiselect(
      'Select your prefered DNA Encoding Methods', uti.LIST_ENCODING_METHODS)
 
     st.warning('The length of processing time depends on your chosen methods.')
@@ -134,18 +134,14 @@ def create_main_page():
     string_chosen_storage_length = st.text_input(
         'Choose your length of storage (in hours)')
 
-    df_new_detail = pd.DataFrame(
-        columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',
-                 'Cost', 'Time', 'OriFile_Size', 'Similarity'])
-    df_new_summary = pd.DataFrame(
-        columns=['Filename', 'Method', 'Type', 'Sum_Mean_Time_s',
-                 'Sum_Cost_$', 'Encoding_Multipliers', 'Similarity'])
+    df_new_detail = None
+    df_new_summary = None
 
     list_results = []
     dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
-    if (string_chosen_dna_encoding != [] and np_binary_encoding is not None
+    if (list_chosen_dna_encoding != [] and np_binary_encoding is not None
             and string_chosen_storage_length != ''):
-        for string_encoding_method in string_chosen_dna_encoding:
+        for string_encoding_method in list_chosen_dna_encoding:
             try:
                 (list_encoded_info, list_decoded_info,
                  np_decoded_array) = uti.pipeline(
@@ -155,6 +151,8 @@ def create_main_page():
 
                 list_results.append(list_encoded_info)
                 list_results.append(list_decoded_info)
+                print('ENCODED\n', list_encoded_info)
+                print('DECODED\n', list_decoded_info)
 
                 dict_same_files['Filename'].append(string_file_name)
                 dict_same_files['Method'].append(string_encoding_method)
@@ -187,7 +185,7 @@ def create_main_page():
         st.plotly_chart(chart_time, use_container_width=True)
         st.plotly_chart(chart_cost, use_container_width=True)
 
-    elif string_chosen_dna_encoding != [] and np_binary_encoding is not None:
+    elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
         st.error('Choose your file and length of storage first!')
     else:
         pass
@@ -197,10 +195,15 @@ def create_main_page():
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
-    df_details_combined = pd.concat(
-        [df_new_detail, df_existing_detail], ignore_index=True)
-    df_summary_combined = pd.concat(
-        [df_new_summary, df_existing_summary], ignore_index=True)
+    # If we calculated something new
+    if df_new_detail is not None and df_new_summary is not None:
+        df_details_combined = pd.concat(
+            [df_new_detail, df_existing_detail], ignore_index=True)
+        df_summary_combined = pd.concat(
+            [df_new_summary, df_existing_summary], ignore_index=True)
+    else:
+        df_details_combined = df_existing_detail
+        df_summary_combined = df_existing_summary
 
     csv_detail = df_details_combined.to_csv().encode('utf-8')
     csv_sum = df_summary_combined.to_csv().encode('utf-8')

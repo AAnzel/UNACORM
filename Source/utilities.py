@@ -10,7 +10,7 @@ import streamlit as st
 
 # Importing Encodings
 import xor_code_python as encoding_xor
-from Encodings.The2DCode import encoder as encoding_2d
+from Encodings.The2DCode import encoder as encoding_2d_tmp
 from Encodings.SimpleCode.src import transform as encoding_simple
 from Encodings.RepetitionCode.src import transform as encoding_repetition
 from Encodings.NOREC4DNA import unified_dna_lt as encoding_lt
@@ -35,6 +35,7 @@ _PATH_UPLOADED_DATA = os.path.join(PATH_ROOT_DATA, 'Uploaded')
 _PATH_ENCODING_METHODS = os.path.join('Encodings')
 
 _DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
+encoding_2d = encoding_2d_tmp.api()
 
 _LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
 LIST_ENCODING_METHODS = []
@@ -55,11 +56,13 @@ def remove_cached_data():
 
     # Traversing directories for uploaded files and deleting everything from it
     for string_dir in os.listdir(_PATH_UPLOADED_DATA):
-        if not os.path.isdir(string_dir):
+        path_subdir = os.path.join(_PATH_UPLOADED_DATA, string_dir)
+
+        if not os.path.isdir(path_subdir):
             continue
 
-        for string_file in os.listdir(string_dir):
-            path_file = os.path.join(string_dir, string_file)
+        for string_file in os.listdir(path_subdir):
+            path_file = os.path.join(path_subdir, string_file)
             if 'gitkeep' in string_file or os.path.isdir(path_file):
                 continue
             else:
@@ -146,7 +149,7 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         else:
             pass
     else:
-        if str_encoding_method == 'The2DCode':
+        if str_encoding_method == 'The2DCode':  # ! Fix (problem with decoding)
             list_generated_seq = encoding_2d.decode('', list_np_data)
         elif str_encoding_method == 'XORBasedCode':
             list_generated_seq = encoding_xor.decode('', list_np_data)
@@ -231,6 +234,7 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
 
         st_progress_bar.empty()
 
+    print(list_encoded)
     # We time the decoding process
     int_start_time = time.time()
     np_decoded_dna_sequences = list_encode_decode(
@@ -251,7 +255,7 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
         string_input_file_basename, string_encoding_method, 'Decoding',
         '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
         int_time_decoding, int_original_size]
-
+    print(list_decoded)
     return list_encoded, list_decoded, np_decoded_dna_sequences
 
 
