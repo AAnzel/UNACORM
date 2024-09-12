@@ -56,7 +56,5 @@ coverage.xml
 
 # Added by Aleksandar
 .DS_Store
-Data/Decoded
-Data/Original_Translated
-Data/Encoded
-Data/uploaded
+.vs/
+.vscode/
