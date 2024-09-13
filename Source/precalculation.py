@@ -5,16 +5,29 @@ import streamlit as st
 
 from utilities import PATH_ORIGINAL_DATA, LIST_ENCODING_METHODS
 from utilities import PATH_EXISTING_SUMMARY, PATH_EXISTING_DETAIL
-from utilities import np_data_to_binary_array, pipeline, df_generate_summary
+from utilities import np_data_to_binary_array, tuple_pipeline
+from utilities import df_generate_summary
 
 _NUMBER_OF_EXPERIMENT_RUNS = 4
 
 
 def run_precalculation(int_num_of_iteration):
-    """This function is used for running precalculation
+    """
+    run_precalculation function is used to run the precalculation dashboard
+    num_of_iteration times in order to benchmark all encoding methods
+    across all original files.
+
+    The function only precalculates the original files that were not already
+    processed. The user can add new files into the PATH_ORIGINAL_DATA directory
+    and append the benchmark runs of these files to the existing benchmark
+    precalculated data. The dashboard allows users to choose if they want to
+    append the new data or not.
 
     Args:
         num_of_iteration (int): number of iteration for each file
+
+    Returns:
+        None
     """
     string_progress_text = ''
     st_progress_bar = st.progress(0, text=string_progress_text)
@@ -71,7 +84,7 @@ def run_precalculation(int_num_of_iteration):
                     int_counter += 1
 
                     (list_encoded_info, list_decoded_info,
-                     np_decoded_array) = pipeline(
+                     np_decoded_array) = tuple_pipeline(
                         string_encoding_method, np_binary_encoding,
                         path_one_file, string_file, int_file_size_bytes, False,
                         0)
@@ -120,10 +133,19 @@ def run_precalculation(int_num_of_iteration):
             st.dataframe(df_summary_concat)
         else:
             st.error('There was an error while uploading the pickle file')
+    return None
 
 
 def main():
+    """
+    main function wraps the precalculation dashboard
+
+    Returns:
+        None
+    """
     run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
+
+    return None
 
 
 if __name__ == '__main__':

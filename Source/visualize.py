@@ -5,11 +5,18 @@ _STRING_PLOTLY_THEME = 'plotly_dark'
 
 
 def visualize_uploaded_plotly(df_report):
-    """This function is used for visualizing the results (time, cost, size)
-    for uploaded file
+    """
+    visualize_uploaded_plotly function is used for visualizing the time, cost,
+    and size results for data given in df_report
 
     Args:
-        df_report (dataframe): dataframe of detail results of uploaded file
+        df_report (pd.DataFrame): DataFrame containing detailed benchmark
+        results
+
+    Returns:
+        chart_size (px.Chart): chart with sizes
+        chart_time (px.Chart): chart with run times
+        chart_cost (px.Chart): chart with encoding/decoding costs
     """
 
     chart_size = px.bar(
@@ -34,30 +41,39 @@ def visualize_uploaded_plotly(df_report):
 
 
 def visualize_size_benchmark_plotly(df_measure_sum_concat):
-    """This function is used for visualizing the size multipliers from the
-    benchmarking dataset
+    """
+    visualize_size_benchmark_plotly function is used for visualizing the size
+    multipliers from the benchmarking dataset. These multipliers tell us how
+    much the size of the encoded file differes from the size of the decoded
+    file
 
     Args:
-        df_measure_sum_concat (dataframe): summary dataframe from concanated
-        precalculated data with result of uploaded
-        file (benchmarking dataset)
+        df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+
+    Returns:
+        chart_multiplier (px.Chart): chart with size multipliers
     """
     chart_multiplier = px.box(
         df_measure_sum_concat, y="Encoding_Multipliers", x='Method',
         template=_STRING_PLOTLY_THEME)
     chart_multiplier.update_traces(marker_color='white')
+
     return chart_multiplier
 
 
-def visualize_cost_benchmark_plotly(file_chosen, df_concat):
-    """This function is used for visualizing cost chart for chosen files from
-    benchmarking dataset
+def visualize_cost_benchmark_plotly(string_file_chosen, df_concat):
+    """
+    visualize_cost_benchmark_plotly function is used for visualizing the
+    encoding/decoding costs for each encoding method
 
     Args:
-        file_chosen (str): name of file that want to be showed
+        string_file_chosen (str): name of file that want to be showed
         df_concat (dataframe): detail benchmarking dataset
+
+    Returns:
+        chart_cost (px.Chart): chart with costs
     """
-    df_tmp = df_concat[df_concat['Filename'].isin(file_chosen)].groupby(
+    df_tmp = df_concat[df_concat['Filename'].isin(string_file_chosen)].groupby(
         ['Filename', 'Method', 'Transformation',
          'Size', 'Type']).mean().reset_index()
 
@@ -71,16 +87,21 @@ def visualize_cost_benchmark_plotly(file_chosen, df_concat):
     return chart_cost
 
 
-def visualize_time_benchmark_plotly(file_chosen, df_concat):
-    """This function is used for visualizing time charts for benchmarking
+def visualize_time_benchmark_plotly(string_file_chosen, df_concat):
+    """
+    visualize_time_benchmark_plotly function is used for visualizing run times
+    it took each method to encode/decode files
 
     Args:
-        file_chosen (str): chosen filename will be used for filtering which
-        data will be shown
+        string_file_chosen (str): chosen filename will be used for filtering
+        which data will be shown
         df_concat (dataframe): concanated detail precalculated data and data
         from uploaded file
+
+    Returns:
+        chart_time (px.Chart): chart with times
     """
-    df_tmp = df_concat[df_concat['Filename'].isin(file_chosen)]
+    df_tmp = df_concat[df_concat['Filename'].isin(string_file_chosen)]
 
     chart_time = px.box(
         df_tmp, x='Method', y='Time', color='Transformation',

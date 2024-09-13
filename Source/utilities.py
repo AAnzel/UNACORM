@@ -34,6 +34,7 @@ _PATH_DECODED_DATA = os.path.join(PATH_ROOT_DATA, 'Decoded')
 _PATH_UPLOADED_DATA = os.path.join(PATH_ROOT_DATA, 'Uploaded')
 _PATH_ENCODING_METHODS = os.path.join('Encodings')
 
+_UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 _DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
 encoding_2d = encoding_2d_tmp.api()
 
@@ -46,13 +47,15 @@ for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
 
 
 def remove_cached_data():
-    """This function is used for deleting old uploaded files by user that was
-    uploaded older than 1 hour ago.
+    """
+    remove_cached_data function removes all data that was previously created
+    while running the dashboard
+
+    Returns:
+        None
     """
 
-    # TODO: Implement cleaning for Encoded, Decoded, and Uploaded directories
-    SAVE_TIME = 3600  # 3600 seconds = 1h
-    time_limit = time.time() - SAVE_TIME
+    time_limit = time.time() - _UPLOADED_SAVE_TIME
     list_directories_to_clean = [_PATH_UPLOADED_DATA, _PATH_ENCODED_DATA,
                                  _PATH_DECODED_DATA, _PATH_ORIGINAL_TRANSLATED]
 
@@ -80,17 +83,23 @@ def remove_cached_data():
                     #        ' directory')
                 else:
                     pass
+    return None
 
 
 @st.cache_data
 def int_calculate_encoding_cost(list_dna_sequences):
-    """This function is used for calculating synthesizing cost
+    """
+    int_calculate_encoding_cost function calculates synthesis cost
+
+    The function takes a list of DNA sequences and calculates the cost of
+    synthesis according to their structure and the fixed set of costs saved in
+    an external file.
 
     Args:
-        list_dna_sequences (list): list of DNA sequences
+        list_dna_sequences (list): list of string DNA sequences
 
     Returns:
-        int_cost_total (int): synthesising cost
+        int: calculated cost in US dollars
     """
     int_num_of_oligos = len(list_dna_sequences)
     int_max_nucleotides = 0
@@ -119,17 +128,21 @@ def int_calculate_encoding_cost(list_dna_sequences):
 @st.cache_data
 def list_encode_decode(str_encoding_method, list_np_data, path_file,
                        bool_encode):
-    """This function is used for encoding the binary data into DNA sequences
+    """
+    list_encode_decode function encodes or decodes the data using all encoding
+    methods
 
     Args:
-        encoding_method (str): chosen encoding method
-        list_np_data (list or np.array): data to encode or decode
+        str_encoding_method (str): chosen encoding method
+        list_np_data (list or np.array): list of string DNA sequence if
+        encoding or numpy array of binary data when decoding
         path_file (os.path): path of the original un-encoded file
-        bool_encode (bool): if true encoding is performed, if false then
+        bool_encode (bool): if True, encoding is performed, if False then
         decoding
 
     Returns:
-        list_generated_seq (list): encoded dna list
+        list_generated_seq (list): encoded DNA list if encoding, or numpy
+        boolean array if decoding
     """
     list_generated_seq = []
 
@@ -164,14 +177,16 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
 
 
 @st.cache_data
-def pipeline(string_encoding_method, np_bit_array, path_input_file,
-             string_file_name, int_original_size, bool_simulate_error,
-             int_storage_length):
-    """This function is used for integrating the process for one file
+def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
+                   string_file_name, int_original_size, bool_simulate_error,
+                   int_storage_length):
+    """
+    tuple_pipeline function is used for integrating the encoding/decoding
+    process for one file
 
     Args:
         string_encoding_method (str): chosen encoding method
-        np_bit_array (array): numpy np_bit_array array of uploaded file
+        np_bit_array (array): numpy boolean array of uploaded file
         path_input_file (str): path of uploaded data
         string_file_name (str): the base name of the file with extension
         int_original_size (number): size of original file
@@ -181,10 +196,12 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
         degradation. Used only if bool_simulate_error is True
 
     Returns:
-        list_encoded [list]: list of result from encoding process including
+        list_encoded (list): list of result from encoding process including
         time, cost, and size
-        list_decoded [list]: list of result from decoding process including
+        list_decoded (list): list of result from decoding process including
         time, cost, and size
+        np_decoded_dna_sequences (np.array): numpy boolean array containing
+        decoded sequences
     """
     string_input_file_basename = os.path.splitext(string_file_name)[0]
     string_file_extension = os.path.splitext(string_file_name)[1][1:]
@@ -232,7 +249,7 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
 
         st_progress_bar.empty()
 
-    print(list_encoded)
+    print(list_encoded)  # ! FIX: Remove after debugging the 2D code
     # We time the decoding process
     int_start_time = time.time()
     np_decoded_dna_sequences = list_encode_decode(
@@ -253,21 +270,27 @@ def pipeline(string_encoding_method, np_bit_array, path_input_file,
         string_input_file_basename, string_encoding_method, 'Decoding',
         '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
         int_time_decoding, int_original_size]
-    print(list_decoded)
+    print(list_decoded)  # ! FIX: Remove after debugging the 2D code
     return list_encoded, list_decoded, np_decoded_dna_sequences
 
 
 @st.cache_data
 def df_generate_summary(df_report):
-    """This function is used for generating summary dataframe from detail
-    dataframe (from 10 times running pipeline)
+    """
+    df_generate_summary function generates a summary report of multiple
+    benchmark runs
+
+    This function aggregates mulitple benchmarks of all encoding methods and
+    all original files. The resulting file does not contain per run information
+    but an aggregated information of all runs per encoding method and original
+    file
 
     Args:
-        df_report (DataFrame): detailed df containing previous runs of one
-        encoding method
+        df_report (pd.DataFrame): DataFrame containing the detailed benchmark
+        information of multiple runs
 
     Returns:
-        _type_: _description_
+        pd.DataFrame: DataFrame containing the summary information
     """
     df_summary = df_report.copy(deep=True)
     df_encoding_multipliers = df_report[[
@@ -303,15 +326,19 @@ def df_generate_summary(df_report):
 
 @st.cache_data
 def np_data_to_binary_array(path_original_file, string_file_name):
-    """This function is used to convert data to binary
+    """
+    np_data_to_binary_array function is used to convert the original file to
+    its binary representation contained in a numpy array
 
     Args:
         path_original_file (os.path): path of the original file
         string_file_name (string): name of the file without extension
 
     Returns:
-        binary_numpy_content (np.array): bit array representing the original
-        file
+        binary_numpy_content (np.array): boolean array representing the
+        original file
+        int_translated_file_size (int): size of the resulting numpy array on
+        the disk
     """
     np_binary_numpy_content = None
     int_translated_file_size = 0

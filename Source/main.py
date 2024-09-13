@@ -11,7 +11,8 @@ _PATH_UPLOADED_DATA = os.path.join(uti.PATH_ROOT_DATA, 'Uploaded')
 
 
 def create_sidebar():
-    """This function is used for creating sidebar description
+    """
+    create_sidebar function creates the dashboard sidebar
 
     Returns:
         None
@@ -47,16 +48,18 @@ def create_sidebar():
     return None
 
 
-def upload_file(string_key_suffix):
-    """This function is used for saving uploaded files
+def tuple_upload_file(string_key_suffix):
+    """
+    tuple_upload_file function uploads a file and caches it internally
+
+    The function takes a string argument  necessary for creating seperate user
+    sessions. It returns the path of the uploaded file and its name
 
     Args:
-        string_key_suffix (string): data type that was chosen by user
+        string_key_suffix (string): key that seperates user sessions
 
     Returns:
-        path_input_file (str): full path of uploaded file
-        string_file_name (str): name of uploaded file
-
+        tuple: path of the uploaded file and its name are returned
     """
 
     st.header('Choose your ' + string_key_suffix + ' data')
@@ -88,7 +91,11 @@ def upload_file(string_key_suffix):
 
 
 def create_main_page():
-    """This function is used to wrap all functionalities
+    """
+    create_main_page function creates the main dashboard page
+
+    Returns:
+        None
     """
 
     st.header('File Upload')
@@ -104,7 +111,7 @@ def create_main_page():
     st.markdown('---')
 
     path_input_file = ''
-    path_input_file, string_input_file = upload_file(
+    path_input_file, string_input_file = tuple_upload_file(
         string_key_suffix=string_chosen_file_type)
     string_file_name = os.path.splitext(string_input_file)[0]
 
@@ -138,7 +145,7 @@ def create_main_page():
         for string_encoding_method in list_chosen_dna_encoding:
             try:
                 (list_encoded_info, list_decoded_info,
-                 np_decoded_array) = uti.pipeline(
+                 np_decoded_array) = uti.tuple_pipeline(
                     string_encoding_method, np_binary_encoding,
                     path_input_file, string_input_file, original_file_size,
                     True, int(string_chosen_storage_length))
@@ -245,9 +252,13 @@ def create_main_page():
                 file_chosen, df_details_combined)
         st.plotly_chart(chart, use_container_width=True)
 
+    return None
+
 
 def main():
-    """This function is main function
+    """
+    main function wraps all other functions and creates the main page and the
+    sidebar
 
     Returns:
         None
