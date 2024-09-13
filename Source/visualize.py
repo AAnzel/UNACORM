@@ -1,5 +1,16 @@
 import plotly.express as px
 
+
+__author__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian']
+__copyright__ = ''
+__credits__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian', 'Chisom Ezekannagha']
+__license__ = 'GNU General Public License v3.0'
+__version__ = '1.0.0'
+__maintainer__ = 'Aleksandar Anžel'
+__email__ = 'AnzelA@rki.de'
+__status__ = 'Stable'
+
+
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
 _STRING_PLOTLY_THEME = 'plotly_dark'
 
