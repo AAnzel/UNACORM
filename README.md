@@ -31,7 +31,6 @@ Abstract:
 The code is written in Python 3.12.2 and tested on Linux with the libraries included in the following Anaconda environment: [environment.yml](environment.yml). Some DNA encoding methods have their own dependencies, located in the following files:
 * [Source/Encodings/XORBasedCode/requirements.txt](Source/Encodings/XORBasedCode/requirements.txt)
 * [Source/Encodings/The2DCode/requirements.txt](Source/Encodings/The2DCode/requirements.txt)
-* [Source/Encodings/The2DCode/requirements.txt](Source/Encodings/The2DCode/requirements.txt)
 * [Source/Encodings/NOREC4DNA/requirements.txt](Source/Encodings/NOREC4DNA/requirements.txt)
 
 
@@ -82,6 +81,16 @@ The data located in [Data/Original/](Data/Original/) was used to test and benchm
 | [Source/precalculation.py](/Source/precalculation.py) | contains the code that precalculates the benchmark files [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) and [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) |
 | [Source/mesa_call.py](/Source/mesa_call.py) | contains the code that implements [MESA](https://mesa.mosla.de/) API calls using  [Source/mesa.json](/Source/mesa.json) configuration |
 
+We would like to thank the authors of the encoding methods (located at [Source/Encodings](Source/Encodings)) for helping us integrate them into our platform. We acknowledge their contributions in the table below.
+
+| Location | Authors | Reimplemented by | Repository | Publication |
+|---|---|---|---|---|
+| [Simple Code](Source/Encodings/SimpleCode/) | George M. Church, Yuan Gao, and Sriram Kosuri | Khawla Elhadri | [https://github.com/ke-pm/DNA-Encoding](https://github.com/ke-pm/DNA-Encoding) | [10.1126/science.1226355](https://doi.org/10.1126/science.1226355) | 
+| [2D Code](Source/Encodings/The2DCode) | Robert N. Grass, Reinhard Heckel, Michela Puddu, Daniela Paunescu, and Wendelin J. Stark | Samuel Becker, Felix Klein, and Raffael Schön | [https://github.com/raeudigerRaeffi/reedSolomonDNA](https://github.com/raeudigerRaeffi/reedSolomonDNA) | [10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378) |
+| [XOR-based Code](Source/Encodings/XORBasedCode) | James Bornholt, Randolph Lopez, Douglas M. Carmean, Luis Ceze, Georg Seelig, and Karin Strauss | Leon Wimbes, and Luca Staus | [https://github.com/StausWimbes/XOR_based_DNA_encoding](https://github.com/StausWimbes/XOR_based_DNA_encoding) | [10.1145/2872362.2872397](https://doi.org/10.1145/2872362.2872397) |
+| [Repetition Code](Source/Encodings/RepetitionCode) | Nick Goldman, Paul Bertone, Siyuan Chen, Christophe Dessimoz, Emily M. LeProust, Botond Sipos, and Ewan Birney | David Sonnabend | [https://github.com/davidabendsonn/DNAencoding-Goldman2013](https://github.com/davidabendsonn/DNAencoding-Goldman2013) | [10.1038/nature11875](https://doi.org/10.1038/nature11875) |
+| [DNA-Aeon](Source/Encodings/DNA-Aeon) | Marius Welzel, Peter Michael Schwarz, Hannah F. Löchel, Tolganay Kabdullayeva, Sandra Clemens, Anke Becker, Bernd Freisleben, and Dominik Heider | Marius Welzel | [https://github.com/MW55/DNA-Aeon/tree/main](https://github.com/MW55/DNA-Aeon/tree/main)| [10.1038/s41467-023-36297-3](https://doi.org/10.1038/s41467-023-36297-3) |
+| [NOREC4DNA](Source/Encodings/NOREC4DNA) | Peter Michael Schwarz, and Bernd Freisleben | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) | [10.1186/s12859-021-04318-x](https://doi.org/10.1186/s12859-021-04318-x) |
 
 ## Installation & Running
 ### Stable
