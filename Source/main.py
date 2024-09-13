@@ -58,12 +58,6 @@ def upload_file(string_key_suffix):
         string_file_name (str): name of uploaded file
 
     """
-    dict_file_type_cache = {
-        'txt': os.path.join(_PATH_UPLOADED_DATA, 'txt'),
-        'jpg': os.path.join(_PATH_UPLOADED_DATA, 'jpg'),
-        'wav': os.path.join(_PATH_UPLOADED_DATA, 'wav')}
-
-    cache_folder_path = dict_file_type_cache[string_key_suffix]
 
     st.header('Choose your ' + string_key_suffix + ' data')
     st.markdown('')
@@ -79,7 +73,7 @@ def upload_file(string_key_suffix):
         float_time_uploaded = str(time.time()).replace('.', '_')
         string_file_name = imported_file.name
         string_new_name = float_time_uploaded + '_' + imported_file.name
-        path_input_file = os.path.join(cache_folder_path, string_new_name)
+        path_input_file = os.path.join(_PATH_UPLOADED_DATA, string_new_name)
         with open(path_input_file, mode='wb') as w:
             w.write(imported_file.getvalue())
 

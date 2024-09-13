@@ -53,16 +53,14 @@ def remove_cached_data():
     # TODO: Implement cleaning for Encoded, Decoded, and Uploaded directories
     SAVE_TIME = 3600  # 3600 seconds = 1h
     time_limit = time.time() - SAVE_TIME
+    list_directories_to_clean = [_PATH_UPLOADED_DATA, _PATH_ENCODED_DATA,
+                                 _PATH_DECODED_DATA, _PATH_ORIGINAL_TRANSLATED]
 
-    # Traversing directories for uploaded files and deleting everything from it
-    for string_dir in os.listdir(_PATH_UPLOADED_DATA):
-        path_subdir = os.path.join(_PATH_UPLOADED_DATA, string_dir)
+    # Traversing directories and deleting everything from them
+    for path_dir in list_directories_to_clean:
+        for string_file in os.listdir(path_dir):
+            path_file = os.path.join(path_dir, string_file)
 
-        if not os.path.isdir(path_subdir):
-            continue
-
-        for string_file in os.listdir(path_subdir):
-            path_file = os.path.join(path_subdir, string_file)
             if 'gitkeep' in string_file or os.path.isdir(path_file):
                 continue
             else:
@@ -78,8 +76,8 @@ def remove_cached_data():
                         print('Failed to delete ' + path_file + '. Reason: '
                               + str(e))
 
-                    print('Successfully removed old data from uploaded' +
-                          ' directory')
+                    #  print('Successfully removed old data from uploaded' +
+                    #        ' directory')
                 else:
                     pass
 
