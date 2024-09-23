@@ -1228,3 +1228,7 @@ dkms.conf
 .DS_Store
 .vs/
 .vscode/
+Data/Decoded/*
+Data/Original_Translated/*
+Data/Encoded/*
+Data/Uploaded/*
