@@ -72,7 +72,7 @@ def tuple_upload_file(string_key_suffix):
     Returns:
         tuple: path of the uploaded file and its name are returned
     """
-
+    # TODO: Make upload file type agnostic
     st.header('Choose your ' + string_key_suffix + ' data')
     st.markdown('')
 
