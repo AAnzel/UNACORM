@@ -201,8 +201,6 @@ def create_main_page():
     else:
         pass
 
-    st.markdown('---')
-    st.header('Benchmark')
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
@@ -216,6 +214,8 @@ def create_main_page():
         df_details_combined = df_existing_detail
         df_summary_combined = df_existing_summary
 
+    st.markdown('---')
+    st.header('Benchmark')
     st.dataframe(df_summary_combined)
     st.download_button(
         label="Download",
@@ -224,8 +224,7 @@ def create_main_page():
         mime='text/csv',
     )
 
-    # BUG: The expender doesn't work for some reason
-    with st.expander("Expand Detail", expanded=True):
+    with st.expander("Expand Detailed Information", expanded=True):
         st.markdown('Detail Table')
         st.dataframe(df_details_combined)
         st.download_button(
