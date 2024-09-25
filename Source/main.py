@@ -108,7 +108,6 @@ def create_main_page():
     Returns:
         None
     """
-
     st.header('File Upload')
 
     list_file_type = ['txt', 'jpg', 'wav']
@@ -163,8 +162,8 @@ def create_main_page():
 
                 list_results.append(list_encoded_info)
                 list_results.append(list_decoded_info)
-                print('ENCODED\n', list_encoded_info)
-                print('DECODED\n', list_decoded_info)
+                print('ENCODED\n', list_encoded_info)  # TODO: Remove
+                print('DECODED\n', list_decoded_info)  # TODO: Remove
 
                 dict_same_files['Filename'].append(string_file_name)
                 dict_same_files['Method'].append(string_encoding_method)
@@ -220,18 +219,18 @@ def create_main_page():
     st.dataframe(df_summary_combined)
     st.download_button(
         label="Download",
-        data=df_summary_combined.to_csv().encode('utf-8'),
+        data=df_summary_combined.to_csv(index=False).encode('utf-8'),
         file_name='summary_data.csv',
         mime='text/csv',
     )
 
     # BUG: The expender doesn't work for some reason
-    with st.expander("Expand Detail---", expanded=True):
+    with st.expander("Expand Detail", expanded=True):
         st.markdown('Detail Table')
         st.dataframe(df_details_combined)
         st.download_button(
             label="Download",
-            data=df_details_combined.to_csv().encode('utf-8'),
+            data=df_details_combined.to_csv(index=False).encode('utf-8'),
             file_name='detail_data.csv',
             mime='text/csv',
         )

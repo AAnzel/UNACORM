@@ -127,6 +127,13 @@ cd ../../
 streamlit run main.py
 ```
 
+Every subsequent run of the tool after restarting the terminal emulator session requires activating the installed conda environment and running the dashboard. The following sequence of instructions defines that process:
+
+```bash
+conda activate dna_project_env
+streamlit run main.py
+```
+
 ## License
 
 Licensed under the GNU General Public License, Version 3.0 ([LICENSE](./LICENSE) or https://www.gnu.org/licenses/gpl-3.0.en.html)
