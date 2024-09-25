@@ -239,23 +239,22 @@ def create_main_page():
     chart = vis.visualize_size_benchmark_plotly(df_summary_combined)
     st.plotly_chart(chart, use_container_width=True)
 
-    string_file_chosen = st.selectbox(
+    list_files_to_visualize = list(
+        pd.unique(df_summary_combined['Filename'])) + os.listdir(
+            uti.PATH_ORIGINAL_DATA)
+    list_files_chosen = st.multiselect(
      'Select files that you want to review (This will affect Cost' +
-     ' and Time Charts)', placeholder='Chose a file', index=None,
-     options=os.listdir(uti.PATH_ORIGINAL_DATA))
-    # TODO: Change to Uploaded path
-    # TODO: Instead of this select box there should be a checkbox saying if the
-    # TODO: user wants to included the uploaded data or not
-    # TODO: By default, these charts should represent the precalculated data
+     ' and Time Charts)', default=list_files_to_visualize,
+     options=list_files_to_visualize)
 
     st.markdown('---')
     chart = vis.visualize_cost_benchmark_plotly(
-        string_file_chosen, df_details_combined)
+        list_files_chosen, df_details_combined)
     st.plotly_chart(chart, use_container_width=True)
 
     st.markdown('---')
     chart = vis.visualize_time_benchmark_plotly(
-            string_file_chosen, df_details_combined)
+            list_files_chosen, df_details_combined)
     st.plotly_chart(chart, use_container_width=True)
 
     return None
