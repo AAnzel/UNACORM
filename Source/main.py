@@ -276,9 +276,6 @@ def main():
                     #MainMenu {visibility: hidden;}
                     .stDeployButton {display:none;}
                     footer {visibility: hidden;}
-                    details {
-                                display: None;
-                            }
                     </style>
 
                 ''', unsafe_allow_html=True)
