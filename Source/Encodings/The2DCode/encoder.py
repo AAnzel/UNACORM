@@ -1,7 +1,7 @@
 # Import libaries
 import numpy as np
 import random
-from utils import *
+from utils.utils import *
 from reedSolomon import *
 import os
 

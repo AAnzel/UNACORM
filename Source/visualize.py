@@ -34,19 +34,25 @@ def visualize_uploaded_plotly(df_report):
         df_report, x='Method', y='Size', color='Transformation',
         title='Size (in bytes)', barmode='group', text_auto=True,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        template=_STRING_PLOTLY_THEME)  # ",.0f"
+        template=_STRING_PLOTLY_THEME).update_layout(
+            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+                   'font': {'size': 24}})
 
     chart_time = px.bar(
         df_report, x='Method', y='Time', color='Transformation',
         title='Process Time (in seconds)', barmode='group',
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True, template=_STRING_PLOTLY_THEME)  # ",.0f"
+        text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
+            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+                   'font': {'size': 24}})
 
     chart_cost = px.bar(
         df_report, x='Method', y='Cost', color='Transformation',
         title='Cost (based on length of nucleotides)', barmode='group',
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True, template=_STRING_PLOTLY_THEME)
+        text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
+            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+                   'font': {'size': 24}})
 
     return chart_size, chart_time, chart_cost
 
@@ -66,8 +72,10 @@ def visualize_size_benchmark_plotly(df_measure_sum_concat):
     """
     chart_multiplier = px.box(
         df_measure_sum_concat, y="Encoding_Multipliers", x='Method',
-        template=_STRING_PLOTLY_THEME)
-    chart_multiplier.update_traces(marker_color='white')
+        template=_STRING_PLOTLY_THEME, title='File Size')
+    chart_multiplier.update_traces(marker_color='white').update_layout(
+        title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+               'font': {'size': 24}})
 
     return chart_multiplier
 
@@ -84,16 +92,25 @@ def visualize_cost_benchmark_plotly(string_file_chosen, df_concat):
     Returns:
         chart_cost (px.Chart): chart with costs
     """
-    df_tmp = df_concat[df_concat['Filename'].isin(string_file_chosen)].groupby(
-        ['Filename', 'Method', 'Transformation',
-         'Size', 'Type']).mean().reset_index()
 
-    chart_cost = px.bar(
+    if string_file_chosen is None:
+        df_tmp = df_concat.copy()
+    else:
+        df_tmp = df_concat[
+            df_concat['Filename'].isin([string_file_chosen])].groupby(
+                ['Filename', 'Method', 'Transformation',
+                 'Size', 'Type']).mean().reset_index()
+
+    print('DF_TMP', df_tmp)
+    print('String: ', string_file_chosen)
+    chart_cost = px.box(
         df_tmp,
         x='Method', y='Cost', color='Transformation', facet_col='Filename',
-        title='Cost (based on length of nucleotides)', barmode='group',
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, text_auto=True,
-        template=_STRING_PLOTLY_THEME)
+        title='Cost (based on length of nucleotides)', facet_col_wrap=4,
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        template=_STRING_PLOTLY_THEME).update_layout(
+            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+                   'font': {'size': 24}})
 
     return chart_cost
 
@@ -112,12 +129,18 @@ def visualize_time_benchmark_plotly(string_file_chosen, df_concat):
     Returns:
         chart_time (px.Chart): chart with times
     """
-    df_tmp = df_concat[df_concat['Filename'].isin(string_file_chosen)]
+
+    if string_file_chosen is None:
+        df_tmp = df_concat
+    else:
+        df_tmp = df_concat[df_concat['Filename'].isin([string_file_chosen])]
 
     chart_time = px.box(
         df_tmp, x='Method', y='Time', color='Transformation',
         title='Process Time (in seconds)', facet_col='Filename',
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        template=_STRING_PLOTLY_THEME)  # ",.0f"
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
+        template=_STRING_PLOTLY_THEME).update_layout(
+            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+                   'font': {'size': 24}})
 
     return chart_time

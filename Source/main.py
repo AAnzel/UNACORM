@@ -183,11 +183,11 @@ def create_main_page():
 
         df_new_summary = uti.df_generate_summary(df_new_detail)
 
-        st.write('Summary Report')
+        st.markdown('Summary Report')
         st.dataframe(df_new_summary)
 
         with st.expander("Expand Detail"):
-            st.write('Detail Table')
+            st.markdown('Detail Table')
             st.dataframe(df_new_detail)
 
         (chart_size, chart_time,
@@ -202,7 +202,7 @@ def create_main_page():
     else:
         pass
 
-    st.write('---')
+    st.markdown('---')
     st.header('Benchmark')
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
@@ -217,51 +217,46 @@ def create_main_page():
         df_details_combined = df_existing_detail
         df_summary_combined = df_existing_summary
 
-    csv_detail = df_details_combined.to_csv().encode('utf-8')
-    csv_sum = df_summary_combined.to_csv().encode('utf-8')
-
     st.dataframe(df_summary_combined)
     st.download_button(
         label="Download",
-        data=csv_sum,
+        data=df_summary_combined.to_csv().encode('utf-8'),
         file_name='summary_data.csv',
         mime='text/csv',
     )
 
-    with st.expander("Expand Detail"):
-        st.write('Detail Table')
+    # BUG: The expender doesn't work for some reason
+    with st.expander("Expand Detail---", expanded=True):
+        st.markdown('Detail Table')
         st.dataframe(df_details_combined)
         st.download_button(
             label="Download",
-            data=csv_detail,
+            data=df_details_combined.to_csv().encode('utf-8'),
             file_name='detail_data.csv',
             mime='text/csv',
         )
-    st.markdown("<h3 style='text-align: center;" +
-                " color: black;'>File Size </h3>", unsafe_allow_html=True)
 
     chart = vis.visualize_size_benchmark_plotly(df_summary_combined)
     st.plotly_chart(chart, use_container_width=True)
 
-    st.write('---')
-    st.markdown("<h3 style='text-align: center; color: black;'>Cost </h3>",
-                unsafe_allow_html=True)
-    file_chosen = st.multiselect(
+    string_file_chosen = st.selectbox(
      'Select files that you want to review (This will affect Cost' +
-     ' and Time Charts)', os.listdir(uti.PATH_ORIGINAL_DATA))
+     ' and Time Charts)', placeholder='Chose a file', index=None,
+     options=os.listdir(uti.PATH_ORIGINAL_DATA))
+    # TODO: Change to Uploaded path
+    # TODO: Instead of this select box there should be a checkbox saying if the
+    # TODO: user wants to included the uploaded data or not
+    # TODO: By default, these charts should represent the precalculated data
 
-    if file_chosen:
-        chart = vis.visualize_cost_benchmark_plotly(
-            file_chosen, df_details_combined)
-        st.plotly_chart(chart, use_container_width=True)
+    st.markdown('---')
+    chart = vis.visualize_cost_benchmark_plotly(
+        string_file_chosen, df_details_combined)
+    st.plotly_chart(chart, use_container_width=True)
 
-        st.write('---')
-        st.markdown("<h3 style='text-align: center; color: black;'>Time</h3>",
-                    unsafe_allow_html=True)
-
-        chart = vis.visualize_time_benchmark_plotly(
-                file_chosen, df_details_combined)
-        st.plotly_chart(chart, use_container_width=True)
+    st.markdown('---')
+    chart = vis.visualize_time_benchmark_plotly(
+            string_file_chosen, df_details_combined)
+    st.plotly_chart(chart, use_container_width=True)
 
     return None
 

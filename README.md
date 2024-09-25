@@ -115,6 +115,7 @@ The platform can also be installed without the docker container. This process re
 git clone https://github.com/AAnzel/DNA_Encodings.git
 cd DNA_Encodings/
 conda create -f environment.yml
+conda activate dna_project_env
 pip install -r Source/Encodings/XORBasedCode/requirements.txt
 pip install -r Source/Encodings/The2DCode/requirements.txt
 pip install -r Source/Encodings/NOREC4DNA/requirements.txt
