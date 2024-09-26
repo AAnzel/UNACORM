@@ -59,26 +59,24 @@ def create_sidebar():
     return None
 
 
-def tuple_upload_file(string_key_suffix):
+def tuple_upload_file():
     """
     tuple_upload_file function uploads a file and caches it internally
 
     The function takes a string argument  necessary for creating seperate user
     sessions. It returns the path of the uploaded file and its name
 
-    Args:
-        string_key_suffix (string): key that seperates user sessions
-
     Returns:
         tuple: path of the uploaded file and its name are returned
     """
-    # TODO: Make upload file type agnostic
-    st.header('Choose your ' + string_key_suffix + ' data')
+
+    st.header('File Upload')
     st.markdown('')
+    list_file_type = ['txt', 'jpg', 'wav']
 
     imported_file = st.file_uploader(
-        label='Upload your file', type=string_key_suffix,
-        accept_multiple_files=False, key='Upload_file_' + string_key_suffix)
+        label='Upload your file', type=list_file_type,
+        accept_multiple_files=False, key='Upload_file_')
 
     string_file_name = ''
     path_input_file = ''
@@ -93,10 +91,6 @@ def tuple_upload_file(string_key_suffix):
 
         if os.path.exists(path_input_file):
             st.success('Your file is successfully uploaded!')
-        # st.write(type(imported_file))
-        file_details = {"filename": imported_file.name,
-                        "filetype": imported_file.type}
-        st.write(file_details)
 
     return path_input_file, string_file_name
 
@@ -108,12 +102,6 @@ def create_main_page():
     Returns:
         None
     """
-    st.header('File Upload')
-
-    list_file_type = ['txt', 'jpg', 'wav']
-
-    string_chosen_file_type = st.selectbox(
-        'Which type of file do you want to upload:', list_file_type)
 
     # Removing old uploaded data
     uti.remove_cached_data()
@@ -121,8 +109,7 @@ def create_main_page():
     st.markdown('---')
 
     path_input_file = ''
-    path_input_file, string_input_file = tuple_upload_file(
-        string_key_suffix=string_chosen_file_type)
+    path_input_file, string_input_file = tuple_upload_file()
     string_file_name = os.path.splitext(string_input_file)[0]
 
     st.write('Your uploaded path data:\t', path_input_file)
@@ -174,8 +161,8 @@ def create_main_page():
 
         df_new_detail = pd.DataFrame(
             list_results,
-            columns=['Filename', 'Method', 'Transformation', 'Type',
-                     'Size', 'Cost', 'Time', 'OriFile_Size'])
+            columns=pd.Series(['Filename', 'Method', 'Transformation', 'Type',
+                               'Size', 'Cost', 'Time', 'OriFile_Size']))
         df_new_detail = df_new_detail.merge(
             pd.DataFrame(dict_same_files), on=['Filename', 'Method'],
             how='inner')
@@ -185,7 +172,7 @@ def create_main_page():
         st.markdown('Summary Report')
         st.dataframe(df_new_summary)
 
-        with st.expander("Expand Detail"):
+        with st.expander("Expand Detailed Information"):
             st.markdown('Detail Table')
             st.dataframe(df_new_detail)
 
