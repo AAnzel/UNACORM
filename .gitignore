@@ -1228,6 +1228,10 @@ dkms.conf
 .DS_Store
 .vs/
 .vscode/
+Data/Decoded/*
+Data/Original_Translated/*
+Data/Encoded/*
+Data/Uploaded/*
 Data/Decoded/!.gitkeep
 Data/Original_Translated/!.gitkeep
 Data/Encoded/!.gitkeep
