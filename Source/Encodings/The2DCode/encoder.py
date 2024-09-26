@@ -1,9 +1,10 @@
 # Import libaries
+import os
 import numpy as np
 import random
-from utils.utils import *
-from reedSolomon import *
-import os
+from .utils import dnaWheel, parallelReed, utils
+from .reedSolomon import generalizedreedsolo
+
 
 class api():
     def __init__(self):
@@ -166,9 +167,7 @@ class api():
                     pos += 1
 
         # Decode array
-        print(dataList)  # ! THIS IS NOT PRINTED (Aleksandar). Bug is above
         reedWorker.startRsCode(dataList, 1)
-
         # Transform decoded array to a list of galoise field values 47^3
         output = []
         for block in dataList:
@@ -202,16 +201,15 @@ class api():
                 numpy_boolean_array[arr_out_pointer] = bool_val
                 arr_out_pointer += 1
 
-        print(numpy_boolean_array)
         return numpy_boolean_array[0:arr_out_pointer]
 
     # Function Test - DNA Encoding/Decoding with Generalized Reed Solomon Code
 
     def utility_test(self):
         print('\n'+'Load test file..')
-        test_data = np.load(
-            os.path.join(os.path.dirname(__file__), 'test', 'data',
-                         'test.npy'))
+        test_data = np.load(os.path.join(os.path.dirname(__file__),
+                                         'test', 'data',
+                                         'test.npy'))
         org_data = np.copy(test_data)
         print('Test file loaded!'+'\n'*2)
 

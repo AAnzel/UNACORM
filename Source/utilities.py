@@ -233,7 +233,7 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
     path_encoded_file = os.path.join(_PATH_ENCODED_DATA,
                                      string_encoded_file_name)
     with open(path_encoded_file, 'w') as f:
-        f.writelines(list_dna_sequences)
+        f.writelines(string_dna + '\n' for string_dna in list_dna_sequences)
 
     int_encoded_file_size = os.path.getsize(path_encoded_file)
 
@@ -260,7 +260,6 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
 
         st_progress_bar.empty()
 
-    print(list_encoded)  # ! FIX: Remove after debugging the 2D code
     # We time the decoding process
     int_start_time = time.time()
     np_decoded_dna_sequences = list_encode_decode(
@@ -281,7 +280,7 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         string_input_file_basename, string_encoding_method, 'Decoding',
         '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
         int_time_decoding, int_original_size]
-    print(list_decoded)  # ! FIX: Remove after debugging the 2D code
+
     return list_encoded, list_decoded, np_decoded_dna_sequences
 
 

@@ -50,14 +50,16 @@ def run_precalculation(int_num_of_iteration):
         df_existing_summary = pd.read_pickle(PATH_EXISTING_SUMMARY)
     else:
         df_existing_summary = pd.DataFrame(
-            columns=['Filename', 'Method', 'Type', 'Sum_Mean_Time_s',
-                     'Sum_Cost_$', 'Encoding_Multipliers', 'Similarity'])
+            columns=pd.Series(
+                ['Filename', 'Method', 'Type', 'Sum_Mean_Time_s', 'Sum_Cost_$',
+                 'Encoding_Multipliers', 'Similarity']))
     if bool_detail_exists:
         df_existing_detail = pd.read_pickle(PATH_EXISTING_DETAIL)
     else:
         df_existing_detail = pd.DataFrame(
-            columns=['Filename', 'Method', 'Transformation', 'Type', 'Size',
-                     'Cost', 'Time', 'OriFile_Size', 'Similarity'])
+            columns=pd.Series(
+                ['Filename', 'Method', 'Transformation', 'Type', 'Size',
+                 'Cost', 'Time', 'OriFile_Size', 'Similarity']))
 
     list_results = []
     dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
@@ -109,8 +111,9 @@ def run_precalculation(int_num_of_iteration):
                         np.array_equal(np_binary_encoding, np_decoded_array))
 
     df_new_detail = pd.DataFrame(
-        list_results, columns=['Filename', 'Method', 'Transformation', 'Type',
-                               'Size', 'Cost', 'Time', 'OriFile_Size'])
+        list_results, columns=pd.Series(
+            ['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost',
+             'Time', 'OriFile_Size']))
     df_new_detail = df_new_detail.merge(
         pd.DataFrame(dict_same_files), on=['Filename', 'Method'], how='inner')
 

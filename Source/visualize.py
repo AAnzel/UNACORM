@@ -14,6 +14,7 @@ __status__ = 'Stable'
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
 _STRING_PLOTLY_THEME = 'plotly_dark'
 _INT_CHART_ROW_SIZE = 400
+_INT_CHART_TITLE_SIZE = 24
 
 
 def visualize_uploaded_plotly(df_report):
@@ -38,7 +39,7 @@ def visualize_uploaded_plotly(df_report):
         height=_INT_CHART_ROW_SIZE,
         template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size': 24}})
+                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
 
     chart_time = px.bar(
         df_report, x='Method', y='Time', color='Transformation',
@@ -47,7 +48,7 @@ def visualize_uploaded_plotly(df_report):
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size': 24}})
+                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
 
     chart_cost = px.bar(
         df_report, x='Method', y='Cost', color='Transformation',
@@ -56,7 +57,7 @@ def visualize_uploaded_plotly(df_report):
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size': 24}})
+                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
 
     return chart_size, chart_time, chart_cost
 
@@ -80,7 +81,7 @@ def visualize_size_benchmark_plotly(df_measure_sum_concat):
         title='File Size Multiplier')
     chart_multiplier.update_traces(marker_color='white').update_layout(
         title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-               'font': {'size': 24}})
+               'font': {'size':  _INT_CHART_TITLE_SIZE}})
 
     return chart_multiplier
 
@@ -111,7 +112,7 @@ def visualize_cost_benchmark_plotly(list_files_chosen, df_concat):
         height=_INT_CHART_ROW_SIZE * ((len(list_files_chosen) % 4) + 1),
         template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size': 24}})
+                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
 
     return chart_cost
 
@@ -139,6 +140,6 @@ def visualize_time_benchmark_plotly(list_files_chosen, df_concat):
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size': 24}})
+                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
 
     return chart_time

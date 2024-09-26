@@ -110,7 +110,8 @@ def create_main_page():
 
     path_input_file = ''
     path_input_file, string_input_file = tuple_upload_file()
-    string_file_name = os.path.splitext(string_input_file)[0]
+    string_file_name, string_file_extension = os.path.splitext(
+        string_input_file)
 
     st.write('Your uploaded path data:\t', path_input_file)
 
@@ -125,39 +126,55 @@ def create_main_page():
 
     st.header('DNA Encoding')
     list_chosen_dna_encoding = st.multiselect(
-     'Select your prefered DNA Encoding Methods', uti.LIST_ENCODING_METHODS)
+     'Select your preferred DNA Encoding Methods', uti.LIST_ENCODING_METHODS)
 
-    st.warning('The length of processing time depends on your chosen methods.')
+    st.warning('The length of processing time depends on your chosen methods')
 
-    string_chosen_storage_length = st.text_input(
-        'Choose your length of storage (in hours)')
+    int_chosen_storage_length = st.number_input(
+        'Choose your length of storage (in hours) or leave it empty to skip',
+        value=None, min_value=1, step=1)
 
     df_new_detail = None
     df_new_summary = None
 
     list_results = []
+    list_cannot_encode_decode = []
     dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
-    if (list_chosen_dna_encoding != [] and np_binary_encoding is not None
-            and string_chosen_storage_length != ''):
+    if (list_chosen_dna_encoding != [] and np_binary_encoding is not None):
         for string_encoding_method in list_chosen_dna_encoding:
+            # Runtime errors can occur if we simulate DNA degradation using
+            # MESA. These errors occur with some DNA Encoding methods, such as
+            # The2DCode that breaks if the error creates a homopolymer of
+            # length 3. This is why we have to catch errors
+            list_encoded_info = []
             try:
                 (list_encoded_info, list_decoded_info,
-                 np_decoded_array) = uti.tuple_pipeline(
+                    np_decoded_array) = uti.tuple_pipeline(
                     string_encoding_method, np_binary_encoding,
                     path_input_file, string_input_file, original_file_size,
-                    True, int(string_chosen_storage_length))
-
-                list_results.append(list_encoded_info)
-                list_results.append(list_decoded_info)
-                print('ENCODED\n', list_encoded_info)  # TODO: Remove
-                print('DECODED\n', list_decoded_info)  # TODO: Remove
-
-                dict_same_files['Filename'].append(string_file_name)
-                dict_same_files['Method'].append(string_encoding_method)
-                dict_same_files['Similarity'].append(
-                    np.array_equal(np_binary_encoding, np_decoded_array))
+                    True if int_chosen_storage_length is not None else False,
+                    int_chosen_storage_length)
             except Exception:
-                continue
+                list_cannot_encode_decode.append(string_encoding_method)
+                # If the runtime error happens we have to create dummy data
+                list_encoded_info = [string_file_name, string_encoding_method,
+                                     'Encoding', string_file_extension,
+                                     None, None, None, None]
+                list_decoded_info = list_encoded_info
+                list_decoded_info[2] = 'Decoding'
+                np_decoded_array = np.array([])
+
+            list_results.append(list_encoded_info)
+            list_results.append(list_decoded_info)
+
+            dict_same_files['Filename'].append(string_file_name)
+            dict_same_files['Method'].append(string_encoding_method)
+            dict_same_files['Similarity'].append(
+                np.array_equal(np_binary_encoding, np_decoded_array))
+
+        if list_cannot_encode_decode:
+            st.error('Cannot encode/decode using the following methods:\t' +
+                     str(list_cannot_encode_decode))
 
         df_new_detail = pd.DataFrame(
             list_results,
@@ -211,7 +228,7 @@ def create_main_page():
         mime='text/csv',
     )
 
-    with st.expander("Expand Detailed Information", expanded=True):
+    with st.expander("Expand Detailed Information", expanded=False):
         st.markdown('Detail Table')
         st.dataframe(df_details_combined)
         st.download_button(
@@ -263,7 +280,6 @@ def main():
                     .stDeployButton {display:none;}
                     footer {visibility: hidden;}
                     </style>
-
                 ''', unsafe_allow_html=True)
 
     create_sidebar()
