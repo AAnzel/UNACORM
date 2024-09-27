@@ -154,7 +154,8 @@ def create_main_page():
                     path_input_file, string_input_file, original_file_size,
                     True if int_chosen_storage_length is not None else False,
                     int_chosen_storage_length)
-            except Exception:
+            except Exception as exc_e:
+                print(exc_e)
                 list_cannot_encode_decode.append(string_encoding_method)
                 # If the runtime error happens we have to create dummy data
                 list_encoded_info = [string_file_name, string_encoding_method,

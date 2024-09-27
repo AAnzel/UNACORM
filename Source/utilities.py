@@ -13,9 +13,9 @@ import xor_code_python as encoding_xor
 from Encodings.The2DCode import encoder as encoding_2d_tmp
 from Encodings.SimpleCode.src import transform as encoding_simple
 from Encodings.RepetitionCode.src import transform as encoding_repetition
-from Encodings.NOREC4DNA import unified_dna_lt as encoding_lt
-from Encodings.NOREC4DNA import unified_dna_online as encoding_online # TODO: Include this one # noqa
-from Encodings.NOREC4DNA import unified_dna_raptor as encoding_raptor # TODO: Include this one # noqa
+from Encodings.RaptorCode import unified_dna_lt as encoding_lt
+from Encodings.RaptorCode import unified_dna_online as encoding_online
+from Encodings.RaptorCode import unified_dna_raptor as encoding_raptor
 
 # Importing MESA
 import mesa_call
@@ -49,7 +49,7 @@ _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 _DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
 encoding_2d = encoding_2d_tmp.api()
 
-_LIST_PASS_METHODS = ['NOREC4DNA', 'DNA-Aeon']
+_LIST_PASS_METHODS = ['DNA-Aeon']
 LIST_ENCODING_METHODS = []
 for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
     if string_encoding_method not in _LIST_PASS_METHODS and os.path.isdir(
@@ -166,12 +166,19 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
             list_generated_seq = encoding_simple.encode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
             list_generated_seq = encoding_repetition.encode('', list_np_data)
-        elif str_encoding_method == 'NOREC4DNA':  # ! Fix
-            list_generated_seq = encoding_lt.encode(path_file, list_np_data)[0]
+        elif str_encoding_method == 'OnlineCode':  # ! Fix
+            list_generated_seq = encoding_online.encode(
+                path_file, list_np_data)[0]
+        elif str_encoding_method == 'LTCode':  # ! Fix
+            list_generated_seq = encoding_lt.encode(
+                 path_file, list_np_data)[0]
+        elif str_encoding_method == 'RaptorCode':
+            list_generated_seq = encoding_raptor.encode(
+                path_file, list_np_data)[0]
         else:
             pass
     else:
-        if str_encoding_method == 'The2DCode':  # ! Fix (problem with decoding)
+        if str_encoding_method == 'The2DCode':
             list_generated_seq = encoding_2d.decode('', list_np_data)
         elif str_encoding_method == 'XORBasedCode':
             list_generated_seq = encoding_xor.decode('', list_np_data)
@@ -179,8 +186,15 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
             list_generated_seq = encoding_simple.decode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
             list_generated_seq = encoding_repetition.decode('', list_np_data)
-        elif str_encoding_method == 'NOREC4DNA':  # ! Fix
-            list_generated_seq = encoding_lt.decode(path_file, list_np_data)[0]
+        elif str_encoding_method == 'OnlineCode':  # ! Fix
+            list_generated_seq = encoding_online.decode(
+                path_file, list_np_data)
+        elif str_encoding_method == 'LTCode':  # ! Fix
+            list_generated_seq = encoding_lt.decode(
+                 path_file, list_np_data)
+        elif str_encoding_method == 'RaptorCode':
+            list_generated_seq = encoding_raptor.decode(
+                path_file, list_np_data)
         else:
             pass
 
