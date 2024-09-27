@@ -77,11 +77,13 @@ def visualize_size_benchmark_plotly(df_measure_sum_concat):
     """
     chart_multiplier = px.box(
         df_measure_sum_concat, y="Encoding_Multipliers", x='Method',
-        height=_INT_CHART_ROW_SIZE, template=_STRING_PLOTLY_THEME,
+        height=_INT_CHART_ROW_SIZE * 2, template=_STRING_PLOTLY_THEME,
         title='File Size Multiplier')
     chart_multiplier.update_traces(marker_color='white').update_layout(
         title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
                'font': {'size':  _INT_CHART_TITLE_SIZE}})
+    chart_multiplier.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_multiplier
 
@@ -109,10 +111,13 @@ def visualize_cost_benchmark_plotly(list_files_chosen, df_concat):
         x='Method', y='Cost', color='Transformation', facet_col='Filename',
         title='Cost (based on length of nucleotides)', facet_col_wrap=4,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        height=_INT_CHART_ROW_SIZE * ((len(list_files_chosen) % 4) + 1),
+        height=_INT_CHART_ROW_SIZE * (
+            int((len(list_files_chosen) - 1) / 4) + 1),
         template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
                    'font': {'size':  _INT_CHART_TITLE_SIZE}})
+    chart_cost.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_cost
 
@@ -136,10 +141,14 @@ def visualize_time_benchmark_plotly(list_files_chosen, df_concat):
     chart_time = px.box(
         df_tmp, x='Method', y='Time', color='Transformation',
         title='Process Time (in seconds)', facet_col='Filename',
-        height=_INT_CHART_ROW_SIZE * ((len(list_files_chosen) % 4) + 1),
+        height=_INT_CHART_ROW_SIZE * (
+            int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
                    'font': {'size':  _INT_CHART_TITLE_SIZE}})
+
+    chart_time.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_time

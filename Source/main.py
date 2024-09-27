@@ -243,11 +243,17 @@ def create_main_page():
     st.plotly_chart(chart, use_container_width=True)
 
     list_files_to_visualize = list(
-        pd.unique(df_summary_combined['Filename'])) + os.listdir(
-            uti.PATH_ORIGINAL_DATA)
+        pd.unique(df_summary_combined['Filename']))
+
+    if path_input_file != '':
+        list_files_to_visualize += [string_file_name]
+        list_default_files_to_visualize = list_files_to_visualize[-1]
+    else:
+        list_default_files_to_visualize = list_files_to_visualize
+
     list_files_chosen = st.multiselect(
      'Select files that you want to review (This will affect Cost' +
-     ' and Time Charts)', default=list_files_to_visualize,
+     ' and Time Charts)', default=list_default_files_to_visualize,
      options=list_files_to_visualize)
 
     st.markdown('---')
