@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import find_packages
-from distutils.core import setup, Extension
+from setuptools import find_packages, setup, Extension
 import os
 
 try:
@@ -27,7 +26,6 @@ setup(
     description="NOREC4DNA - a Fountain Code based approach to DNA-Storage",
     author="Michael Schwarz",
     packages=find_packages(),
-    setup_requires=["numpy~=1.23.5"],
     install_requires=install_requires,
     zip_safe=False,
     long_description=long_description,
@@ -38,6 +36,4 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
-    ext_modules=[Extension('cdnarules', ['cdnarules.c'], include_dirs=[get_numpy_include()]), ],
-    include_dirs=[get_numpy_include()]
 )

@@ -16,6 +16,7 @@ from Encodings.RepetitionCode.src import transform as encoding_repetition
 from Encodings.RaptorCode import unified_dna_lt as encoding_lt
 from Encodings.RaptorCode import unified_dna_online as encoding_online
 from Encodings.RaptorCode import unified_dna_raptor as encoding_raptor
+from Encodings.DNA_Aeon import unified as encoding_dnaaeon
 
 # Importing MESA
 import mesa_call
@@ -49,7 +50,7 @@ _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 _DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
 encoding_2d = encoding_2d_tmp.api()
 
-_LIST_PASS_METHODS = ['DNA-Aeon']
+_LIST_PASS_METHODS = []
 LIST_ENCODING_METHODS = []
 for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
     if string_encoding_method not in _LIST_PASS_METHODS and os.path.isdir(
@@ -175,7 +176,12 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'RaptorCode':
             list_generated_seq = encoding_raptor.encode(
                 path_file, list_np_data)[0]
+        elif str_encoding_method == 'DNA_Aeon':  # ! Fix
+            list_generated_seq = encoding_dnaaeon.encode(
+                path_file, '')
         else:
+            print('Encoding method ' + str_encoding_method +
+                  ' is not implemented')
             pass
     else:
         if str_encoding_method == 'The2DCode':
@@ -195,7 +201,12 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'RaptorCode':
             list_generated_seq = encoding_raptor.decode(
                 path_file, list_np_data)
+        elif str_encoding_method == 'DNA_Aeon':  # ! Fix
+            list_generated_seq = encoding_dnaaeon.decode(
+                path_file, list_np_data)
         else:
+            print('Encoding method ' + str_encoding_method +
+                  ' is not implemented')
             pass
 
     return list_generated_seq
