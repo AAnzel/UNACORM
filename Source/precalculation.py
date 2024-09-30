@@ -69,7 +69,8 @@ def run_precalculation(int_num_of_iteration):
     int_counter = 1
     for string_file in list_original_files:
         path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-        string_file_name = os.path.splitext(string_file)[0]
+        string_file_name, string_file_extension = os.path.splitext(
+            string_file)
 
         if not os.path.isfile(path_one_file):
             continue
@@ -95,11 +96,23 @@ def run_precalculation(int_num_of_iteration):
                               '_' + str(int_i)))
                     int_counter += 1
 
-                    (list_encoded_info, list_decoded_info,
-                     np_decoded_array) = tuple_pipeline(
-                        string_encoding_method, np_binary_encoding,
-                        path_one_file, string_file, int_file_size_bytes, False,
-                        0)
+                    try:
+                        (list_encoded_info, list_decoded_info,
+                            np_decoded_array) = tuple_pipeline(
+                            string_encoding_method, np_binary_encoding,
+                            path_one_file, string_file,
+                            int_file_size_bytes, False, 0)
+                    except Exception as exc_e:
+                        print(exc_e)
+                        # If the runtime error happens we have to create dummy
+                        # data
+                        list_encoded_info = [
+                            string_file_name, string_encoding_method,
+                            'Encoding', string_file_extension,
+                            None, None, None, None]
+                        list_decoded_info = list_encoded_info
+                        list_decoded_info[2] = 'Decoding'
+                        np_decoded_array = np.array([])
 
                     bool_similar_files = np.array_equal(
                         np_binary_encoding, np_decoded_array)
