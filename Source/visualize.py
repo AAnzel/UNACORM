@@ -77,7 +77,7 @@ def visualize_size_benchmark_plotly(df_measure_sum_concat):
     """
     chart_multiplier = px.box(
         df_measure_sum_concat, y="Encoding_Multipliers", x='Method',
-        height=_INT_CHART_ROW_SIZE * 2, template=_STRING_PLOTLY_THEME,
+        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME,
         title='File Size Multiplier')
     chart_multiplier.update_traces(marker_color='white').update_layout(
         title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',

@@ -139,7 +139,6 @@ def create_main_page():
 
     list_results = []
     list_cannot_encode_decode = []
-    dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
     if (list_chosen_dna_encoding != [] and np_binary_encoding is not None):
         for string_encoding_method in list_chosen_dna_encoding:
             # Runtime errors can occur if we simulate DNA degradation using
@@ -165,13 +164,12 @@ def create_main_page():
                 list_decoded_info[2] = 'Decoding'
                 np_decoded_array = np.array([])
 
-            list_results.append(list_encoded_info)
-            list_results.append(list_decoded_info)
-
-            dict_same_files['Filename'].append(string_file_name)
-            dict_same_files['Method'].append(string_encoding_method)
-            dict_same_files['Similarity'].append(
-                np.array_equal(np_binary_encoding, np_decoded_array))
+            bool_similar_files = np.array_equal(
+                np_binary_encoding, np_decoded_array)
+            list_results.append(list_encoded_info +
+                                [bool_similar_files])
+            list_results.append(list_decoded_info +
+                                [bool_similar_files])
 
         if list_cannot_encode_decode:
             st.error('Cannot encode/decode using the following methods:\t' +
@@ -180,10 +178,8 @@ def create_main_page():
         df_new_detail = pd.DataFrame(
             list_results,
             columns=pd.Series(['Filename', 'Method', 'Transformation', 'Type',
-                               'Size', 'Cost', 'Time', 'OriFile_Size']))
-        df_new_detail = df_new_detail.merge(
-            pd.DataFrame(dict_same_files), on=['Filename', 'Method'],
-            how='inner')
+                               'Size', 'Cost', 'Time', 'OriFile_Size',
+                               'Similarity']))
 
         df_new_summary = uti.df_generate_summary(df_new_detail)
 

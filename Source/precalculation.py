@@ -62,7 +62,6 @@ def run_precalculation(int_num_of_iteration):
                  'Cost', 'Time', 'OriFile_Size', 'Similarity']))
 
     list_results = []
-    dict_same_files = {'Filename': [], 'Method': [], 'Similarity': []}
     list_original_files = os.listdir(PATH_ORIGINAL_DATA)
     int_total_runs = len(list_original_files) * len(LIST_ENCODING_METHODS) *\
         int_num_of_iteration
@@ -102,20 +101,17 @@ def run_precalculation(int_num_of_iteration):
                         path_one_file, string_file, int_file_size_bytes, False,
                         0)
 
-                    list_results.append(list_encoded_info)
-                    list_results.append(list_decoded_info)
-
-                    dict_same_files['Filename'].append(string_file_name)
-                    dict_same_files['Method'].append(string_encoding_method)
-                    dict_same_files['Similarity'].append(
-                        np.array_equal(np_binary_encoding, np_decoded_array))
+                    bool_similar_files = np.array_equal(
+                        np_binary_encoding, np_decoded_array)
+                    list_results.append(list_encoded_info +
+                                        [bool_similar_files])
+                    list_results.append(list_decoded_info +
+                                        [bool_similar_files])
 
     df_new_detail = pd.DataFrame(
         list_results, columns=pd.Series(
             ['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost',
-             'Time', 'OriFile_Size']))
-    df_new_detail = df_new_detail.merge(
-        pd.DataFrame(dict_same_files), on=['Filename', 'Method'], how='inner')
+             'Time', 'OriFile_Size', 'Similarity']))
 
     df_new_summary = df_generate_summary(df_new_detail)
 
