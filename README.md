@@ -98,7 +98,6 @@ The easiest way to install the tool is to use our latest Docker image by buildin
 
 ```bash
 # how to install docker container and run it locally
-# ===== NOT TESTED =====
 
 git clone https://github.com/AAnzel/DNA_Encodings.git
 cd DNA_Encodings/
