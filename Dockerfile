@@ -4,7 +4,9 @@ FROM continuumio/miniconda3
 ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 
-RUN apt update && apt install -y fontconfig gcc clang clang-tools protobuf-compiler \
+RUN apt update && apt install -y fontconfig gcc build-essential ffmpeg \
+    && apt autoclean -y \
+    && apt autoremove -y \
     && export PATH=~/anaconda3/bin:$PATH \
     && export FONTCONFIG_FILE=/etc/fonts/fonts.conf \
     && export FONTCONFIG_PATH=/etc/fonts/ \

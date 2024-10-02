@@ -36,4 +36,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
+    ext_modules=[Extension('cdnarules', ['cdnarules.c'],
+                           include_dirs=[get_numpy_include()]), ],
+    include_dirs=[get_numpy_include()]
 )
