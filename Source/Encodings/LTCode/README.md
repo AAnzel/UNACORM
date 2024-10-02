@@ -1,0 +1,1 @@
+This directory is only a placeholder. The LTCode implementation resides in [../RaptorCode/unified_dna_lt.py](../RaptorCode/unified_dna_lt.py).
