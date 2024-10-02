@@ -102,7 +102,7 @@ The easiest way to install the tool is to use our latest Docker image by buildin
 git clone https://github.com/AAnzel/DNA_Encodings.git
 cd DNA_Encodings/
 docker build -t dna-encodings-local:stable .
-docker run --publish 8501:8501 --detach --name dna-encodings-local:stable
+docker run --publish 8501:8501 --detach --name dna-encodings-local dna-encodings-local:stable
 ```
 
 You can start using the tool by opening a web browser and typing in [http://localhost:8501/](http://localhost:8501/) as the address. If you run the docker container, you have to use the IP address or hostname instead of localhost.
