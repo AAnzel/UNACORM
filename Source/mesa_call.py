@@ -1,7 +1,7 @@
 import json
-import time
 import requests
-
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 
 __author__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian']
 __copyright__ = ''
@@ -14,79 +14,62 @@ __status__ = 'Stable'
 
 
 # Attributes for API calling
-string_url = 'https://mesa.mosla.de/api/all'
-dict_header = {'content-type': 'application/json;charset=UTF-8'}
+_STRING_MESA_URL = 'https://mesa.mosla.de/api/all'
+_STRING_MESA_KEY = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
+_DICT_MESA_HEADER = {'content-type': 'application/json;charset=UTF-8'}
+_INT_MAX_RETRY_FOR_SESSION = 2
+_FLOAT_BACK_OFF_FACTOR = 0.3
+_LIST_ERROR_CODES = (500, 502, 504)
 with open("mesa.json") as json_file:  # Config file for API
-    dict_config_api = json.load(json_file)
+    _DICT_MESA_CONFIG_API = json.load(json_file)
 
 
-# Running API
-def run_requests(int_current, res_all, list_one_dna_strand, c, dict_payload,
-                 dict_header, string_url):
-    """This function is used for running the MESA API
+def requests_retry_session(
+        retries=_INT_MAX_RETRY_FOR_SESSION,
+        backoff_factor=_FLOAT_BACK_OFF_FACTOR,
+        status_force_list=_LIST_ERROR_CODES, session=requests.Session()):
 
-    Args:
-        res_all (list): container for API result
-        list_one_dna_strand (list): encoded dna sequence
-        c (int): initial number for length of dna list
-        dict_payload (dict): API config
-        dict_header (dict): API dict_header
-        string_url (str): MESA API URL
+    session = session
+    retry = Retry(total=retries, read=retries, connect=retries,
+                  backoff_factor=_FLOAT_BACK_OFF_FACTOR,
+                  status_forcelist=status_force_list,
+                  allowed_methods=frozenset(['GET', 'POST']))
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
 
-    Returns:
-        time_used (number): length of API run
+    return session
+
+
+def string_api_call(list_encoded_dna, int_storage_length):
     """
-    start_time = time.time()
-
-    for j in range(int_current, len(list_one_dna_strand)):
-        dict_payload['sequence'] = list_one_dna_strand
-        try:
-            res = requests.post(string_url, data=json.dumps(dict_payload),
-                                headers=dict_header)
-            res_all.append(res)
-            c += 1
-        except Exception:
-            print("Max retries, going to sleep for 100 sec.")
-            print("j= " + str(j))
-            time.sleep(100)
-            run_requests(j, res_all, list_one_dna_strand, c, dict_payload,
-                         dict_header, string_url)
-
-    time_used = time.time() - start_time
-
-    return time_used
-
-
-# Setup parameter and call API
-def api_call(encoded_dna, storage_length):
-    """This function is used for calling MESA API and setup input parameter
+    string_api_call function sends a POST method to MESA containing the
+    original DNA sequence and a set of parameters and returns a modified DNA
+    sequences
 
     Args:
-        encoded_dna (list): encoded DNA sequence
-        storage_length (str): length of storage
+        list_encoded_dna (list): a list that cotains only one encoded DNA
+        sequence
+        int_storage_length (int): length of storage in years
 
     Returns:
         modified_sequence (str): modified sequence sequence
     """
-    list_one_dna_strand = encoded_dna
-    dict_payload = dict_config_api
+    dict_payload = _DICT_MESA_CONFIG_API
     dict_payload['asHTML'] = False
-    dict_payload["key"] = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
+    dict_payload["key"] = _STRING_MESA_KEY
     dict_payload["err_simulation_order"]["Storage/PCR"][0][
-        "cycles"] = storage_length
-    c = 0
-    res_all = list()
-    time_used = run_requests(
-        0, res_all, list_one_dna_strand, c, dict_payload, dict_header,
-        string_url)
-    # print(time_used)
-    dict_result = {}
+        "cycles"] = int_storage_length
+    dict_payload['sequence'] = list_encoded_dna
+
+    mesa_response = requests.post(
+        _STRING_MESA_URL, data=json.dumps(dict_payload),
+        headers=_DICT_MESA_HEADER)
+
+    dict_result = mesa_response.json()
     string_modified_sequence = ''
 
-    for ent in res_all:
-        dict_result = ent.json()
-
-    for key, _ in dict_result.items():
-        string_modified_sequence = dict_result[key]["res"]["modified_sequence"]
+    string_modified_sequence = dict_result[
+        list_encoded_dna[0]]['modified_sequence']
 
     return string_modified_sequence

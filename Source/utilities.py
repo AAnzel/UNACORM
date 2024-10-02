@@ -282,9 +282,8 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
                 text=('Sequence ' + str(int_i + 1) + ' of ' +
                       str(int_num_of_sequences)))
             list_modified_sequences.append(
-                mesa_call.api_call([list_dna_sequences[int_i]],
-                                   int_storage_length))
-
+                mesa_call.string_api_call([list_dna_sequences[int_i]],
+                                          int_storage_length))
         st_progress_bar.empty()
 
     # We time the decoding process

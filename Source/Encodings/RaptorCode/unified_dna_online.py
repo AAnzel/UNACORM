@@ -28,7 +28,7 @@ NUMBER_OF_CHUNKS = None
 CHECKSUM_LEN_STR = "H"
 
 # For Online encoding, one should set the epsilon and quality parameters and derive the number of chunks from the file size..
-EPS = 0.19
+EPS = 0.9  # Original value 0.19
 QUALITY = 7
 SEED = 2
 
