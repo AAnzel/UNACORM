@@ -43,17 +43,29 @@ def create_sidebar():
         ---
         ### DNA Encoding Methods:
 
-        * **Simple Code** by Church et al.
+        * **Simple Code** by Church _et al._
             * [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)
 
-        * **Repetition Code** by Goldman et al.
+        * **Repetition Code** by Goldman _et al._
             * [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)
 
         * **The 2D Code** by Grass et al.
             * [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)
 
-        * **XOR-Based Code** by Bornholt et al.
+        * **XOR-Based Code** by Bornholt _et al._
             * [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)
+
+        * **DNA-Aeon Code** by Welzel _et al._
+            * [DOI: 10.1038/s41467-023-36297-3](https://doi.org/10.1038/s41467-023-36297-3)
+
+        * **Raptor Code** by Shokrollahi _et al._
+            * [DOI: 10.1109/TIT.2006.874390](https://doi.org/10.1109/TIT.2006.874390)
+
+        * **LT Code** by Luby _et al._
+            * [DOI: 10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950)
+
+        * **Online Code** by Maymounkov _et al._
+            * [DOI: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
         ''')
 
     return None
