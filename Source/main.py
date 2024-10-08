@@ -87,7 +87,7 @@ def tuple_upload_file():
     list_file_type = ['txt', 'jpg', 'wav']
 
     imported_file = st.file_uploader(
-        label='Upload your file', type=list_file_type,
+        label='Upload a file', type=list_file_type,
         accept_multiple_files=False, key='Upload_file_')
 
     string_file_name = ''
@@ -102,7 +102,7 @@ def tuple_upload_file():
             w.write(imported_file.getvalue())
 
         if os.path.exists(path_input_file):
-            st.success('Your file is successfully uploaded!')
+            st.success('The file is successfully uploaded!')
 
     return path_input_file, string_file_name
 
@@ -125,7 +125,7 @@ def create_main_page():
     string_file_name, string_file_extension = os.path.splitext(
         string_input_file)
 
-    st.write('Your uploaded path data:\t', path_input_file)
+    st.write('Uploaded path data:\t', path_input_file)
 
     if path_input_file != '':
         np_binary_encoding, original_file_size = uti.np_data_to_binary_array(
@@ -138,12 +138,12 @@ def create_main_page():
 
     st.header('DNA Encoding')
     list_chosen_dna_encoding = st.multiselect(
-     'Select your preferred DNA Encoding Methods', uti.LIST_ENCODING_METHODS)
+     'Select preferred DNA Encoding Methods', uti.LIST_ENCODING_METHODS)
 
-    st.warning('The length of processing time depends on your chosen methods')
+    st.warning('The length of processing time depends on chosen methods')
 
     int_chosen_storage_length = st.number_input(
-        'Choose your length of storage (in hours) or leave it empty to skip',
+        'Choose length of storage (in hours) or leave it empty to skip',
         value=None, min_value=1, step=1)
 
     df_new_detail = None
@@ -210,7 +210,7 @@ def create_main_page():
         st.plotly_chart(chart_cost, use_container_width=True)
 
     elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
-        st.error('Choose your file and length of storage first!')
+        st.error('Choose a file and length of storage first!')
     else:
         pass
 
@@ -260,7 +260,7 @@ def create_main_page():
         list_default_files_to_visualize = list_files_to_visualize
 
     list_files_chosen = st.multiselect(
-     'Select files that you want to review (This will affect Cost' +
+     'Select the files to review (This will affect Cost' +
      ' and Time Charts)', default=list_default_files_to_visualize,
      options=list_files_to_visualize)
 
