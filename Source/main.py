@@ -49,7 +49,7 @@ def create_sidebar():
         * **Repetition Code** by Goldman _et al._
             * [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)
 
-        * **The 2D Code** by Grass et al.
+        * **The 2D Code** by Grass _et al._
             * [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)
 
         * **XOR-Based Code** by Bornholt _et al._
@@ -143,7 +143,7 @@ def create_main_page():
     st.warning('The length of processing time depends on chosen methods')
 
     int_chosen_storage_length = st.number_input(
-        'Choose length of storage (in hours) or leave it empty to skip',
+        'Choose length of storage (in months) or leave it empty to skip',
         value=None, min_value=1, step=1)
 
     df_new_detail = None

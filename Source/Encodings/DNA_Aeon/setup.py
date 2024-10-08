@@ -45,5 +45,5 @@ if __name__ == "__main__":
     install_norec_packages(cpath)
     print("Compiling DNA Aeon")
     compile_dna_aeon(cpath)
-    
+
     print("Installation finished!")
