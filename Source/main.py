@@ -65,7 +65,7 @@ def create_sidebar():
             * [DOI: 10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950)
 
         * **Online Code** by Maymounkov _et al._
-            * [DOI: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
+            * [LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
         ''')
 
     return None

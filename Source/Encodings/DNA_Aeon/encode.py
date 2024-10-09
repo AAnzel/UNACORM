@@ -29,10 +29,17 @@ def encode_norec_for_ac(config_data, current_path):
     error_detection = config_data["NOREC4DNA"]["error_detection"]
     header_crc_str = "" if not header_crc_mapper(config_data["NOREC4DNA"]["header_crc_length"], config_data["NOREC4DNA"]["insert_header"]) else " --header_crc_str " + header_crc_mapper(config_data["NOREC4DNA"]["header_crc_length"], config_data["NOREC4DNA"]["insert_header"]) + "" 
     filename = input_file.split("/")[-1]
-    py_command = ("{cpath}/NOREC4DNA/venv/bin/python3 {cpath}/NOREC4DNA/demo_raptor_encode.py --chunk_size {chunk_size_str} --error_correction {err_det} --save_as_zip {file}{ins_header}{crc_str} --overhead {redundancy}".format(
-        cpath=current_path, chunk_size_str=str(chunk_size), file=input_file, redundancy=packet_redundancy, ins_header=header, err_det=error_detection, crc_str=header_crc_str))
+    # NEW CODE WITH LIBRARY USAGE
+    # TODO: Check how RAPTOR UNIFIED works and change the call below to the one that Michael created
+    py_command = ("python Encodings/RaptorCode/demo_raptor_encode.py --chunk_size {chunk_size_str} --error_correction {err_det} --save_as_zip {file}{ins_header}{crc_str} --overhead {redundancy}".format(
+        chunk_size_str=str(chunk_size), file=input_file, redundancy=packet_redundancy, ins_header=header, err_det=error_detection, crc_str=header_crc_str))
+    # OLD CODE WITH ENVIRONMENT USAGE
+    # py_command = ("{cpath}/NOREC4DNA/venv/bin/python3 {cpath}/NOREC4DNA/demo_raptor_encode.py --chunk_size {chunk_size_str} --error_correction {err_det} --save_as_zip {file}{ins_header}{crc_str} --overhead {redundancy}".format(
+    #    cpath=current_path, chunk_size_str=str(chunk_size), file=input_file, redundancy=packet_redundancy, ins_header=header, err_det=error_detection, crc_str=header_crc_str))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
+    print(output, error) # THIS IS THE OUTPUT: 'File to encode: ../Data/Uploaded/1728399480_710021_test.txt\nNumber of Chunks does not work for given file. New Number of Chunks = 25\n
+    # ! FIX: There is an error with DNA-Aeon where config.json file contains one extra curly bracket at the end from time to time
     norec_config = output.split()[-1].decode()
     # print("\n" + NOREC4DNA_BASE_PATH + "/" + filename + ".ini\n")
     # os.rename(config, NOREC4DNA_BASE_PATH + "/" + filename + ".ini")

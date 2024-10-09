@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1727879228_36759_test.txt",
+        "input": "../Data/Uploaded/1728399480_710021_test.txt",
         "keep_intermediary": false,
         "min_length": 0,
         "output": "data/encoded.fasta",

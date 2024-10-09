@@ -13,6 +13,7 @@ __status__ = 'Stable'
 
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
 _STRING_PLOTLY_THEME = 'plotly_dark'
+_STRING_MULTIPLIER_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 
@@ -76,12 +77,14 @@ def visualize_size_benchmark_plotly(df_measure_sum_concat):
         chart_multiplier (px.Chart): chart with size multipliers
     """
     chart_multiplier = px.box(
-        df_measure_sum_concat, y="Encoding_Multipliers", x='Method',
+        df_measure_sum_concat.sort_values('Method'),
+        y="Encoding_Multipliers", x='Method',
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME,
         title='File Size Multiplier')
-    chart_multiplier.update_traces(marker_color='white').update_layout(
-        title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-               'font': {'size':  _INT_CHART_TITLE_SIZE}})
+    chart_multiplier.update_traces(
+        marker_color=_STRING_MULTIPLIER_MARKER_COLOR).update_layout(
+            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
+                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
     chart_multiplier.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
@@ -104,16 +107,18 @@ def visualize_cost_benchmark_plotly(list_files_chosen, df_concat):
     df_tmp = df_concat[
         df_concat['Filename'].isin(list_files_chosen)].groupby(
             ['Filename', 'Method', 'Transformation',
-                'Size', 'Type']).mean().reset_index()
+                'Size', 'Type']).mean().sort_values('Method').reset_index()
 
     chart_cost = px.box(
         df_tmp,
         x='Method', y='Cost', color='Transformation', facet_col='Filename',
         title='Cost (based on length of nucleotides)', facet_col_wrap=4,
+        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
-        template=_STRING_PLOTLY_THEME).update_layout(
+        template=_STRING_PLOTLY_THEME,
+        category_orders={'Filename': list_files_chosen}).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
                    'font': {'size':  _INT_CHART_TITLE_SIZE}})
     chart_cost.for_each_xaxis(
@@ -136,15 +141,18 @@ def visualize_time_benchmark_plotly(list_files_chosen, df_concat):
         chart_time (px.Chart): chart with times
     """
 
-    df_tmp = df_concat[df_concat['Filename'].isin(list_files_chosen)]
+    df_tmp = df_concat[
+        df_concat['Filename'].isin(list_files_chosen)].sort_values('Method')
 
     chart_time = px.box(
         df_tmp, x='Method', y='Time', color='Transformation',
         title='Process Time (in seconds)', facet_col='Filename',
+        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
-        template=_STRING_PLOTLY_THEME).update_layout(
+        template=_STRING_PLOTLY_THEME,
+        category_orders={'Filename': list_files_chosen}).update_layout(
             title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
                    'font': {'size':  _INT_CHART_TITLE_SIZE}})
 

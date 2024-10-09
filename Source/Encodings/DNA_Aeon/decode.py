@@ -25,8 +25,13 @@ def decode_norec_for_ac(current_path, config_data):
             o_.writelines(line_list)
     pathlib.Path('data/results').mkdir(parents=True, exist_ok=True)
     os.chdir('data/results')
-    py_command = ("{cpath}/NOREC4DNA/venv/bin/python3 {cpath}/NOREC4DNA/ConfigWorker.py {ipath}".format(
-        cpath=current_path, ipath=ini_path))
+
+    # NEW CODE WITH LIBRARY USAGE
+    py_command = ("python ../RaptorCode/ConfigWorker.py {ipath}".format(
+        ipath=ini_path))
+    # OLD CODE WITH ENVIRONMENT USAGE
+    # py_command = ("{cpath}/NOREC4DNA/venv/bin/python3 {cpath}/NOREC4DNA/ConfigWorker.py {ipath}".format(
+    #    cpath=current_path, ipath=ini_path))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     os.chdir('../..')
