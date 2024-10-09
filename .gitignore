@@ -1233,8 +1233,10 @@ Data/Decoded/*
 Data/Translated_Binary/*
 Data/Encoded/*
 Data/Uploaded/*
+Source/Encodings/DNA_Aeon/data/*
 
 Data/Decoded/!.gitkeep
 Data/Translated_Binary/!.gitkeep
 Data/Encoded/!.gitkeep
 Data/Uploaded/!.gitkeep
+Source/Encodings/DNA_Aeon/!D
