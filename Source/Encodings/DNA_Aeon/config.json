@@ -1,7 +1,7 @@
 {
     "decode": {
-        "input": "data/to_be_decoded.fasta",
-        "NOREC4DNA_config": "data/encoded.ini",
+        "input": "Encodings/DNA_Aeon/data/to_be_decoded.fasta",
+        "NOREC4DNA_config": "Encodings/DNA_Aeon/data/encoded.ini",
         "length": 0,
         "metric": {
             "fano": {
@@ -16,7 +16,7 @@
                 "no_hit": 9
             }
         },
-        "output": "data/decoded.txt",
+        "output": "Encodings/DNA_Aeon/data/decoded.txt",
         "queue": {
             "reduce": 0.5,
             "runs": 1,
@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1728494138_531185_Anna_Karenina.txt",
+        "input": "../Data/Uploaded/1728657927_1002529_Anna_Karenina.txt",
         "keep_intermediary": false,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",

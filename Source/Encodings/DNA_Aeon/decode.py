@@ -9,6 +9,7 @@ def decode_ac(current_path, config_path):
                                                                                                 conf_path=config_path))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
+    print('\nOUTPUT:\t', output, '\nERROR:\t', error, '\n\n')
     return
 
 def decode_norec_for_ac(current_path, config_data):
@@ -18,16 +19,17 @@ def decode_norec_for_ac(current_path, config_data):
     :return:
     """
     ini_path = pathlib.Path(config_data["decode"]["NOREC4DNA_config"]).resolve()
-    with open(ini_path, "r") as c_:
-        line_list = c_.readlines()
-        line_list[0] = "[{cpath}/{dpath}.zip]\n".format(cpath=current_path, dpath=config_data["decode"]["output"]) #"[../data/" + filename + "_RU10.zip]\n"
-        with open("{cpath}/{ini_path}".format(cpath=current_path, ini_path=config_data["decode"]["NOREC4DNA_config"]), "w") as o_:
-            o_.writelines(line_list)
-    pathlib.Path('data/results').mkdir(parents=True, exist_ok=True)
-    os.chdir('data/results')
+    print('\n\nINI PATH:\t', ini_path, '\n\n')
+    #with open(ini_path, "r") as c_:
+    #    line_list = c_.readlines()
+    #    line_list[0] = "[{dpath}.zip]\n".format(dpath=config_data["decode"]["output"]) #"[../data/" + filename + "_RU10.zip]\n"
+    #    with open("{ini_path}".format(ini_path=config_data["decode"]["NOREC4DNA_config"]), "w") as o_:
+    #        o_.writelines(line_list)
+    pathlib.Path('Encodings/DNA_Aeon/data/results').mkdir(parents=True, exist_ok=True)
+    os.chdir('Encodings/DNA_Aeon/data/results')
 
     # NEW CODE WITH LIBRARY USAGE
-    py_command = ("python ../RaptorCode/ConfigWorker.py {ipath}".format(
+    py_command = ("python ../../../RaptorCode/ConfigWorker.py {ipath}".format(
         ipath=ini_path))
     # OLD CODE WITH ENVIRONMENT USAGE
     # py_command = ("{cpath}/NOREC4DNA/venv/bin/python3 {cpath}/NOREC4DNA/ConfigWorker.py {ipath}".format(
@@ -49,7 +51,7 @@ if __name__ == "__main__":
 
     # Start outer decode
     print("Starting inner decoder.")
-    decode_ac(cpath, conf_path)
+    decode_ac(cpath, conf_path)  # ! FIX: The problem lies here. .zip paths might be wrong
     print("\nFinished inner decoding, starting outer decoder...\n")
     # Start inner encoder
     decode_norec_for_ac(cpath, config_data)

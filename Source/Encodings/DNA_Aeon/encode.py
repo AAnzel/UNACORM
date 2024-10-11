@@ -30,7 +30,6 @@ def encode_norec_for_ac(config_data, current_path):
     header_crc_str = "" if not header_crc_mapper(config_data["NOREC4DNA"]["header_crc_length"], config_data["NOREC4DNA"]["insert_header"]) else " --header_crc_str " + header_crc_mapper(config_data["NOREC4DNA"]["header_crc_length"], config_data["NOREC4DNA"]["insert_header"]) + "" 
     filename = input_file.split("/")[-1]
     # NEW CODE WITH LIBRARY USAGE
-    # TODO: Check how RAPTOR UNIFIED works and change the call below to the one that Michael created
     py_command = ("python Encodings/RaptorCode/demo_raptor_encode.py --chunk_size {chunk_size_str} --error_correction {err_det} --save_as_zip {file}{ins_header}{crc_str} --overhead {redundancy}".format(
         chunk_size_str=str(chunk_size), file=input_file, redundancy=packet_redundancy, ins_header=header, err_det=error_detection, crc_str=header_crc_str))
     # OLD CODE WITH ENVIRONMENT USAGE
@@ -49,7 +48,7 @@ def encode_norec_for_ac(config_data, current_path):
         line_list[0] = os.path.join('..', 'Data', 'Uploaded', filename + '_RU10.zip\n')
         if config_data["NOREC4DNA"]["header_crc_length"] == 0:
             del(line_list[-6])
-        with open("{cpath}/{ini_path}".format(cpath=current_path, ini_path=config_data["decode"]["NOREC4DNA_config"]), "w") as o_:
+        with open("{ini_path}".format(ini_path=config_data["decode"]["NOREC4DNA_config"]), "w") as o_:
             o_.writelines(line_list)
     os.remove(norec_config)
     return
@@ -63,20 +62,16 @@ def encode_ac(current_path, config):
     """
     filename = config["encode"]["input"]
     config["encode"]["input"] = filename + '_RU10.zip'
-    print(json.dumps(config, indent=4))
+
     with open("intermediate_config.json", "w") as inter:
         json.dump(config, inter)
     # Inner encoder command
     py_command = ("{cpath}/arithmetic_modulator_error_correction -e {config_file}".format(
         cpath=current_path, config_file="intermediate_config.json"))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
-    
-    with open("intermediate_config.json", "r") as inter:
-        print(json.dumps(json.load(inter), indent=4))
-    
+
     process.wait()
     output, error = process.communicate()
-    print('\nOUTPUT:\t', output, '\nERROR:\t', error, '\n')
     os.remove("intermediate_config.json")
     if not config["encode"]["keep_intermediary"]:
         os.remove(config["encode"]["input"])
@@ -91,7 +86,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     cpath = pathlib.Path(__file__).parent.resolve()
-    print('\n\nCPATH:\t', cpath, '\n\n')
     with open(args.conf, "r") as conf_inp:
         config_data = json.load(conf_inp)
 

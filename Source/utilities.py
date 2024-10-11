@@ -179,8 +179,6 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'DNA_Aeon':  # ! Fix
             list_generated_seq = encoding_dnaaeon.encode(
                 path_file, '')
-            # TODO Instead of using venv Norec4DNA I should try using locally
-            # TODO installed package. This is probably the fix for this method
         else:
             print('Encoding method ' + str_encoding_method +
                   ' is not implemented')
@@ -205,7 +203,7 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
                 path_file, list_np_data)
         elif str_encoding_method == 'DNA_Aeon':  # ! Fix
             list_generated_seq = encoding_dnaaeon.decode(
-                path_file, list_np_data)
+                '', list_np_data)
         else:
             print('Encoding method ' + str_encoding_method +
                   ' is not implemented')

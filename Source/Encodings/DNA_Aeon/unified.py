@@ -37,8 +37,6 @@ def encode(string_file_name, numpy_boolen_array=None):
         if sequence != "":
             sequences.append(sequence)
 
-    print('\n\nINSIDE\n', sequences, '\n')
-
     return sequences
 
 def decode(string_file_name=None, list_of_dna_strings=None):
@@ -53,7 +51,7 @@ def decode(string_file_name=None, list_of_dna_strings=None):
         cfile = json.load(conf_file)
         input_file_name = cfile["encode"]["input"].split("/")[-1]
         if list_of_dna_strings:
-            cfile["decode"]["input"] = "data/to_be_decoded.fasta"
+            cfile["decode"]["input"] = "Encodings/DNA_Aeon/data/to_be_decoded.fasta"
         elif string_file_name:
             cfile["decode"]["input"] = string_file_name
         else:
