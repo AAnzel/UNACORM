@@ -19,7 +19,8 @@ __email__ = 'AnzelA@rki.de'
 __status__ = 'Stable'
 
 
-_NUMBER_OF_EXPERIMENT_RUNS = 4
+_NUMBER_OF_EXPERIMENT_RUNS = 5
+_BOOL_USER_INTERACTION = True
 
 
 def run_precalculation(int_num_of_iteration):
@@ -138,8 +139,9 @@ def run_precalculation(int_num_of_iteration):
     st.dataframe(df_new_summary)
     st.header('Existed precalculated summary')
     st.dataframe(df_existing_summary)
+
     st.write('Do you want to merge new data into pickle file?')
-    if st.button('Merge new data to pickle'):
+    if _BOOL_USER_INTERACTION or st.button('Merge new data to pickle'):
         df_detail_concat = pd.concat(
             [df_new_detail, df_existing_detail], ignore_index=True)
         df_detail_concat.to_pickle(PATH_EXISTING_DETAIL)

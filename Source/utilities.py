@@ -176,7 +176,7 @@ def int_calculate_decoding_cost(list_dna_sequences,
     int_total_base_pairs = sum([len(string_dna_sequence)
                                 for string_dna_sequence in
                                 list_dna_sequences]) * _INT_SEQUENCING_COVERAGE
-    int_cost_total = int_total_base_pairs * _DF_SEQUENCING_METRICS[
+    int_cost_total = int_total_base_pairs * _DF_SEQUENCING_METRICS.iloc[
         int_technology_position, 2]
 
     return int_cost_total
