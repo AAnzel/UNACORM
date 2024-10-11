@@ -51,6 +51,7 @@ _DF_SYNTHESIS_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA,
                                                  'synthesis_cost.csv'))
 _DF_SEQUENCING_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA,
                                                   'sequencing_cost_perBP.csv'))
+_INT_SEQUENCING_COVERAGE = 100
 encoding_2d = encoding_2d_tmp.api()
 
 _LIST_PASS_METHODS = []
@@ -116,6 +117,7 @@ def int_calculate_encoding_cost(list_dna_sequences):
     Returns:
         int: calculated cost in US dollars
     """
+
     int_num_of_oligos = len(list_dna_sequences)
     int_max_nucleotides = 0
     for string_seq in list_dna_sequences:
@@ -136,6 +138,46 @@ def int_calculate_encoding_cost(list_dna_sequences):
         j = 4
 
     int_cost_total = _DF_SYNTHESIS_METRICS.iloc[i, j] * int_num_of_oligos
+
+    return int_cost_total
+
+
+@st.cache_data
+def int_calculate_decoding_cost(list_dna_sequences,
+                                string_technology='PacBio'):
+    """
+    int_calculate_decoding_cost function calculates sequencing cost
+
+    The function takes a list of DNA sequences and calculates the cost of
+    sequencing according to their structure, chosen sequencing technology,
+    and the fixed set of costs saved in an external file.
+
+    Args:
+        list_dna_sequences (list): list of string DNA sequences
+        string_technology (string): sequencing technology
+
+    Returns:
+        int: calculated cost in US dollars
+    """
+    # To calculate sequence cost per base pair:
+    # Total Cost = Total Base Pairs x Cost per Base Pair (depending on
+    # technology)
+    # Where Total Base Pairs = Number of oligos x
+    #                          Length of each oligo(length of nucleotide) x
+    #                          Coverage
+    # We skip the first column that contains the Name of Technology (j=0)
+    if string_technology == 'Ilumina':
+        int_technology_position = 0
+    elif string_technology == 'Nanopore':
+        int_technology_position = 1
+    else:
+        int_technology_position = 2
+
+    int_total_base_pairs = sum([len(string_dna_sequence)
+                                for string_dna_sequence in
+                                list_dna_sequences]) * _INT_SEQUENCING_COVERAGE
+    int_cost_total = int_total_base_pairs * _DF_SEQUENCING_METRICS[
+        int_technology_position, 2]
 
     return int_cost_total
 
@@ -294,7 +336,7 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         False)
     int_time_decoding = time.time() - int_start_time
 
-    int_cost_decoding = 0
+    int_cost_decoding = int_calculate_decoding_cost(list_dna_sequences)
     string_decoded_file_name = string_input_file_basename + '_' + \
         string_encoding_method + '.npy'
 
