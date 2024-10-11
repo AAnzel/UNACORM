@@ -38,7 +38,7 @@ def encode_norec_for_ac(config_data, current_path):
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
     process.wait()
     output, error = process.communicate()
-    print(output, error) # THIS IS THE OUTPUT: 'File to encode: ../Data/Uploaded/1728399480_710021_test.txt\nNumber of Chunks does not work for given file. New Number of Chunks = 25\n
+    print(output, error)
     # ! FIX: There is an error with DNA-Aeon where config.json file contains one extra curly bracket at the end from time to time
     norec_config = output.split()[-1].decode()
     # print("\n" + NOREC4DNA_BASE_PATH + "/" + filename + ".ini\n")

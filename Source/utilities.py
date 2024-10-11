@@ -47,7 +47,10 @@ _PATH_UPLOADED_DATA = os.path.join(PATH_ROOT_DATA, 'Uploaded')
 _PATH_ENCODING_METHODS = os.path.join('Encodings')
 
 _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
-_DF_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA, 'synthesis_cost.csv'))
+_DF_SYNTHESIS_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA,
+                                                 'synthesis_cost.csv'))
+_DF_SEQUENCING_METRICS = pd.read_csv(os.path.join(PATH_CACHE_DATA,
+                                                  'sequencing_cost_perBP.csv'))
 encoding_2d = encoding_2d_tmp.api()
 
 _LIST_PASS_METHODS = []
@@ -132,7 +135,7 @@ def int_calculate_encoding_cost(list_dna_sequences):
     else:
         j = 4
 
-    int_cost_total = _DF_METRICS.iloc[i, j] * int_num_of_oligos
+    int_cost_total = _DF_SYNTHESIS_METRICS.iloc[i, j] * int_num_of_oligos
 
     return int_cost_total
 
