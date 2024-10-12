@@ -71,8 +71,8 @@ def decode(string_file_name=None, list_of_dna_strings=None):
     return bits
 
 if __name__ == "__main__":
-    list_of_dna = encode("data/D")
-    res = decode(list_of_dna_strings=list_of_dna)
+    #list_of_dna = encode("data/D")
+    #res = decode(list_of_dna_strings=list_of_dna)
 
 
 
