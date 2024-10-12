@@ -221,7 +221,7 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'RaptorCode':
             list_generated_seq = encoding_raptor.encode(
                 path_file, list_np_data)[0]
-        elif str_encoding_method == 'DNA_Aeon':  # ! Fix
+        elif str_encoding_method == 'DNA_Aeon':
             list_generated_seq = encoding_dnaaeon.encode(
                 path_file, '')
         else:
@@ -246,7 +246,7 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'RaptorCode':
             list_generated_seq = encoding_raptor.decode(
                 path_file, list_np_data)
-        elif str_encoding_method == 'DNA_Aeon':  # ! Fix
+        elif str_encoding_method == 'DNA_Aeon':
             list_generated_seq = encoding_dnaaeon.decode(
                 '', list_np_data)
         else:

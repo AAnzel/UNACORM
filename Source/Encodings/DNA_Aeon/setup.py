@@ -32,17 +32,14 @@ def compile_dna_aeon(current_path):
     run(["cmake", current_path])
     run(["cmake", "--build", current_path])
 
-    run(["deactivate"],
-        cwd=os.path.join(current_path, "NOREC4DNA"))
-
 
 if __name__ == "__main__":
     cpath = os.path.dirname(os.path.realpath(__file__))
     print('Current_Path:\t', cpath, '\n')
-    print("Setting up NOREC4DNA virtual environment.")
-    create_norec_env(cpath)
-    print("Installing packages required for NOREC4DNA.")
-    install_norec_packages(cpath)
+    #print("Setting up NOREC4DNA virtual environment.")
+    #create_norec_env(cpath)
+    #print("Installing packages required for NOREC4DNA.")
+    #install_norec_packages(cpath)
     print("Compiling DNA Aeon")
     compile_dna_aeon(cpath)
 

@@ -38,8 +38,6 @@ def encode_norec_for_ac(config_data, current_path):
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
     process.wait()
     output, error = process.communicate()
-    print(output, error)
-    # ! FIX: There is an error with DNA-Aeon where config.json file contains one extra curly bracket at the end from time to time
     norec_config = output.split()[-1].decode()
     # print("\n" + NOREC4DNA_BASE_PATH + "/" + filename + ".ini\n")
     # os.rename(config, NOREC4DNA_BASE_PATH + "/" + filename + ".ini")
@@ -62,17 +60,15 @@ def encode_ac(current_path, config):
     """
     filename = config["encode"]["input"]
     config["encode"]["input"] = filename + '_RU10.zip'
-
-    with open("intermediate_config.json", "w") as inter:
-        json.dump(config, inter)
+    with open("{cpath}/intermediate_config.json".format(cpath=current_path), "w") as inter:
+        json.dump(config, inter, indent=4)
     # Inner encoder command
-    py_command = ("{cpath}/arithmetic_modulator_error_correction -e {config_file}".format(
+    py_command = ("{cpath}/arithmetic_modulator_error_correction -e {cpath}/{config_file}".format(
         cpath=current_path, config_file="intermediate_config.json"))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
-
     process.wait()
     output, error = process.communicate()
-    os.remove("intermediate_config.json")
+    #os.remove("{cpath}/intermediate_config.json".format(cpath=current_path))
     if not config["encode"]["keep_intermediary"]:
         os.remove(config["encode"]["input"])
     #ret = parse_fasta(file + "_encoded.fasta")

@@ -8,8 +8,8 @@ def decode_ac(current_path, config_path):
     py_command = ("{cpath}/arithmetic_modulator_error_correction -d {conf_path}".format(cpath=current_path,
                                                                                                 conf_path=config_path))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
+    process.wait()
     output, error = process.communicate()
-    print('\nOUTPUT:\t', output, '\nERROR:\t', error, '\n\n')
     return
 
 def decode_norec_for_ac(current_path, config_data):
@@ -19,15 +19,16 @@ def decode_norec_for_ac(current_path, config_data):
     :return:
     """
     ini_path = pathlib.Path(config_data["decode"]["NOREC4DNA_config"]).resolve()
-    print('\n\nINI PATH:\t', ini_path, '\n\n')
-    #with open(ini_path, "r") as c_:
-    #    line_list = c_.readlines()
-    #    line_list[0] = "[{dpath}.zip]\n".format(dpath=config_data["decode"]["output"]) #"[../data/" + filename + "_RU10.zip]\n"
-    #    with open("{ini_path}".format(ini_path=config_data["decode"]["NOREC4DNA_config"]), "w") as o_:
-    #        o_.writelines(line_list)
+    with open(ini_path, "r") as c_:
+        line_list = c_.readlines()
+        line_list[0] = "[{cpath}/../../{dpath}_RU10.zip]\n".format(cpath=current_path, dpath=config_data["encode"]["input"]) #"[../data/" + filename + "_RU10.zip]\n"
+    with open("{ini_path}".format(ini_path=config_data["decode"]["NOREC4DNA_config"]), "w") as o_:
+        o_.writelines(line_list)
     pathlib.Path('Encodings/DNA_Aeon/data/results').mkdir(parents=True, exist_ok=True)
     os.chdir('Encodings/DNA_Aeon/data/results')
-
+    
+    print(str(pathlib.Path(__file__).parent.resolve()))
+    print('\n\nINIPATH\t', ini_path, '\n\n')
     # NEW CODE WITH LIBRARY USAGE
     py_command = ("python ../../../RaptorCode/ConfigWorker.py {ipath}".format(
         ipath=ini_path))
@@ -35,7 +36,9 @@ def decode_norec_for_ac(current_path, config_data):
     # py_command = ("{cpath}/NOREC4DNA/venv/bin/python3 {cpath}/NOREC4DNA/ConfigWorker.py {ipath}".format(
     #    cpath=current_path, ipath=ini_path))
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
+    process.wait()
     output, error = process.communicate()
+    print('\n\nOUTPUT\t', output, '\nERROR\t', error, '\n\n')
     os.chdir('../..')
     return
 
@@ -51,7 +54,7 @@ if __name__ == "__main__":
 
     # Start outer decode
     print("Starting inner decoder.")
-    decode_ac(cpath, conf_path)  # ! FIX: The problem lies here. .zip paths might be wrong
+    decode_ac(cpath, conf_path)
     print("\nFinished inner decoding, starting outer decoder...\n")
     # Start inner encoder
     decode_norec_for_ac(cpath, config_data)

@@ -29,8 +29,8 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1728657927_1002529_Anna_Karenina.txt",
-        "keep_intermediary": false,
+        "input": "../Data/Uploaded/1728754207_736255_test.txt",
+        "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",
         "same_length": true,

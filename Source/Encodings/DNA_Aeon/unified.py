@@ -13,10 +13,11 @@ def encode(string_file_name, numpy_boolen_array=None):
     if not os.path.exists(string_file_name):
         raise IOError("Input file does not exists")
 
-    with open(conf_file_path, "r+") as conf_file:
+    with open(conf_file_path, "r") as conf_file:
         cfile = json.load(conf_file)
         cfile["encode"]["input"] = string_file_name
         conf_file.seek(0)
+    with open(conf_file_path, "w") as conf_file:
         json.dump(cfile, conf_file, indent=4)
 
     subprocess.call(["python", os.path.join(path_working_dir, "encode.py"),
@@ -46,18 +47,20 @@ def decode(string_file_name=None, list_of_dna_strings=None):
                 header = ">{}\n".format(i + 1)
                 file.write(header)
                 file.write(sequence + "\n")
-    with open(conf_file_path, "r+") as conf_file:
+    with open(conf_file_path, "r") as conf_file:
         # DNA-Aeon decodes the file with the original filename, have to extract it before being able to read in the decoded data.
         cfile = json.load(conf_file)
         input_file_name = cfile["encode"]["input"].split("/")[-1]
         if list_of_dna_strings:
             cfile["decode"]["input"] = "Encodings/DNA_Aeon/data/to_be_decoded.fasta"
-        elif string_file_name:
-            cfile["decode"]["input"] = string_file_name
+        # elif string_file_name:
+        #    cfile["decode"]["input"] = string_file_name
         else:
             raise IOError
         conf_file.seek(0)
+    with open(conf_file_path, "w") as conf_file:
         json.dump(cfile, conf_file, indent=4)
+
     subprocess.call(["python", os.path.join(path_working_dir, "decode.py"),
                      "-c", conf_file_path])
 
