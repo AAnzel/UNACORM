@@ -26,9 +26,6 @@ def decode_norec_for_ac(current_path, config_data):
         o_.writelines(line_list)
     pathlib.Path('Encodings/DNA_Aeon/data/results').mkdir(parents=True, exist_ok=True)
     os.chdir('Encodings/DNA_Aeon/data/results')
-    
-    print(str(pathlib.Path(__file__).parent.resolve()))
-    print('\n\nINIPATH\t', ini_path, '\n\n')
     # NEW CODE WITH LIBRARY USAGE
     py_command = ("python ../../../RaptorCode/ConfigWorker.py {ipath}".format(
         ipath=ini_path))
@@ -38,7 +35,6 @@ def decode_norec_for_ac(current_path, config_data):
     process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
     process.wait()
     output, error = process.communicate()
-    print('\n\nOUTPUT\t', output, '\nERROR\t', error, '\n\n')
     os.chdir('../..')
     return
 
