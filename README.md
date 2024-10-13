@@ -124,6 +124,8 @@ cd Source/Encodings/XORBasedCode
 python setup.py install
 cd ../RaptorCode
 python setup.py install
+cd ../DNA_Aeon
+python setup.py
 cd ../../
 streamlit run main.py
 ```

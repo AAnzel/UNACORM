@@ -37,6 +37,10 @@ WORKDIR /app/Source/Encodings/The2DCode
 
 RUN pip install -r requirements.txt
 
+WORKDIR /app/Source/Encodings/DNA_Aeon
+
+RUN python setup.py
+
 WORKDIR /app/Source/
 
 EXPOSE 8501
