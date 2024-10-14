@@ -7,7 +7,9 @@ import os
 def decode_ac(current_path, config_path):
     py_command = ("{cpath}/arithmetic_modulator_error_correction -d {conf_path}".format(cpath=current_path,
                                                                                                 conf_path=config_path))
-    process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE)
+    process = subprocess.Popen(py_command.split(), stdout=subprocess.PIPE, universal_newlines=True)
+    for string_line in process.stdout:
+        print(string_line, end='')  # process line here
     process.wait()
     output, error = process.communicate()
     return
