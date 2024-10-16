@@ -238,7 +238,8 @@ def create_main_page():
         mime='text/csv',
     )
 
-    with st.expander("Expand Detailed Information", expanded=False):
+    with st.expander("Expand Detailed Information",
+                     expanded=True if path_input_file != '' else False):
         st.markdown('Detail Table')
         st.dataframe(df_details_combined)
         st.download_button(
