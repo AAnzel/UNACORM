@@ -138,7 +138,8 @@ def create_main_page():
 
     st.header('DNA Encoding')
     list_chosen_dna_encoding = st.multiselect(
-     'Select preferred DNA Encoding Methods', uti.LIST_ENCODING_METHODS)
+     'Select preferred DNA Encoding Methods', uti.LIST_ENCODING_METHODS,
+     placeholder='Choose DNA encoding methods')
 
     st.warning('The length of processing time depends on chosen methods')
 
@@ -262,7 +263,7 @@ def create_main_page():
     list_files_chosen = st.multiselect(
      'Select the files to review (This will affect Cost' +
      ' and Time Charts)', default=list_default_files_to_visualize,
-     options=list_files_to_visualize)
+     options=list_files_to_visualize, placeholder='Choose files')
 
     st.markdown('---')
     chart = vis.visualize_cost_benchmark_plotly(
