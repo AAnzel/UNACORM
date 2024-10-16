@@ -48,6 +48,7 @@ The code is written in Python 3.12.2 and tested on Linux with the libraries incl
 | [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_detail.pkl) | contains cached benchmark data that represents the summary of [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs |
 | [Data/cache_data/huff3.dict](Data/cache_data/huff3.dict) | contains cached codebook for the 2D code |
 | [Data/cache_data/synthesis_cost.csv](Data/cache_data/synthesis_cost.csv) | contains cached synthesis cost |
+| [Data/cache_data/sequencing_cost_perBP.csv](Data/cache_data/sequencing_cost_perBP.csv) | contains cached sequencing cost |
 
 The cached benchmark data can be re-calculated using [Source/precalculation.py](/Source/precalculation.py) script and the following command:
 

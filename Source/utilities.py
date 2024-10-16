@@ -166,12 +166,14 @@ def int_calculate_decoding_cost(list_dna_sequences,
     #                          Length of each oligo(length of nucleotide) x
     #                          Coverage
     # We skip the first column that contains the Name of Technology (j=0)
-    if string_technology == 'Ilumina':
+    if string_technology == 'Illumina':
         int_technology_position = 0
     elif string_technology == 'Nanopore':
         int_technology_position = 1
-    else:
+    elif string_technology == 'PacBio':
         int_technology_position = 2
+    else:
+        raise RuntimeError('ERROR: Bad technology string for sequencing!')
 
     int_total_base_pairs = sum([len(string_dna_sequence)
                                 for string_dna_sequence in
