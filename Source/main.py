@@ -232,7 +232,7 @@ def create_main_page():
     st.header('Benchmark')
     st.dataframe(df_summary_combined)
     st.download_button(
-        label="Download",
+        label="Download Benchmark Data",
         data=df_summary_combined.to_csv(index=False).encode('utf-8'),
         file_name='summary_data.csv',
         mime='text/csv',
@@ -242,7 +242,7 @@ def create_main_page():
         st.markdown('Detail Table')
         st.dataframe(df_details_combined)
         st.download_button(
-            label="Download",
+            label="Download Detailed Benchmark Data",
             data=df_details_combined.to_csv(index=False).encode('utf-8'),
             file_name='detail_data.csv',
             mime='text/csv',
