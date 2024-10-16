@@ -197,11 +197,11 @@ def create_main_page():
         df_new_summary = uti.df_generate_summary(df_new_detail)
 
         st.markdown('Summary Report')
-        st.dataframe(df_new_summary)
+        st.dataframe(df_new_summary, use_container_width=True)
 
         with st.expander("Expand Detailed Information"):
             st.markdown('Detail Table')
-            st.dataframe(df_new_detail)
+            st.dataframe(df_new_detail, use_container_width=True)
 
         (chart_size, chart_time,
          chart_cost) = vis.visualize_uploaded_plotly(df_new_detail)
@@ -230,7 +230,7 @@ def create_main_page():
 
     st.markdown('---')
     st.header('Benchmark')
-    st.dataframe(df_summary_combined)
+    st.dataframe(df_summary_combined, use_container_width=True)
     st.download_button(
         label="Download Benchmark Data",
         data=df_summary_combined.to_csv(index=False).encode('utf-8'),
@@ -241,7 +241,7 @@ def create_main_page():
     with st.expander("Expand Detailed Information",
                      expanded=True if path_input_file != '' else False):
         st.markdown('Detail Table')
-        st.dataframe(df_details_combined)
+        st.dataframe(df_details_combined, use_container_width=True)
         st.download_button(
             label="Download Detailed Benchmark Data",
             data=df_details_combined.to_csv(index=False).encode('utf-8'),
