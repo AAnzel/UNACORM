@@ -21,62 +21,146 @@ __status__ = 'Stable'
 _PATH_UPLOADED_DATA = os.path.join(uti.PATH_ROOT_DATA, 'Uploaded')
 
 
-def create_sidebar():
+def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
+    string_key = 'new' if bool_expand_detail else 'old'
+
+    st.header('Benchmark')
+    st.dataframe(df_summary, use_container_width=True)
+    st.download_button(
+        label="Download Benchmark Data",
+        data=df_summary.to_csv(index=False).encode('utf-8'),
+        file_name='summary_data.csv',
+        mime='text/csv',
+        key='Download_Summary_' + string_key
+    )
+
+    with st.expander("Expand Detailed Information",
+                     expanded=bool_expand_detail):
+        st.markdown('Detail Table')
+        st.dataframe(df_detail, use_container_width=True)
+        st.download_button(
+            label="Download Detailed Benchmark Data",
+            data=df_detail.to_csv(index=False).encode('utf-8'),
+            file_name='detail_data.csv',
+            mime='text/csv',
+            key='Download_Detail_' + string_key
+        )
+
+    return None
+
+
+def create_contact_page():
+    st_col_1, st_col_2, st_col_3 = st.columns([1, 2, 1])
+
+    st_col_2.markdown(
+        '''
+        # Contact Us
+
+        We appreciate your interest in our project! Here are the best ways to get in touch or contribute.
+
+        ## Project Repository
+
+        Our project is hosted on GitHub. You can find the main repository here:
+
+        **GitHub Repository:** [github.com/YourUsername/YourProject](https://github.com/YourUsername/YourProject)
+
+        ## Reporting Issues
+
+        If you've encountered a bug or have a feature request, please open an issue on our GitHub repository:
+
+        **Open an Issue:** [github.com/YourUsername/YourProject/issues/new](https://github.com/YourUsername/YourProject/issues/new)
+
+        Before creating a new issue, please check if a similar one already exists.
+
+        ## Contributing
+
+        We welcome contributions! If you'd like to contribute to the project:
+
+        1. Fork the repository
+        2. Create a new branch for your feature or bug fix
+        3. Make your changes
+        4. Submit a pull request
+
+        **Create a Pull Request:** [github.com/YourUsername/YourProject/compare](https://github.com/YourUsername/YourProject/compare)
+
+        Please review our contribution guidelines before submitting a pull request.
+
+        ## Discussions
+
+        For general questions, ideas, or community discussions, please use our GitHub Discussions forum:
+
+        **GitHub Discussions:** [github.com/YourUsername/YourProject/discussions](https://github.com/YourUsername/YourProject/discussions)
+
+        ## Project Updates
+
+        Stay updated with our latest releases and announcements:
+
+        **Releases:** [github.com/YourUsername/YourProject/releases](https://github.com/YourUsername/YourProject/releases)
+
+        ## Additional Contact Information
+
+        For matters not suitable for GitHub, you can reach us at:
+
+        **Email:** [info@yourproject.com](mailto:info@yourproject.com)
+
+        ## Follow Us
+
+        Stay connected with our project:
+
+        - **GitHub:** [@YourUsername](https://github.com/YourUsername)
+        - **Twitter:** [@YourProject](https://twitter.com/YourProject)
+
+        ---
+
+        Thank you for your interest in our project! We look forward to your contributions and feedback.
+        '''
+    )
+    return None
+
+
+def create_about_page():
     """
-    create_sidebar function creates the dashboard sidebar
+    create_about function creates the About page
 
     Returns:
         None
     """
 
-    col_1, col_2 = st.sidebar.columns([3, 1])
-    col_2.image(
-        os.path.join(uti.PATH_CACHE_DATA, 'images',
-                     'GitHub-Mark-120px-plus.png'),
-        width=54)
-    col_2.markdown('[GitHub](https://github.com/AAnzel/DNA_Encodings)')
-    col_1.markdown('''
-                      # UNACORM
-                      The **U**nified D**NA** En**co**dings Platfo**rm**''')
-
-    st.sidebar.markdown('''
-        ---
+    st_col_1, st_col_2, st_col_3 = st.columns([1, 2, 1])
+    st_col_2.markdown('''
         ### DNA Encoding Methods:
 
         * **Simple Code** by Church _et al._
-            * [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)
+        [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)
 
         * **Repetition Code** by Goldman _et al._
-            * [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)
+        [DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)
 
         * **The 2D Code** by Grass _et al._
-            * [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)
+        [DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)
 
         * **XOR-Based Code** by Bornholt _et al._
-            * [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)
+        [DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)
 
         * **DNA-Aeon Code** by Welzel _et al._
-            * [DOI: 10.1038/s41467-023-36297-3](https://doi.org/10.1038/s41467-023-36297-3)
+        [DOI: 10.1038/s41467-023-36297-3](https://doi.org/10.1038/s41467-023-36297-3)
 
         * **Raptor Code** by Shokrollahi _et al._
-            * [DOI: 10.1109/TIT.2006.874390](https://doi.org/10.1109/TIT.2006.874390)
+        [DOI: 10.1109/TIT.2006.874390](https://doi.org/10.1109/TIT.2006.874390)
 
         * **LT Code** by Luby _et al._
-            * [DOI: 10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950)
+        [DOI: 10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950)
 
         * **Online Code** by Maymounkov _et al._
-            * [LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
+        [LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
         ''')
 
     return None
 
 
-def tuple_upload_file():
+def create_upload_page():
     """
-    tuple_upload_file function uploads a file and caches it internally
-
-    The function takes a string argument  necessary for creating seperate user
-    sessions. It returns the path of the uploaded file and its name
+    create_upload_page function creates the Upload Page
 
     Returns:
         tuple: path of the uploaded file and its name are returned
@@ -90,12 +174,12 @@ def tuple_upload_file():
         label='Upload a file', type=list_file_type,
         accept_multiple_files=False, key='Upload_file_')
 
-    string_file_name = ''
+    string_input_file = ''
     path_input_file = ''
 
     if imported_file is not None:
         float_time_uploaded = str(time.time()).replace('.', '_')
-        string_file_name = imported_file.name
+        string_input_file = imported_file.name
         string_new_name = float_time_uploaded + '_' + imported_file.name
         path_input_file = os.path.join(_PATH_UPLOADED_DATA, string_new_name)
         with open(path_input_file, mode='wb') as w:
@@ -104,24 +188,6 @@ def tuple_upload_file():
         if os.path.exists(path_input_file):
             st.success('The file is successfully uploaded.')
 
-    return path_input_file, string_file_name
-
-
-def create_main_page():
-    """
-    create_main_page function creates the main dashboard page
-
-    Returns:
-        None
-    """
-
-    # Removing old uploaded data
-    uti.remove_cached_data()
-
-    st.markdown('---')
-
-    path_input_file = ''
-    path_input_file, string_input_file = tuple_upload_file()
     string_file_name, string_file_extension = os.path.splitext(
         string_input_file)
 
@@ -196,12 +262,9 @@ def create_main_page():
 
         df_new_summary = uti.df_generate_summary(df_new_detail)
 
-        st.markdown('Summary Report')
-        st.dataframe(df_new_summary, use_container_width=True)
-
-        with st.expander("Expand Detailed Information"):
-            st.markdown('Detail Table')
-            st.dataframe(df_new_detail, use_container_width=True)
+        if df_new_detail is not None and df_new_summary is not None:
+            st.markdown('---')
+            display_processed_data(df_new_summary, df_new_detail, True)
 
         (chart_size, chart_time,
          chart_cost) = vis.visualize_uploaded(df_new_detail)
@@ -215,55 +278,30 @@ def create_main_page():
     else:
         pass
 
+    return None
+
+
+def create_benchmark_page():
+    """
+    create_main_page function creates the main dashboard page
+
+    Returns:
+        None
+    """
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
-    # If we calculated something new
-    if df_new_detail is not None and df_new_summary is not None:
-        df_details_combined = pd.concat(
-            [df_new_detail, df_existing_detail], ignore_index=True)
-        df_summary_combined = pd.concat(
-            [df_new_summary, df_existing_summary], ignore_index=True)
-    else:
-        df_details_combined = df_existing_detail
-        df_summary_combined = df_existing_summary
+    display_processed_data(df_existing_summary, df_existing_detail)
 
-    st.markdown('---')
-    st.header('Benchmark')
-    st.dataframe(df_summary_combined, use_container_width=True)
-    st.download_button(
-        label="Download Benchmark Data",
-        data=df_summary_combined.to_csv(index=False).encode('utf-8'),
-        file_name='summary_data.csv',
-        mime='text/csv',
-    )
-
-    with st.expander("Expand Detailed Information",
-                     expanded=True if path_input_file != '' else False):
-        st.markdown('Detail Table')
-        st.dataframe(df_details_combined, use_container_width=True)
-        st.download_button(
-            label="Download Detailed Benchmark Data",
-            data=df_details_combined.to_csv(index=False).encode('utf-8'),
-            file_name='detail_data.csv',
-            mime='text/csv',
-        )
-
-    chart = vis.visualize_size_benchmark(df_summary_combined)
+    chart = vis.visualize_size_benchmark(df_existing_summary)
     st.plotly_chart(chart, use_container_width=True)
 
     list_files_to_visualize = list(
-        pd.unique(df_summary_combined['Filename']))
-
-    if path_input_file != '':
-        list_files_to_visualize += [string_file_name]
-        list_default_files_to_visualize = list_files_to_visualize[-1]
-    else:
-        list_default_files_to_visualize = list_files_to_visualize
+        pd.unique(df_existing_summary['Filename']))
 
     list_files_chosen = st.multiselect(
      'Select the files to review (This will affect Cost' +
-     ' and Time Charts)', default=list_default_files_to_visualize,
+     ' and Time Charts)', default=list_files_to_visualize,
      options=list_files_to_visualize, placeholder='Choose files')
 
     string_selected_visualization = st.radio(
@@ -272,14 +310,14 @@ def create_main_page():
     st.markdown('---')
     if string_selected_visualization == 'Whisker Chart':
         chart_cost_all = vis.visualize_cost_benchmark_whisker(
-            list_files_chosen, df_details_combined)
+            list_files_chosen, df_existing_detail)
         chart_time_all = vis.visualize_time_benchmark_whisker(
-            list_files_chosen, df_details_combined)
+            list_files_chosen, df_existing_detail)
     else:
         chart_cost_all = vis.visualize_cost_benchmark_bar(
-            list_files_chosen, df_details_combined)
+            list_files_chosen, df_existing_detail)
         chart_time_all = vis.visualize_time_benchmark_bar(
-            list_files_chosen, df_details_combined)
+            list_files_chosen, df_existing_detail)
 
     st.plotly_chart(chart_cost_all, use_container_width=True)
     st.markdown('---')
@@ -298,18 +336,72 @@ def main():
     """
 
     st.set_page_config(page_title='UNACORM', layout='wide',
-                       initial_sidebar_state='expanded')
+                       initial_sidebar_state='collapsed')
 
     st.markdown('''
                     <style>
-                    #MainMenu {visibility: hidden;}
-                    .stDeployButton {display:none;}
-                    footer {visibility: hidden;}
+
+                        #MainMenu {visibility: hidden;}
+                        .stDeployButton {display:none;}
+                        footer {visibility: hidden;}
+
+                        .block-container {
+                            padding-top: 1.8rem;
+                        }
+
+                        button[title="View fullscreen"]{
+                            visibility: hidden;}
+
+                        .stTabs [data-baseweb="tab-list"] {
+                            gap: 80px;
+                            display: flex;
+                            justify-content: flex-end;
+                            width: 100%;
+                        }
+
+                        .stTabs [data-baseweb="tab-list"]
+                            button [data-testid="stMarkdownContainer"] p {
+                                font-size: 1.2rem;
+                                font-weight: bold;
+                            }
+                        .stTabs [data-baseweb="tab"] {
+                            height: 50px;
+                            white-space: pre-wrap;
+                            border-radius: 4px 4px 0px 0px;
+                            gap: 1px;
+                            padding-top: 5px;
+                            padding-bottom: 10px;
+                        }
+
                     </style>
                 ''', unsafe_allow_html=True)
 
-    create_sidebar()
-    create_main_page()
+    # Removing old uploaded data
+    uti.remove_cached_data()
+
+    st_col_1, st_col_2, _ = st.columns([1, 1, 1])
+    st_col_1.title('UNACORM')
+    st_col_1.markdown('The **U**nified D**NA** En**co**dings Platfo**rm**')
+    st_col_2.markdown('')
+    st_col_2.markdown('')
+    st_col_2.image(
+        os.path.join(uti.PATH_CACHE_DATA, 'images', 'github-mark-white.png'),
+        width=60)
+    st.markdown('')
+    st.markdown('')
+    st.markdown('')
+
+    st_tab_benchmark, st_tab_upload, st_tab_about, st_tab_contact = st.tabs(
+        ['📊 BENCHMARK', '📂 FILE UPLOAD', 'ℹ️ ABOUT', '✉️ CONTACT'])
+
+    with st_tab_benchmark:
+        create_benchmark_page()
+    with st_tab_upload:
+        create_upload_page()
+    with st_tab_about:
+        create_about_page()
+    with st_tab_contact:
+        create_contact_page()
 
     return None
 

@@ -3,4 +3,4 @@ base="dark"
 primaryColor="blue"
 
 [browser]
-gatherUsageStats=false 
+gatherUsageStats=false
