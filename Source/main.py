@@ -102,7 +102,7 @@ def tuple_upload_file():
             w.write(imported_file.getvalue())
 
         if os.path.exists(path_input_file):
-            st.success('The file is successfully uploaded!')
+            st.success('The file is successfully uploaded.')
 
     return path_input_file, string_file_name
 
@@ -211,7 +211,7 @@ def create_main_page():
         st.plotly_chart(chart_cost, use_container_width=True)
 
     elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
-        st.error('Choose a file and length of storage first!')
+        st.error('Choose a file and length of storage first.')
     else:
         pass
 
