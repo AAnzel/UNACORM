@@ -204,7 +204,7 @@ def create_main_page():
             st.dataframe(df_new_detail, use_container_width=True)
 
         (chart_size, chart_time,
-         chart_cost) = vis.visualize_uploaded_plotly(df_new_detail)
+         chart_cost) = vis.visualize_uploaded(df_new_detail)
 
         st.plotly_chart(chart_size, use_container_width=True)
         st.plotly_chart(chart_time, use_container_width=True)
@@ -249,7 +249,7 @@ def create_main_page():
             mime='text/csv',
         )
 
-    chart = vis.visualize_size_benchmark_plotly(df_summary_combined)
+    chart = vis.visualize_size_benchmark(df_summary_combined)
     st.plotly_chart(chart, use_container_width=True)
 
     list_files_to_visualize = list(
@@ -266,15 +266,24 @@ def create_main_page():
      ' and Time Charts)', default=list_default_files_to_visualize,
      options=list_files_to_visualize, placeholder='Choose files')
 
-    st.markdown('---')
-    chart = vis.visualize_cost_benchmark_plotly(
-        list_files_chosen, df_details_combined)
-    st.plotly_chart(chart, use_container_width=True)
+    string_selected_visualization = st.radio(
+        'Visualize using', ['Whisker Chart', 'Bar Chart'], horizontal=True)
 
     st.markdown('---')
-    chart = vis.visualize_time_benchmark_plotly(
+    if string_selected_visualization == 'Whisker Chart':
+        chart_cost_all = vis.visualize_cost_benchmark_whisker(
             list_files_chosen, df_details_combined)
-    st.plotly_chart(chart, use_container_width=True)
+        chart_time_all = vis.visualize_time_benchmark_whisker(
+            list_files_chosen, df_details_combined)
+    else:
+        chart_cost_all = vis.visualize_cost_benchmark_bar(
+            list_files_chosen, df_details_combined)
+        chart_time_all = vis.visualize_time_benchmark_bar(
+            list_files_chosen, df_details_combined)
+
+    st.plotly_chart(chart_cost_all, use_container_width=True)
+    st.markdown('---')
+    st.plotly_chart(chart_time_all, use_container_width=True)
 
     return None
 
