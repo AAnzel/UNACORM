@@ -145,7 +145,7 @@ def visualize_time_benchmark_plotly(list_files_chosen, df_concat):
         df_concat['Filename'].isin(list_files_chosen)].sort_values('Method')
 
     chart_time = px.box(
-        df_tmp, x='Method', y='Time', color='Transformation',
+        df_tmp, x='Method', y='Time', color='Transformation', log_y=True,
         title='Process Time (in seconds)', facet_col='Filename',
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE * (
