@@ -94,7 +94,6 @@ def remove_cached_data():
                     except OSError as e:
                         print('Failed to delete ' + path_file + '. Reason: '
                               + str(e))
-
                     #  print('Successfully removed old data from uploaded' +
                     #        ' directory')
                 else:

@@ -61,15 +61,17 @@ The data located in [Data/Original/](Data/Original/) was used to test and benchm
 
 | Type | Location | Source |
 |---|---|---|
-| TXT | [Data/Original/Anna_Karenina.txt](Data/Original/Anna_Karenina.txt) | [https://www.gutenberg.org/ebooks/1399](https://www.gutenberg.org/ebooks/1399)
 | TXT | [Data/Original/Around_the_World_in_Eighty_Days.txt](Data/Original/Around_the_World_in_Eighty_Days.txt) | [https://www.gutenberg.org/ebooks/103](https://www.gutenberg.org/ebooks/103)
 | TXT | [Data/Original/The_Picture_of_Dorian_Gray.txt](Data/Original/The_Picture_of_Dorian_Gray.txt) | [https://www.gutenberg.org/ebooks/174](https://www.gutenberg.org/ebooks/174)
-| TXT | [Data/Original/The_Republic_Plato.txt](Data/Original/The_Republic_Plato.txt) | [https://www.gutenberg.org/ebooks/1497](https://www.gutenberg.org/ebooks/1497)
-| TXT | [Data/Original/Ulysses.txt](Data/Original/Ulysses.txt) | [https://www.gutenberg.org/ebooks/4300](https://www.gutenberg.org/ebooks/4300)
-| WAV | [Data/Original/bbc_house.wav](Data/Original/bbc_house.wav) | [https://sound-effects.bbcrewind.co.uk/search?q=07005179](https://sound-effects.bbcrewind.co.uk/search?q=07005179)
+| MP3 | [Data/Original/bbc_clock.mp3](Data/Original/bbc_clock.mp3) | [https://sound-effects.bbcrewind.co.uk/search?q=07002136](https://sound-effects.bbcrewind.co.uk/search?q=07002136)
 | WAV | [Data/Original/bbc_peregrine_falcon.wav](Data/Original/bbc_peregrine_falcon.wav) | [https://sound-effects.bbcrewind.co.uk/search?q=NHU05015024](https://sound-effects.bbcrewind.co.uk/search?q=NHU05015024)
-| JPG | [Data/Original/La_Jeunesse.jpg](Data/Original/La_Jeunesse.jpg) | [https://www.metmuseum.org/art/collection/search/10054](https://www.metmuseum.org/art/collection/search/10054)
 | JPG | [Data/Original/Vue_de_la_Buena_Vista.jpg](Data/Original/Vue_de_la_Buena_Vista.jpg) | [Wikimedia](https://commons.wikimedia.org/w/index.php?title=File:Les_merveilles_de_l%27industrie,_1873_%22Vue_de_la_Buena_Vista,_plantation_de_Don_Justo_Cantero,_dnas_l%27ille_de_Cuba%22_(4727225688).jpg&oldid=889592425)
+| PNG | [Data/Original/all_black.png](Data/Original/all_black.png) | Created
+| PDF | [Data/Original/Zero_File.pdf](Data/Original/Zero_File.pdf) | Created
+| GIF | [Data/Original/nature.gif](Data/Original/nature.gif) | [https://pixabay.com/gifs/nature-autumn-landscapes-orange-3507/](https://pixabay.com/gifs/nature-autumn-landscapes-orange-3507/)
+| MP4 | [Data/Original/egypt.mp4](Data/Original/egypt.mp4) | [https://pixabay.com/videos/desert-sand-egypt-culture-131220/](https://pixabay.com/videos/desert-sand-egypt-culture-131220/)
+
+
 
 ## Code
 | Location | Description |
