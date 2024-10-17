@@ -38,6 +38,12 @@ def decode_norec_for_ac(current_path, config_data):
     process.wait()
     output, error = process.communicate()
     os.chdir('../..')
+    try:
+        os.remove("[{cpath}/../../{dpath}_RU10.zip]\n".format(cpath=current_path, dpath=config_data["encode"]["input"]))
+        print('Successfully removed .zip intermediary file [DNA Aeon]')
+    except OSError as er:
+        print(er)
+        print('Cannot remove .zip intermediary file [DNA Aeon]')
     return
 
 if __name__ == "__main__":
