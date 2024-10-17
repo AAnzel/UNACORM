@@ -1,6 +1,6 @@
 [theme]
 base="dark"
-primaryColor="blue"
+primaryColor="#3399ff"
 
 [browser]
 gatherUsageStats=false
