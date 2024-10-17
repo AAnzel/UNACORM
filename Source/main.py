@@ -24,8 +24,6 @@ _PATH_UPLOADED_DATA = os.path.join(uti.PATH_ROOT_DATA, 'Uploaded')
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     string_key = 'new' if bool_expand_detail else 'old'
-
-    st.header('Benchmark')
     st.dataframe(df_summary, use_container_width=True)
     st.download_button(
         label="Download Benchmark Data",
@@ -37,7 +35,8 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
 
     with st.expander("Expand Detailed Information",
                      expanded=bool_expand_detail):
-        st.markdown('Detail Table')
+        st.markdown('### Detailed Benchmark Data',
+                    help=tc.STRING_DETAILED_HELP)
         st.dataframe(df_detail, use_container_width=True)
         st.download_button(
             label="Download Detailed Benchmark Data",
@@ -184,13 +183,17 @@ def create_upload_page():
 
         if df_new_detail is not None and df_new_summary is not None:
             st.markdown('---')
+            st.header('Benchmark')
             display_processed_data(df_new_summary, df_new_detail, True)
 
         (chart_size, chart_time,
          chart_cost) = vis.visualize_uploaded(df_new_detail)
 
+        st.header('Size', help=tc.STRING_SIZE_HELP)
         st.plotly_chart(chart_size, use_container_width=True)
+        st.header('Time', help=tc.STRING_TIME_HELP)
         st.plotly_chart(chart_time, use_container_width=True)
+        st.header('Cost', help=tc.STRING_COST_HELP)
         st.plotly_chart(chart_cost, use_container_width=True)
 
     elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
@@ -212,8 +215,11 @@ def create_benchmark_page():
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
+    st.header('Benchmark', help=tc.STRING_MAIN_BENCHMARK_HELP)
     display_processed_data(df_existing_summary, df_existing_detail)
+    st.markdown('---')
 
+    st.header('File Size Multiplier', help=tc.STRING_MULTIPLIER_HELP)
     chart = vis.visualize_size_benchmark(df_existing_summary)
     st.plotly_chart(chart, use_container_width=True)
 
@@ -240,8 +246,9 @@ def create_benchmark_page():
         chart_time_all = vis.visualize_time_benchmark_bar(
             list_files_chosen, df_existing_detail)
 
+    st.header('Cost', help=tc.STRING_COST_HELP)
     st.plotly_chart(chart_cost_all, use_container_width=True)
-    st.markdown('---')
+    st.header('Time', help=tc.STRING_TIME_HELP)
     st.plotly_chart(chart_time_all, use_container_width=True)
 
     return None

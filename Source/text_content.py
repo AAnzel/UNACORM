@@ -96,4 +96,39 @@ STRING_ABOUT_PAGE = '''
     [LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
 '''
 
+STRING_MAIN_BENCHMARK_HELP = '''
+    The benchmark dataset includes summarized results for all encoding methods 
+    and benchmark files. This dataset does not differentiate between the various 
+    runs of each encoding method for every benchmark file.
+'''
 
+STRING_DETAILED_HELP = '''
+    The detailed dataset contains information on both encoding and decoding 
+    across multiple runs.
+'''
+
+STRING_MULTIPLIER_HELP = '''
+    The File Size Multiplier defines how much the size of the encoded file 
+    differs from the original file size. For example, if the original file size 
+    is 100 kB and encoding the file using a certain method produces a file 
+    size of 200 kB, then the File Size Multiplier is 2, indicating that the 
+    encoded file has doubled in size.
+'''
+
+STRING_COST_HELP = '''
+    The cost of both encoding and decoding is calculated based on the number 
+    of nucleotides in the encoded file. For synthesis, the lengths of 
+    oligonucleotides are also considered. For sequencing, we default to using 
+    PacBio as the sequencing technology.
+'''
+
+STRING_TIME_HELP = '''
+    The time taken for the encoding and decoding processes is measured for each 
+    method and each file. These values should be used only as a reference, as 
+    the implementations of encodings can vary to some degree depending on the 
+    programming language used.
+'''
+
+STRING_SIZE_HELP = '''
+    The size of resulting files from encoding and decoding processes.
+'''

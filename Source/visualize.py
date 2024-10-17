@@ -35,30 +35,24 @@ def visualize_uploaded(df_report):
 
     chart_size = px.bar(
         df_report, x='Method', y='Size', color='Transformation',
-        title='Size (in bytes)', barmode='group', text_auto=True,
+        barmode='group', text_auto=True,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE,
-        template=_STRING_PLOTLY_THEME).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+        template=_STRING_PLOTLY_THEME).update_layout(yaxis_title='Size(B)')
 
     chart_time = px.bar(
         df_report, x='Method', y='Time', color='Transformation',
-        title='Process Time (in seconds)', barmode='group',
-        height=_INT_CHART_ROW_SIZE,
+        barmode='group', height=_INT_CHART_ROW_SIZE,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+            yaxis_title='Time(s)')
 
     chart_cost = px.bar(
         df_report, x='Method', y='Cost', color='Transformation',
-        title='Cost (based on length of nucleotides)', barmode='group',
-        height=_INT_CHART_ROW_SIZE,
+        barmode='group', height=_INT_CHART_ROW_SIZE,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+            yaxis_title='Cost($)')
 
     return chart_size, chart_time, chart_cost
 
@@ -79,12 +73,9 @@ def visualize_size_benchmark(df_measure_sum_concat):
     chart_multiplier = px.box(
         df_measure_sum_concat.sort_values('Method'),
         y="Encoding_Multipliers", x='Method',
-        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME,
-        title='File Size Multiplier')
+        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
     chart_multiplier.update_traces(
-        marker_color=_STRING_MULTIPLIER_MARKER_COLOR).update_layout(
-            title={'y': 0.9, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+        marker_color=_STRING_MULTIPLIER_MARKER_COLOR)
     chart_multiplier.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
@@ -107,20 +98,19 @@ def visualize_cost_benchmark_whisker(list_files_chosen, df_concat):
     df_tmp = df_concat[
         df_concat['Filename'].isin(list_files_chosen)].groupby(
             ['Filename', 'Method', 'Transformation',
-                'Size', 'Type']).mean().sort_values('Method').reset_index()
+                'Size', 'Type']).mean().sort_values('Method').reset_index(
+                ).rename(columns={'Cost': 'Cost($)'})
 
     chart_cost = px.box(
         df_tmp,
-        x='Method', y='Cost', color='Transformation', facet_col='Filename',
-        title='Cost (based on length of nucleotides)', facet_col_wrap=4,
+        x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
+        facet_col_wrap=4,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
         template=_STRING_PLOTLY_THEME,
-        category_orders={'Filename': list_files_chosen}).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+        category_orders={'Filename': list_files_chosen})
     chart_cost.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
@@ -143,20 +133,19 @@ def visualize_cost_benchmark_bar(list_files_chosen, df_concat):
     df_tmp = df_concat[
         df_concat['Filename'].isin(list_files_chosen)].groupby(
             ['Filename', 'Method', 'Transformation',
-                'Size', 'Type']).mean().sort_values('Method').reset_index()
+             'Size', 'Type']).mean().sort_values('Method').reset_index(
+             ).rename(columns={'Cost': 'Cost($)'})
 
     chart_cost = px.bar(
         df_tmp,
-        x='Method', y='Cost', color='Transformation', facet_col='Filename',
-        title='Cost (based on length of nucleotides)', facet_col_wrap=4,
+        x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
+        facet_col_wrap=4,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
         template=_STRING_PLOTLY_THEME, barmode='group',
-        category_orders={'Filename': list_files_chosen}).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+        category_orders={'Filename': list_files_chosen})
     chart_cost.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
@@ -178,22 +167,24 @@ def visualize_time_benchmark_whisker(list_files_chosen, df_concat):
     """
 
     df_tmp = df_concat[
-        df_concat['Filename'].isin(list_files_chosen)].sort_values('Method')
+        df_concat['Filename'].isin(list_files_chosen)].sort_values(
+            'Method').rename(columns={'Time': 'log(Time(s))'})
 
     chart_time = px.box(
-        df_tmp, x='Method', y='Time', color='Transformation', log_y=True,
-        title='Process Time (in seconds)', facet_col='Filename',
+        df_tmp, x='Method', y='log(Time(s))', color='Transformation',
+        log_y=True, facet_col='Filename',
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME,
-        category_orders={'Filename': list_files_chosen}).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+        category_orders={'Filename': list_files_chosen})
 
     chart_time.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
+
+    chart_time.for_each_yaxis(
+        lambda yaxis: yaxis.update(title='log(Time(s))'))
 
     return chart_time
 
@@ -213,19 +204,17 @@ def visualize_time_benchmark_bar(list_files_chosen, df_concat):
     """
 
     df_tmp = df_concat[
-        df_concat['Filename'].isin(list_files_chosen)].sort_values('Method')
-
+        df_concat['Filename'].isin(list_files_chosen)].sort_values(
+            'Method').rename(columns={'Time': 'log(Time(s))'})
     chart_time = px.bar(
-        df_tmp, x='Method', y='Time', color='Transformation', log_y=True,
-        title='Process Time (in seconds)', facet_col='Filename',
+        df_tmp, x='Method', y='log(Time(s))', color='Transformation',
+        log_y=True, facet_col='Filename',
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME, barmode='group',
-        category_orders={'Filename': list_files_chosen}).update_layout(
-            title={'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top',
-                   'font': {'size':  _INT_CHART_TITLE_SIZE}})
+        category_orders={'Filename': list_files_chosen})
 
     chart_time.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
