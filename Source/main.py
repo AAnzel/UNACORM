@@ -58,6 +58,7 @@ def create_contact_page():
         None
     """
     st_col_1, st_col_2, st_col_3 = st.columns([1, 2, 1])
+    st_col_2.header('Contact Us')
     st_col_2.markdown(tc.STRING_CONTACT_PAGE)
 
     return None
@@ -71,6 +72,7 @@ def create_about_page():
         None
     """
     st_col_1, st_col_2, st_col_3 = st.columns([1, 2, 1])
+    st_col_2.header('About')
     st_col_2.markdown(tc.STRING_ABOUT_PAGE)
 
     return None
@@ -297,7 +299,7 @@ def main():
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    st_col_1, st_col_2, _ = st.columns([1, 1, 1])
+    st_col_1, st_col_2, _ = st.columns([1, 1, 3])
     st_col_1.title('UNACORM')
     st_col_1.markdown('The **U**nified D**NA** En**co**dings Platfo**rm**')
     st_col_2.markdown('')

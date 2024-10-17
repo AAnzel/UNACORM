@@ -11,17 +11,15 @@ __status__ = 'Stable'
 # flake8: noqa: E501
 
 STRING_CONTACT_PAGE = '''
-    # Contact Us
-
     We appreciate your interest in our project! Here are the best ways to get in touch or contribute.
 
-    ## Project Repository
+    ### Project Repository
 
     Our project is hosted on GitHub. You can find the main repository here:
 
     **GitHub Repository:** [github.com/YourUsername/YourProject](https://github.com/YourUsername/YourProject)
 
-    ## Reporting Issues
+    ### Reporting Issues
 
     If you've encountered a bug or have a feature request, please open an issue on our GitHub repository:
 
@@ -29,7 +27,7 @@ STRING_CONTACT_PAGE = '''
 
     Before creating a new issue, please check if a similar one already exists.
 
-    ## Contributing
+    ### Contributing
 
     We welcome contributions! If you'd like to contribute to the project:
 
@@ -42,25 +40,25 @@ STRING_CONTACT_PAGE = '''
 
     Please review our contribution guidelines before submitting a pull request.
 
-    ## Discussions
+    ### Discussions
 
     For general questions, ideas, or community discussions, please use our GitHub Discussions forum:
 
     **GitHub Discussions:** [github.com/YourUsername/YourProject/discussions](https://github.com/YourUsername/YourProject/discussions)
 
-    ## Project Updates
+    ### Project Updates
 
     Stay updated with our latest releases and announcements:
 
     **Releases:** [github.com/YourUsername/YourProject/releases](https://github.com/YourUsername/YourProject/releases)
 
-    ## Additional Contact Information
+    ### Additional Contact Information
 
     For matters not suitable for GitHub, you can reach us at:
 
     **Email:** [info@yourproject.com](mailto:info@yourproject.com)
 
-    ## Follow Us
+    ### Follow Us
 
     Stay connected with our project:
 
@@ -73,8 +71,6 @@ STRING_CONTACT_PAGE = '''
 '''
 
 STRING_ABOUT_PAGE = '''
-    # DNA Encoding Methods:
-
     * **Simple Code** by Church _et al._
     [DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)
 
