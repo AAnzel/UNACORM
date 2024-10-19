@@ -183,9 +183,6 @@ def visualize_time_benchmark_whisker(list_files_chosen, df_concat):
     chart_time.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
-    chart_time.for_each_yaxis(
-        lambda yaxis: yaxis.update(title='log(Time(s))'))
-
     return chart_time
 
 
