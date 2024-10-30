@@ -203,7 +203,7 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
             list_generated_seq = encoding_simple.encode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
             list_generated_seq = encoding_repetition.encode('', list_np_data)
-        elif str_encoding_method == 'OnlineCode':  # ! Fix
+        elif str_encoding_method == 'OnlineCode':
             list_generated_seq = encoding_online.encode(
                 path_file, list_np_data)[0]
         elif str_encoding_method == 'LTCode':  # ! Fix
@@ -228,7 +228,7 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
             list_generated_seq = encoding_simple.decode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
             list_generated_seq = encoding_repetition.decode('', list_np_data)
-        elif str_encoding_method == 'OnlineCode':  # ! Fix
+        elif str_encoding_method == 'OnlineCode':
             list_generated_seq = encoding_online.decode(
                 path_file, list_np_data)
         elif str_encoding_method == 'LTCode':  # ! Fix
