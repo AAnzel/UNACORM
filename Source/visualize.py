@@ -13,7 +13,7 @@ __status__ = 'Stable'
 
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
 _STRING_PLOTLY_THEME = 'plotly_dark'
-_STRING_MULTIPLIER_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
+_STRING_RATIO_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 
@@ -59,8 +59,8 @@ def visualize_uploaded(df_report):
 
 def visualize_size_benchmark(df_measure_sum_concat):
     """
-    visualize_size_benchmark function is used for visualizing the size
-    multipliers from the benchmarking dataset. These multipliers tell us how
+    visualize_size_benchmark function is used for visualizing the compression
+    ratios from the benchmarking dataset. These ratios tell us how
     much the size of the encoded file differes from the size of the decoded
     file
 
@@ -68,18 +68,18 @@ def visualize_size_benchmark(df_measure_sum_concat):
         df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
 
     Returns:
-        chart_multiplier (px.Chart): chart with size multipliers
+        chart_ratio (px.Chart): chart with compression ratio
     """
-    chart_multiplier = px.box(
+    chart_ratio = px.box(
         df_measure_sum_concat.sort_values('Method'),
-        y="Encoding_Multipliers", x='Method',
+        y="Compression_Ratio", x='Method',
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
-    chart_multiplier.update_traces(
-        marker_color=_STRING_MULTIPLIER_MARKER_COLOR)
-    chart_multiplier.for_each_xaxis(
+    chart_ratio.update_traces(
+        marker_color=_STRING_RATIO_MARKER_COLOR)
+    chart_ratio.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
-    return chart_multiplier
+    return chart_ratio
 
 
 def visualize_cost_benchmark_whisker(list_files_chosen, df_concat):

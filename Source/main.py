@@ -219,7 +219,7 @@ def create_benchmark_page():
     display_processed_data(df_existing_summary, df_existing_detail)
     st.markdown('---')
 
-    st.header('File Size Multiplier', help=tc.STRING_MULTIPLIER_HELP)
+    st.header('Compression Ratio', help=tc.STRING_COMPRESSION_HELP)
     chart = vis.visualize_size_benchmark(df_existing_summary)
     st.plotly_chart(chart, use_container_width=True)
 

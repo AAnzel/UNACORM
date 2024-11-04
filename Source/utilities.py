@@ -363,18 +363,18 @@ def df_generate_summary(df_report):
         pd.DataFrame: DataFrame containing the summary information
     """
     df_summary = df_report.copy(deep=True)
-    df_encoding_multipliers = df_report[[
+    df_compression_ratios = df_report[[
         'Filename', 'Method', 'Transformation', 'Type', 'Size',
         'OriFile_Size']].copy(deep=True)
-    df_encoding_multipliers['Encoding_Multipliers'] = df_encoding_multipliers[
-        'Size'] / df_encoding_multipliers['OriFile_Size']
-    df_encoding_multipliers = df_encoding_multipliers.loc[
+    df_compression_ratios['Compression_Ratio'] = df_compression_ratios[
+        'Size'] / df_compression_ratios['OriFile_Size']
+    df_compression_ratios = df_compression_ratios.loc[
         df_summary['Transformation'] == 'Encoding']
-    df_encoding_multipliers.drop(
+    df_compression_ratios.drop(
         ['Transformation', 'Size', 'OriFile_Size'], axis=1, inplace=True)
-    df_encoding_multipliers = df_encoding_multipliers.groupby(
+    df_compression_ratios = df_compression_ratios.groupby(
         ['Filename', 'Method', 'Type']).agg(
-            {'Encoding_Multipliers': 'first'}).reset_index()
+            {'Compression_Ratio': 'first'}).reset_index()
 
     df_summary.drop(['Size', 'OriFile_Size'], axis=1, inplace=True)
 
@@ -388,7 +388,7 @@ def df_generate_summary(df_report):
         columns={'Time': 'Sum_Mean_Time_s', 'Cost': 'Sum_Cost_$'},
         inplace=True)
     df_summary = df_summary.merge(
-        df_encoding_multipliers,
+        df_compression_ratios,
         on=['Filename', 'Method', 'Type'], how='inner')
 
     return df_summary

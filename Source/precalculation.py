@@ -53,7 +53,7 @@ def run_precalculation(int_num_of_iteration):
         df_existing_summary = pd.DataFrame(
             columns=pd.Series(
                 ['Filename', 'Method', 'Type', 'Sum_Mean_Time_s', 'Sum_Cost_$',
-                 'Encoding_Multipliers', 'Similarity']))
+                 'Compression_Ratio', 'Similarity']))
     if bool_detail_exists:
         df_existing_detail = pd.read_pickle(PATH_EXISTING_DETAIL)
     else:

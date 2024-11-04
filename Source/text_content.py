@@ -107,12 +107,13 @@ STRING_DETAILED_HELP = '''
     across multiple runs.
 '''
 
-STRING_MULTIPLIER_HELP = '''
-    The File Size Multiplier defines how much the size of the encoded file 
+STRING_COMPRESSION_HELP = '''
+    The Compression Ratio defines how much the size of the encoded file 
     differs from the original file size. For example, if the original file size 
     is 100 kB and encoding the file using a certain method produces a file 
-    size of 200 kB, then the File Size Multiplier is 2, indicating that the 
-    encoded file has doubled in size.
+    size of 200 kB, then the Compression Ratio is 2, indicating that the 
+    encoded file has doubled in size. When this value is less then 1 but
+    greater than 0, the encoded file is smaller in size than the original file.
 '''
 
 STRING_COST_HELP = '''
