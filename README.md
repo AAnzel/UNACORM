@@ -147,3 +147,5 @@ Licensed under the GNU General Public License, Version 3.0 ([LICENSE](./LICENSE)
 
 Any contribution intentionally submitted for inclusion in the work by you, shall be licensed under the GNU GPLv3.
 
+**To see how to contribute, please check [CONTRIBUTE.md](CONTRIBUTE.md).**
+
