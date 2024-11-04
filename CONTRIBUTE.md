@@ -14,7 +14,7 @@ Thank you for your interest in contributing to our DNA data storage evaluation t
   ```
 
 ### 3. Implement Your Encoding
-- Your encoding should be implemented in Python or as a Python wrapper. Please add your encoding files in the following directory of the project:
+- Your encoding should be implemented in Python or as a Python wrapper. Please add your encoding files in a separate directory under the following root directory of the project:
 [Source/Encodings/](Source/Encodings/)
   
 - The structure of your code should include two main functions:
@@ -23,14 +23,14 @@ Thank you for your interest in contributing to our DNA data storage evaluation t
   - **Function Name:** `encode(file_path, bool_array)`
   - **Parameters:**
     - `file_path`: Path to the file or a NumPy boolean array representing binary data.
-    - `bool_array`: A boolean array (optional if using file_path).
+    - `bool_array`: A NumPy boolean array (optional if using file_path, but preferred).
   - **Returns:** A list of DNA strings representing the encoded sequence, where each character is from the alphabet {A, C, G, T}.
 
   **Decode Function**
   - **Function Name:** `decode(file_path, list_of_dna_strings)`
   - **Parameters:**
     - `file_path`: Path to the file or a list of DNA strings.
-    - `list_of_dna_strings`: A list of DNA strings (optional if using file_path).
+    - `list_of_dna_strings`: A list of DNA strings (optional if using file_path, but preferred).
   - **Returns:** A NumPy boolean array reconstructing the original binary data.
 
 ### 4. Use OS-Agnostic File Management
@@ -43,7 +43,7 @@ Thank you for your interest in contributing to our DNA data storage evaluation t
 - Once you are satisfied with your changes, commit them with a clear message:
   ```bash
   git add .
-  git commit -m "Add new encoding method for DNA storage"
+  git commit -m "Added: Added new encoding method named ->method name here<-"
   ```
 
 ### 7. Push Your Changes
