@@ -53,7 +53,7 @@ def run_precalculation(int_num_of_iteration):
         df_existing_summary = pd.DataFrame(
             columns=pd.Series(
                 ['Filename', 'Method', 'Type', 'Sum_Mean_Time_s', 'Sum_Cost_$',
-                 'Compression_Ratio', 'Similarity']))
+                 'Information_Density', 'Similarity']))
     if bool_detail_exists:
         df_existing_detail = pd.read_pickle(PATH_EXISTING_DETAIL)
     else:
@@ -87,7 +87,7 @@ def run_precalculation(int_num_of_iteration):
 
             if not bool_file_is_processed:
                 (np_binary_encoding,
-                 int_file_size_bytes) = np_data_to_binary_array(
+                 int_file_size_bits) = np_data_to_binary_array(
                     path_one_file, string_file_name)
 
                 for int_i in range(int_num_of_iteration):
@@ -102,7 +102,7 @@ def run_precalculation(int_num_of_iteration):
                             np_decoded_array) = tuple_pipeline(
                             string_encoding_method, np_binary_encoding,
                             path_one_file, string_file,
-                            int_file_size_bytes, False, 0)
+                            int_file_size_bits, False, 0)
                     except Exception as exc_e:
                         print(exc_e)
                         # If the runtime error happens we have to create dummy

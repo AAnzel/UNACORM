@@ -288,19 +288,12 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
                           for string_dna in list_dna_sequences]
 
     int_cost_encoding = float_calculate_encoding_cost(list_dna_sequences)
-
-    string_encoded_file_name = string_input_file_basename + '_' + \
-        string_encoding_method + '.txt'
-    path_encoded_file = os.path.join(_PATH_ENCODED_DATA,
-                                     string_encoded_file_name)
-    with open(path_encoded_file, 'w') as f:
-        f.writelines(string_dna + '\n' for string_dna in list_dna_sequences)
-
-    int_encoded_file_size = os.path.getsize(path_encoded_file)
+    int_encoded_size = sum(len(string_dna_sequence)
+                           for string_dna_sequence in list_dna_sequences)
 
     list_encoded = [
         string_input_file_basename, string_encoding_method, 'Encoding',
-        '.' + string_file_extension, int_encoded_file_size, int_cost_encoding,
+        '.' + string_file_extension, int_encoded_size, int_cost_encoding,
         int_time_encoding, int_original_size]
 
     list_modified_sequences = []
@@ -328,17 +321,11 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
     int_time_decoding = time.time() - int_start_time
 
     int_cost_decoding = float_calculate_decoding_cost(list_dna_sequences)
-    string_decoded_file_name = string_input_file_basename + '_' + \
-        string_encoding_method + '.npy'
-
-    path_decoded_file = os.path.join(_PATH_DECODED_DATA,
-                                     string_decoded_file_name)
-    np.save(path_decoded_file, np_decoded_dna_sequences)
-    int_decoded_file_size = os.path.getsize(path_decoded_file)
+    int_decoded_size = np_decoded_dna_sequences.shape[0]  # noqa
 
     list_decoded = [
         string_input_file_basename, string_encoding_method, 'Decoding',
-        '.' + string_file_extension, int_decoded_file_size, int_cost_decoding,
+        '.' + string_file_extension, int_decoded_size, int_cost_decoding,
         int_time_decoding, int_original_size]
 
     return list_encoded, list_decoded, np_decoded_dna_sequences
@@ -363,18 +350,18 @@ def df_generate_summary(df_report):
         pd.DataFrame: DataFrame containing the summary information
     """
     df_summary = df_report.copy(deep=True)
-    df_compression_ratios = df_report[[
+    df_information_densities = df_report[[
         'Filename', 'Method', 'Transformation', 'Type', 'Size',
         'OriFile_Size']].copy(deep=True)
-    df_compression_ratios['Compression_Ratio'] = df_compression_ratios[
-        'Size'] / df_compression_ratios['OriFile_Size']
-    df_compression_ratios = df_compression_ratios.loc[
+    df_information_densities['Information_Density'] = df_information_densities[
+        'OriFile_Size'] / df_information_densities['Size']
+    df_information_densities = df_information_densities.loc[
         df_summary['Transformation'] == 'Encoding']
-    df_compression_ratios.drop(
+    df_information_densities.drop(
         ['Transformation', 'Size', 'OriFile_Size'], axis=1, inplace=True)
-    df_compression_ratios = df_compression_ratios.groupby(
+    df_information_densities = df_information_densities.groupby(
         ['Filename', 'Method', 'Type']).agg(
-            {'Compression_Ratio': 'first'}).reset_index()
+            {'Information_Density': 'first'}).reset_index()
 
     df_summary.drop(['Size', 'OriFile_Size'], axis=1, inplace=True)
 
@@ -388,7 +375,7 @@ def df_generate_summary(df_report):
         columns={'Time': 'Sum_Mean_Time_s', 'Cost': 'Sum_Cost_$'},
         inplace=True)
     df_summary = df_summary.merge(
-        df_compression_ratios,
+        df_information_densities,
         on=['Filename', 'Method', 'Type'], how='inner')
 
     return df_summary
@@ -407,8 +394,8 @@ def np_data_to_binary_array(path_original_file, string_file_name):
     Returns:
         binary_numpy_content (np.array): boolean array representing the
         original file
-        int_translated_file_size (int): size of the resulting numpy array on
-        the disk
+        int_translated_file_size (int): length of the resulting numpy array
+        (number of bits)
     """
     np_binary_numpy_content = None
     int_translated_file_size = 0
@@ -420,10 +407,7 @@ def np_data_to_binary_array(path_original_file, string_file_name):
             np_binary_numpy_content = np.frombuffer(
                 np_binary_array_content.unpack(), dtype=bool)
 
-            path_translated_file = os.path.join(_PATH_ORIGINAL_TRANSLATED,
-                                                string_file_name + '.npy')
-            np.save(path_translated_file, np_binary_numpy_content)
-            int_translated_file_size = os.path.getsize(path_translated_file)
+            int_translated_file_size = np_binary_numpy_content.shape[0]
     else:
         raise FileNotFoundError(
             errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)

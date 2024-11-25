@@ -105,7 +105,7 @@ def create_upload_page():
             w.write(imported_file.getvalue())
 
         if os.path.exists(path_input_file):
-            st.success('The file is successfully uploaded.')
+            st.success('The file is successfully uploaded')
 
     string_file_name, string_file_extension = os.path.splitext(
         string_input_file)
@@ -219,8 +219,8 @@ def create_benchmark_page():
     display_processed_data(df_existing_summary, df_existing_detail)
     st.markdown('---')
 
-    st.header('Compression Ratio', help=tc.STRING_COMPRESSION_HELP)
-    chart = vis.visualize_size_benchmark(df_existing_summary)
+    st.header('Information Density', help=tc.STRING_DENSITY_HELP)
+    chart = vis.visualize_density_benchmark(df_existing_summary)
     st.plotly_chart(chart, use_container_width=True)
 
     list_files_to_visualize = list(

@@ -107,13 +107,13 @@ STRING_DETAILED_HELP = '''
     across multiple runs.
 '''
 
-STRING_COMPRESSION_HELP = '''
-    The Compression Ratio defines how much the size of the encoded file 
-    differs from the original file size. For example, if the original file size 
-    is 100 kB and encoding the file using a certain method produces a file 
-    size of 200 kB, then the Compression Ratio is 2, indicating that the 
-    encoded file has doubled in size. When this value is less then 1 but
-    greater than 0, the encoded file is smaller in size than the original file.
+STRING_DENSITY_HELP = '''
+    Information Density measures the difference in size between an encoded file
+    and its original counterpart. For instance, if the original file consists
+    of 300 bits and encoding it using a specific method produces a DNA strand
+    of 100 bases (nucleotides), the Information Density would be 3. A higher
+    value indicates that the encoding method can store more data efficiently,
+    leading to enhanced cost-effectiveness.
 '''
 
 STRING_COST_HELP = '''

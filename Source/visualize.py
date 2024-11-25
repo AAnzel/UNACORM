@@ -13,7 +13,7 @@ __status__ = 'Stable'
 
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
 _STRING_PLOTLY_THEME = 'plotly_dark'
-_STRING_RATIO_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
+_STRING_DENSITY_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 
@@ -38,7 +38,7 @@ def visualize_uploaded(df_report):
         barmode='group', text_auto=True,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE,
-        template=_STRING_PLOTLY_THEME).update_layout(yaxis_title='Size(B)')
+        template=_STRING_PLOTLY_THEME).update_layout(yaxis_title='Size(b)')
 
     chart_time = px.bar(
         df_report, x='Method', y='Time', color='Transformation',
@@ -57,29 +57,30 @@ def visualize_uploaded(df_report):
     return chart_size, chart_time, chart_cost
 
 
-def visualize_size_benchmark(df_measure_sum_concat):
+def visualize_density_benchmark(df_measure_sum_concat):
     """
-    visualize_size_benchmark function is used for visualizing the compression
-    ratios from the benchmarking dataset. These ratios tell us how
-    much the size of the encoded file differes from the size of the decoded
-    file
+    visualize_density_benchmark function is used for visualizing the
+    information densities from the benchmarking dataset. These densities tell
+    us how much the size of the encoded file differes from the size of the
+    decoded file
 
     Args:
         df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
 
     Returns:
-        chart_ratio (px.Chart): chart with compression ratio
+        chart_density (px.Chart): chart with information density
     """
-    chart_ratio = px.box(
+    chart_density = px.box(
         df_measure_sum_concat.sort_values('Method'),
-        y="Compression_Ratio", x='Method',
+        y="Information_Density", x='Method',
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
-    chart_ratio.update_traces(
-        marker_color=_STRING_RATIO_MARKER_COLOR)
-    chart_ratio.for_each_xaxis(
+    chart_density.update_traces(
+        marker_color=_STRING_DENSITY_MARKER_COLOR)
+    chart_density.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
+    chart_density.update_layout(yaxis_title='Information_Density(b/nt)')
 
-    return chart_ratio
+    return chart_density
 
 
 def visualize_cost_benchmark_whisker(list_files_chosen, df_concat):

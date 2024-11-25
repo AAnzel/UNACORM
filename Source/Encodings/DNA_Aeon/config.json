@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1729155407_0225_Dorn.txt",
+        "input": "../Data/Uploaded/1732544668_3768268_Around_the_World_in_Eighty_Days.txt",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",
