@@ -79,7 +79,7 @@ def visualize_density_benchmark(df_measure_sum_concat):
     chart_density.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
     chart_density.update_layout(yaxis_title='Information_Density(b/nt)')
-
+    # TODO: Make it into a bar chart for uploaded data
     return chart_density
 
 

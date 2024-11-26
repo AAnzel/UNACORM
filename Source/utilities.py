@@ -174,11 +174,11 @@ def float_calculate_decoding_cost(
 
 
 @st.cache_data
-def list_encode_decode(str_encoding_method, list_np_data, path_file,
-                       bool_encode):
+def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
+                          bool_encode):
     """
-    list_encode_decode function encodes or decodes the data using all encoding
-    methods
+    np_list_encode_decode function encodes or decodes the data using all
+    encoding methods
 
     Args:
         str_encoding_method (str): chosen encoding method
@@ -189,31 +189,32 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
         decoding
 
     Returns:
-        list_generated_seq (list): encoded DNA list if encoding, or numpy
-        boolean array if decoding
+        np_list_generated_seq (list): list of encoded DNA sequences if
+        encoding, or numpy boolean array if decoding
     """
-    list_generated_seq = []
+    np_list_generated_seq = [] if bool_encode else np.array([])
 
     if bool_encode:
         if str_encoding_method == 'The2DCode':
-            list_generated_seq = encoding_2d.encode('', list_np_data)
+            np_list_generated_seq = encoding_2d.encode('', list_np_data)
         elif str_encoding_method == 'XORBasedCode':
-            list_generated_seq = encoding_xor.encode('', list_np_data)
+            np_list_generated_seq = encoding_xor.encode('', list_np_data)
         elif str_encoding_method == 'SimpleCode':
-            list_generated_seq = encoding_simple.encode('', list_np_data)
+            np_list_generated_seq = encoding_simple.encode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
-            list_generated_seq = encoding_repetition.encode('', list_np_data)
+            np_list_generated_seq = encoding_repetition.encode(
+                '', list_np_data)
         elif str_encoding_method == 'OnlineCode':
-            list_generated_seq = encoding_online.encode(
+            np_list_generated_seq = encoding_online.encode(
                 path_file, list_np_data)[0]
         elif str_encoding_method == 'LTCode':  # ! Fix
-            list_generated_seq = encoding_lt.encode(
+            np_list_generated_seq = encoding_lt.encode(
                  path_file, list_np_data)[0]
         elif str_encoding_method == 'RaptorCode':
-            list_generated_seq = encoding_raptor.encode(
+            np_list_generated_seq = encoding_raptor.encode(
                 path_file, list_np_data)[0]
         elif str_encoding_method == 'DNA_Aeon':
-            list_generated_seq = encoding_dnaaeon.encode(
+            np_list_generated_seq = encoding_dnaaeon.encode(
                 path_file, '')
         else:
             print('Encoding method ' + str_encoding_method +
@@ -221,31 +222,32 @@ def list_encode_decode(str_encoding_method, list_np_data, path_file,
             pass
     else:
         if str_encoding_method == 'The2DCode':
-            list_generated_seq = encoding_2d.decode('', list_np_data)
+            np_list_generated_seq = encoding_2d.decode('', list_np_data)
         elif str_encoding_method == 'XORBasedCode':
-            list_generated_seq = encoding_xor.decode('', list_np_data)
+            np_list_generated_seq = encoding_xor.decode('', list_np_data)
         elif str_encoding_method == 'SimpleCode':
-            list_generated_seq = encoding_simple.decode('', list_np_data)
+            np_list_generated_seq = encoding_simple.decode('', list_np_data)
         elif str_encoding_method == 'RepetitionCode':
-            list_generated_seq = encoding_repetition.decode('', list_np_data)
+            np_list_generated_seq = encoding_repetition.decode(
+                '', list_np_data)
         elif str_encoding_method == 'OnlineCode':
-            list_generated_seq = encoding_online.decode(
+            np_list_generated_seq = encoding_online.decode(
                 path_file, list_np_data)
         elif str_encoding_method == 'LTCode':  # ! Fix
-            list_generated_seq = encoding_lt.decode(
+            np_list_generated_seq = encoding_lt.decode(
                  path_file, list_np_data)
         elif str_encoding_method == 'RaptorCode':
-            list_generated_seq = encoding_raptor.decode(
+            np_list_generated_seq = encoding_raptor.decode(
                 path_file, list_np_data)
         elif str_encoding_method == 'DNA_Aeon':
-            list_generated_seq = encoding_dnaaeon.decode(
+            np_list_generated_seq = encoding_dnaaeon.decode(
                 '', list_np_data)
         else:
             print('Encoding method ' + str_encoding_method +
                   ' is not implemented')
             pass
 
-    return list_generated_seq
+    return np_list_generated_seq
 
 
 @st.cache_data
@@ -280,7 +282,7 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
 
     # We time the encoding process
     int_start_time = time.time()
-    list_dna_sequences = list_encode_decode(
+    list_dna_sequences = np_list_encode_decode(
         string_encoding_method, np_bit_array, path_input_file, True)
     int_time_encoding = time.time() - int_start_time
 
@@ -315,13 +317,13 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
 
     # We time the decoding process
     int_start_time = time.time()
-    np_decoded_dna_sequences = list_encode_decode(
+    np_decoded_dna_sequences = np_list_encode_decode(
         string_encoding_method, list_modified_sequences, path_input_file,
         False)
     int_time_decoding = time.time() - int_start_time
 
     int_cost_decoding = float_calculate_decoding_cost(list_dna_sequences)
-    int_decoded_size = np_decoded_dna_sequences.shape[0]  # noqa
+    int_decoded_size = np_decoded_dna_sequences.shape[0]
 
     list_decoded = [
         string_input_file_basename, string_encoding_method, 'Decoding',

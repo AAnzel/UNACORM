@@ -189,6 +189,9 @@ def create_upload_page():
         (chart_size, chart_time,
          chart_cost) = vis.visualize_uploaded(df_new_detail)
 
+        st.header('Information Density', help=tc.STRING_DENSITY_HELP)
+        chart = vis.visualize_density_benchmark(df_new_summary)
+        st.plotly_chart(chart, use_container_width=True)
         st.header('Size', help=tc.STRING_SIZE_HELP)
         st.plotly_chart(chart_size, use_container_width=True)
         st.header('Time', help=tc.STRING_TIME_HELP)
