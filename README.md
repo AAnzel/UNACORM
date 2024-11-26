@@ -82,6 +82,7 @@ The data located in [Data/Original/](Data/Original/) was used to test and benchm
 | [Source/text_content.py](/Source/text_content.py) | contains only various markdown strings that are used to build some pages or provide help tootlips |
 | [Source/precalculation.py](/Source/precalculation.py) | contains the code that precalculates the benchmark files [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) and [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) |
 | [Source/mesa_call.py](/Source/mesa_call.py) | contains the code that implements [MESA](https://mesa.mosla.de/) API calls using  [Source/mesa.json](/Source/mesa.json) configuration |
+| [Source/simulate_errors.py](/Source/simulate_errors.py) | contains the code that implements DNA error simulation which replaces MESA script if necessary |
 
 We would like to thank the authors of the encoding methods (located at [Source/Encodings](Source/Encodings)) for helping us integrate them into our platform. We acknowledge their contributions in the table below.
 
