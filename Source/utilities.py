@@ -44,8 +44,14 @@ _PATH_DECODED_DATA = os.path.join(PATH_ROOT_DATA, 'Decoded')
 _PATH_UPLOADED_DATA = os.path.join(PATH_ROOT_DATA, 'Uploaded')
 _PATH_ENCODING_METHODS = os.path.join('Encodings')
 
-_UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
+
+_FLOAT_ILLUMINA_COST_PER_BASE = 0.000015
+_FLOAT_NANOPORE_COST_PER_BASE = 0.000025
+_FLOAT_PACBIO_COST_PER_BASE = 0.000035
 _INT_SEQUENCING_COVERAGE = 100
+_FLOAT_SYNTHESIS_COST_PER_BASE = 0.1
+
+_UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 encoding_2d = encoding_2d_tmp.api()
 
 _LIST_PASS_METHODS = []
@@ -112,9 +118,10 @@ def float_calculate_encoding_cost(list_dna_sequences):
     """
     # Total Cost = (For Each Oligo) x (Length per Oligo) x (Cost per Base)
     # Cost per Base = $0.10 per base
+    # Twist Bioscience price model
     # Bulk Discount: 10% discount for orders exceeding 100,000 bases
 
-    float_cost_per_base = 0.1
+    float_cost_per_base = _FLOAT_SYNTHESIS_COST_PER_BASE
     int_total_base_pairs = sum([len(string_dna_sequence.strip())
                                 for string_dna_sequence in
                                 list_dna_sequences])
@@ -157,11 +164,11 @@ def float_calculate_decoding_cost(
 
     float_cost_per_base = 0
     if string_technology == 'Illumina':
-        float_cost_per_base = 0.000015
+        float_cost_per_base = _FLOAT_ILLUMINA_COST_PER_BASE
     elif string_technology == 'Nanopore':
-        float_cost_per_base = 0.000025
+        float_cost_per_base = _FLOAT_NANOPORE_COST_PER_BASE
     elif string_technology == 'PacBio':
-        float_cost_per_base = 0.000035
+        float_cost_per_base = _FLOAT_PACBIO_COST_PER_BASE
     else:
         raise RuntimeError('ERROR: Bad technology string for sequencing!')
 
