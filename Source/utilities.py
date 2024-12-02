@@ -330,7 +330,7 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
     int_time_decoding = time.time() - int_start_time
 
     int_cost_decoding = float_calculate_decoding_cost(list_dna_sequences)
-    int_decoded_size = np_decoded_dna_sequences.shape[0]
+    int_decoded_size = len(np_decoded_dna_sequences)
 
     list_decoded = [
         string_input_file_basename, string_encoding_method, 'Decoding',
