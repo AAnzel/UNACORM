@@ -173,10 +173,6 @@ def list_modify_sequences(list_seqs, int_number_of_subs, int_number_of_dels,
 
     int_total_number_of_nucleotides = sum([len(string_seq)
                                            for string_seq in list_seqs])
-    # Assuming all seqs have the same length
-    # TODO: ADAPT THIS FOR SEQUENCES WITH VARYING LENGTH OR CHECK IF THEY ARE
-    # TODO: ALWAYS THE SAME LENGTH
-    int_one_seq_len = len(list_seqs[0])
 
     numpy_all_positions_subs = np.random.choice(
         int_total_number_of_nucleotides, int_number_of_subs, replace=False)
@@ -185,21 +181,22 @@ def list_modify_sequences(list_seqs, int_number_of_subs, int_number_of_dels,
     numpy_all_positions_dels = np.random.choice(
         int_total_number_of_nucleotides, int_number_of_dels, replace=False)
 
-    int_mult = 1
     list_modified_seqs = []
+    int_current_low = 0
+    int_current_high = 0
     for string_seq in list_seqs:
-        int_current_low = int_one_seq_len * (int_mult - 1)
-        int_current_high = int_one_seq_len * int_mult
+        int_one_seq_len = len(string_seq)
+        int_current_high += int_one_seq_len
 
-        list_positions_sub = [int_num % int_one_seq_len
+        list_positions_sub = [int_num - int_current_low - 1
                               for int_num in numpy_all_positions_subs
                               if
                               (int_current_high >= int_num > int_current_low)]
-        list_positions_ins = [int_num % int_one_seq_len
+        list_positions_ins = [int_num - int_current_low - 1
                               for int_num in numpy_all_positions_ins
                               if
                               (int_current_high >= int_num > int_current_low)]
-        list_positions_del = [int_num % int_one_seq_len
+        list_positions_del = [int_num - int_current_low - 1
                               for int_num in numpy_all_positions_dels
                               if
                               (int_current_high >= int_num > int_current_low)]
@@ -207,7 +204,8 @@ def list_modify_sequences(list_seqs, int_number_of_subs, int_number_of_dels,
         list_modified_seqs.append(
             string_modify_sequence(string_seq, list_positions_sub,
                                    list_positions_ins, list_positions_del))
-        int_mult += 1
+
+        int_current_low = int_current_high
 
     return list_modified_seqs
 
