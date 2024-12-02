@@ -5,7 +5,7 @@ from copy import deepcopy
 
 __author__ = ['Aleksandar Anžel']
 __copyright__ = ''
-__credits__ = ['Aleksandar Anžel', 'Chisom Ezekannagha']
+__credits__ = ['Aleksandar Anžel', 'Marius Welzel', 'Chisom Ezekannagha']
 __license__ = 'GNU General Public License v3.0'
 __version__ = '1.0.0'
 __maintainer__ = 'Aleksandar Anžel'
@@ -252,8 +252,8 @@ def tuple_simulate_errors(list_encoded_sequences, float_multiplier=1):
          dict_results["Number_of_deletions"],
          dict_results["Number_of_insertions"]])
 
-    float_base_error_ratio = dict_results["Total_number_of_errors"] /\
-        dict_results["Total_number_of_nucleotides"]
+    dict_results["Base_error_ratio"] = dict_results[
+        "Total_number_of_errors"] / dict_results["Total_number_of_nucleotides"]
 
     list_modified_seqs = list_modify_sequences(
         list_encoded_sequences, dict_results["Number_of_substitutions"],
@@ -261,4 +261,4 @@ def tuple_simulate_errors(list_encoded_sequences, float_multiplier=1):
         dict_results["Number_of_insertions"])
     # print(dict_results)
 
-    return list_modified_seqs, float_base_error_ratio
+    return list_modified_seqs, dict_results

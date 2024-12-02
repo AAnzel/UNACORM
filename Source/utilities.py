@@ -52,7 +52,7 @@ _INT_SEQUENCING_COVERAGE = 100
 _FLOAT_SYNTHESIS_COST_PER_BASE = 0.1
 
 _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
-encoding_2d = encoding_2d_tmp.api()
+encoding_2d = encoding_2d_tmp.api()  # Required because of the implementation
 
 _LIST_PASS_METHODS = []
 LIST_ENCODING_METHODS = []
