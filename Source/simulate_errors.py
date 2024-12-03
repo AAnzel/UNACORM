@@ -27,7 +27,8 @@ def dict_initialize_probabilities(float_multiplier):
         float_multiplier (float): Multiplier increases or decreases
         probability of each error happening by its value. If it is higher than
         1 then it increases the chances of errors happening. If it is less than
-        1 but greater than 0, then it decreases the error probabilites.
+        1 but greater than 0, then it decreases the error probabilites. If it
+        is 0, then no errors are simulated.
 
     Returns:
         dict: A dictionary containig the probability of each error happening.
@@ -210,7 +211,7 @@ def list_modify_sequences(list_seqs, int_number_of_subs, int_number_of_dels,
     return list_modified_seqs
 
 
-def tuple_simulate_errors(list_encoded_sequences, float_multiplier=1):
+def tuple_simulate_errors(list_encoded_sequences, float_multiplier=0):
     """
     tuple_simulate_errors takes a list of DNA sequences and an error multiplier
     and returns a list of degraded sequences with the base error ratio
@@ -221,8 +222,8 @@ def tuple_simulate_errors(list_encoded_sequences, float_multiplier=1):
         float_multiplier (float, optional): Multiplier increases or decreases
         probability of each error happening by its value. If it is higher than
         1 then it increases the chances of errors happening. If it is less than
-        1 but greater than 0, then it decreases the error probabilites.
-        Defaults to 1.
+        1 but greater than 0, then it decreases the error probabilites. If it
+        is 0, then no errors are simulated. Defaults to 0.
 
     Returns:
         tuple: The first element of a tuple is a list of degraded sequences,

@@ -16,8 +16,9 @@ from Encodings.RaptorCode import unified_dna_online as encoding_online
 from Encodings.RaptorCode import unified_dna_raptor as encoding_raptor
 from Encodings.DNA_Aeon import unified as encoding_dnaaeon
 
-# Importing MESA
+# Importing error simulation scripts
 import mesa_call
+import simulate_errors
 
 
 __author__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian']
@@ -50,6 +51,7 @@ _FLOAT_NANOPORE_COST_PER_BASE = 0.000025
 _FLOAT_PACBIO_COST_PER_BASE = 0.000035
 _INT_SEQUENCING_COVERAGE = 100
 _FLOAT_SYNTHESIS_COST_PER_BASE = 0.1
+LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
 
 _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 encoding_2d = encoding_2d_tmp.api()  # Required because of the implementation
@@ -211,18 +213,17 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'RepetitionCode':
             np_list_generated_seq = encoding_repetition.encode(
                 '', list_np_data)
-        elif str_encoding_method == 'OnlineCode':
+        elif str_encoding_method == 'OnlineCode':  # TODO: Tweak hyperparameter
             np_list_generated_seq = encoding_online.encode(
                 path_file, list_np_data)[0]
-        elif str_encoding_method == 'LTCode':  # ! Fix
+        elif str_encoding_method == 'LTCode':  # TODO: Tweak hyperparameters
             np_list_generated_seq = encoding_lt.encode(
                  path_file, list_np_data)[0]
         elif str_encoding_method == 'RaptorCode':
             np_list_generated_seq = encoding_raptor.encode(
                 path_file, list_np_data)[0]
         elif str_encoding_method == 'DNA_Aeon':
-            np_list_generated_seq = encoding_dnaaeon.encode(
-                path_file, '')
+            np_list_generated_seq = encoding_dnaaeon.encode(path_file, '')
         else:
             print('Encoding method ' + str_encoding_method +
                   ' is not implemented')
@@ -237,21 +238,20 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
         elif str_encoding_method == 'RepetitionCode':
             np_list_generated_seq = encoding_repetition.decode(
                 '', list_np_data)
-        elif str_encoding_method == 'OnlineCode':
+        elif str_encoding_method == 'OnlineCode':  # TODO: Tweak hyperparameter
             np_list_generated_seq = encoding_online.decode(
                 path_file, list_np_data)
-        elif str_encoding_method == 'LTCode':  # ! Fix
+        elif str_encoding_method == 'LTCode':  # TODO: Tweak hyperparameters
             np_list_generated_seq = encoding_lt.decode(
                  path_file, list_np_data)
         elif str_encoding_method == 'RaptorCode':
             np_list_generated_seq = encoding_raptor.decode(
                 path_file, list_np_data)
         elif str_encoding_method == 'DNA_Aeon':
-            np_list_generated_seq = encoding_dnaaeon.decode(
-                '', list_np_data)
+            np_list_generated_seq = encoding_dnaaeon.decode('', list_np_data)
         else:
-            print('Encoding method ' + str_encoding_method +
-                  ' is not implemented')
+            print('Encoding method ' + str_encoding_method
+                  + ' is not implemented')
             pass
 
     return np_list_generated_seq
@@ -260,7 +260,7 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
 @st.cache_data
 def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
                    string_file_name, int_original_size, bool_simulate_error,
-                   int_storage_length):
+                   bool_use_mesa, int_storage_length, float_error_multiplier):
     """
     tuple_pipeline function is used for integrating the encoding/decoding
     process for one file
@@ -270,11 +270,18 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         np_bit_array (array): numpy boolean array of uploaded file
         path_input_file (str): path of uploaded data
         string_file_name (str): the base name of the file with extension
-        int_original_size (number): size of original file
+        int_original_size (int): size of original file
         bool_simulate_error (bool): if True, MESA call is invoked and error
         simulation initiated. If False, DNA sequences are not modified
+        bool_use_mesa (bool): if True and bool_simulate_error is True, MESA
+        call is invoked, else error simulation is conducted using
+        simulate_errrors.py script
         int_storage_length (int): number of years for simulating DNA
-        degradation. Used only if bool_simulate_error is True
+        degradation. Used only if bool_simulate_error and bool_use_mesa are
+        True
+        float_error_multiplier (float): number that increases or decreases the
+        probability of errors. Used only if bool_simulate_error is True and
+        bool_use_mesa is False
 
     Returns:
         list_encoded (list): list of result from encoding process including
@@ -283,6 +290,8 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         time, cost, and size
         np_decoded_dna_sequences (np.array): numpy boolean array containing
         decoded sequences
+        dict_error_results (dict): dictionary containing error information
+        if bool_simulate_error is True, else it is empty
     """
     string_input_file_basename = os.path.splitext(string_file_name)[0]
     string_file_extension = os.path.splitext(string_file_name)[1][1:]
@@ -306,21 +315,29 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         int_time_encoding, int_original_size]
 
     list_modified_sequences = []
+    dict_error_results = {}
     if not bool_simulate_error:
         list_modified_sequences = list_dna_sequences
     else:
-        string_progress_text = ''
-        st_progress_bar = st.progress(0, text=string_progress_text)
-        int_num_of_sequences = len(list_dna_sequences)
-        for int_i in range(int_num_of_sequences):
-            st_progress_bar.progress(
-                (int_i + 1) / int_num_of_sequences,
-                text=('Sequence ' + str(int_i + 1) + ' of ' +
-                      str(int_num_of_sequences)))
-            list_modified_sequences.append(
-                mesa_call.string_api_call([list_dna_sequences[int_i]],
-                                          int_storage_length))
-        st_progress_bar.empty()
+        if bool_use_mesa:
+            string_progress_text = ''
+            st_progress_bar = st.progress(0, text=string_progress_text)
+            int_num_of_sequences = len(list_dna_sequences)
+            for int_i in range(int_num_of_sequences):
+                st_progress_bar.progress(
+                    (int_i + 1) / int_num_of_sequences,
+                    text=('Sequence ' + str(int_i + 1) + ' of '
+                          + str(int_num_of_sequences)))
+
+                list_modified_sequences.append(
+                    mesa_call.string_api_call([list_dna_sequences[int_i]],
+                                              int_storage_length))
+            st_progress_bar.empty()
+
+        else:
+            (list_modified_sequences,
+             dict_error_results) = simulate_errors.tuple_simulate_errors(
+                list_dna_sequences, float_error_multiplier)
 
     # We time the decoding process
     int_start_time = time.time()
@@ -337,7 +354,8 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         '.' + string_file_extension, int_decoded_size, int_cost_decoding,
         int_time_decoding, int_original_size]
 
-    return list_encoded, list_decoded, np_decoded_dna_sequences
+    return (list_encoded, list_decoded, np_decoded_dna_sequences,
+            dict_error_results)
 
 
 @st.cache_data
@@ -375,14 +393,29 @@ def df_generate_summary(df_report):
     df_summary.drop(['Size', 'OriFile_Size'], axis=1, inplace=True)
 
     df_summary = df_summary.groupby(
-        ['Filename', 'Method', 'Transformation', 'Type', 'Similarity']).agg(
-            {'Time': 'mean', 'Cost': 'mean'}).reset_index()
+        ['Filename', 'Method', 'Transformation', 'Type', 'Similarity',
+         'Error_Multiplier']).agg(
+            {'Time': 'mean', 'Cost': 'mean',
+             'Number_of_substitutions': 'first',
+             'Number_of_deletions': 'first', 'Number_of_insertions': 'first',
+             'Total_number_of_errors': 'first', 'Base_error_ratio': 'first'}
+            ).reset_index()
     df_summary = df_summary.groupby(
-        ['Filename', 'Method', 'Type', 'Similarity']).agg(
-            {'Time': 'sum', 'Cost': 'sum'}).reset_index()
+        ['Filename', 'Method', 'Type', 'Similarity',
+         'Error_Multiplier']).agg(
+            {'Time': 'sum', 'Cost': 'sum', 'Number_of_substitutions': 'first',
+             'Number_of_deletions': 'first', 'Number_of_insertions': 'first',
+             'Total_number_of_errors': 'first', 'Base_error_ratio': 'first'}
+            ).reset_index()
     df_summary.rename(
-        columns={'Time': 'Sum_Mean_Time_s', 'Cost': 'Sum_Cost_$'},
+        columns={'Time': 'Sum_Mean_Time_s', 'Cost': 'Sum_Cost_$',
+                 'Number_of_substitutions': 'Mean_Num_of_Subs',
+                 'Number_of_deletions': 'Mean_Num_of_Dels',
+                 'Number_of_insertions': 'Mean_Num_of_Ins',
+                 'Total_number_of_errors': 'Mean_Num_of_Errors',
+                 'Base_error_ratio': 'Mean_Base_Error_Ratio'},
         inplace=True)
+
     df_summary = df_summary.merge(
         df_information_densities,
         on=['Filename', 'Method', 'Type'], how='inner')

@@ -130,7 +130,17 @@ def create_upload_page():
 
     int_chosen_storage_length = st.number_input(
         'Choose length of storage (in months) or leave it empty to skip',
-        value=None, min_value=1, step=1)
+        value=None, min_value=1, step=1, disabled=True)
+
+    float_error_multiplier = st.number_input(
+        'Choose error multiplier value or leave it empty to skip',
+        value=None, min_value=0.5, max_value=5, step=0.5)
+
+    if (int_chosen_storage_length is not None
+            or float_error_multiplier is not None):
+        bool_simulate_errors = True
+    else:
+        bool_simulate_errors = False
 
     df_new_detail = None
     df_new_summary = None
@@ -146,11 +156,13 @@ def create_upload_page():
             list_encoded_info = []
             try:
                 (list_encoded_info, list_decoded_info,
-                    np_decoded_array) = uti.tuple_pipeline(
-                    string_encoding_method, np_binary_encoding,
-                    path_input_file, string_input_file, original_file_size,
-                    True if int_chosen_storage_length is not None else False,
-                    int_chosen_storage_length)
+                 np_decoded_array, dict_error_results) = uti.tuple_pipeline(
+                     string_encoding_method, np_binary_encoding,
+                     path_input_file, string_input_file, original_file_size,
+                     bool_simulate_errors,
+                     False,  # TODO: Add logic for this
+                     int_chosen_storage_length,
+                     float_error_multiplier)
             except Exception as exc_e:
                 print(exc_e)
                 list_cannot_encode_decode.append(string_encoding_method)
@@ -175,9 +187,12 @@ def create_upload_page():
 
         df_new_detail = pd.DataFrame(
             list_results,
-            columns=pd.Series(['Filename', 'Method', 'Transformation', 'Type',
-                               'Size', 'Cost', 'Time', 'OriFile_Size',
-                               'Similarity']))
+            columns=pd.Series(
+                ['Filename', 'Method', 'Transformation', 'Type', 'Size',
+                 'Cost', 'Time', 'OriFile_Size', 'Similarity',
+                 'Error_Multiplier', 'Number_of_substitutions',
+                 'Number_of_deletions', 'Number_of_insertions',
+                 'Total_number_of_errors', 'Base_error_ratio']))
 
         df_new_summary = uti.df_generate_summary(df_new_detail)
 
@@ -200,7 +215,7 @@ def create_upload_page():
         st.plotly_chart(chart_cost, use_container_width=True)
 
     elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
-        st.error('Choose a file and length of storage first.')
+        st.error('Choose a file and length of storage first.')  # TODO: Change
     else:
         pass
 

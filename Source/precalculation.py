@@ -6,7 +6,7 @@ import streamlit as st
 from utilities import PATH_ORIGINAL_DATA, LIST_ENCODING_METHODS
 from utilities import PATH_EXISTING_SUMMARY, PATH_EXISTING_DETAIL
 from utilities import np_data_to_binary_array, tuple_pipeline
-from utilities import df_generate_summary
+from utilities import df_generate_summary, LIST_FLOAT_ERROR_MULTIPLIERS
 
 
 __author__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian']
@@ -53,79 +53,121 @@ def run_precalculation(int_num_of_iteration):
         df_existing_summary = pd.DataFrame(
             columns=pd.Series(
                 ['Filename', 'Method', 'Type', 'Sum_Mean_Time_s', 'Sum_Cost_$',
-                 'Information_Density', 'Similarity']))
+                 'Information_Density', 'Similarity', 'Error_Multiplier',
+                 'Mean_Num_of_Subs', 'Mean_Num_of_Dels', 'Mean_Num_of_Ins',
+                 'Mean_Num_of_Errors', 'Mean_Base_Error_Ratio']))
     if bool_detail_exists:
         df_existing_detail = pd.read_pickle(PATH_EXISTING_DETAIL)
     else:
         df_existing_detail = pd.DataFrame(
             columns=pd.Series(
                 ['Filename', 'Method', 'Transformation', 'Type', 'Size',
-                 'Cost', 'Time', 'OriFile_Size', 'Similarity']))
+                 'Cost', 'Time', 'OriFile_Size', 'Similarity',
+                 'Error_Multiplier', 'Number_of_substitutions',
+                 'Number_of_deletions', 'Number_of_insertions',
+                 'Total_number_of_errors', 'Base_error_ratio']))
 
     list_results = []
     list_original_files = os.listdir(PATH_ORIGINAL_DATA)
     int_total_runs = len(list_original_files) * len(LIST_ENCODING_METHODS) *\
-        int_num_of_iteration
-    # We list original files
+        int_num_of_iteration * len(LIST_FLOAT_ERROR_MULTIPLIERS)
+    # We go through error multipliers and list original files
     int_counter = 1
-    for string_file in list_original_files:
-        path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-        string_file_name, string_file_extension = os.path.splitext(
-            string_file)
+    for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
+        for string_file in list_original_files:
+            path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
+            string_file_name, string_file_extension = os.path.splitext(
+                string_file)
 
-        if not os.path.isfile(path_one_file):
-            continue
+            if not os.path.isfile(path_one_file):
+                continue
 
-        for string_encoding_method in LIST_ENCODING_METHODS:
-            # We check if we already processed the file with a specific
-            # encoding method
-            bool_file_is_processed = len(
-                df_existing_summary[
-                    (df_existing_summary["Filename"] == string_file_name) &
-                    (df_existing_summary["Method"] == string_encoding_method)]
-                ) != 0
+            for string_encoding_method in LIST_ENCODING_METHODS:
+                # We check if we already processed the file with a specific
+                # encoding method
+                bool_file_is_processed = len(
+                    df_existing_summary[
+                        (df_existing_summary["Filename"] == string_file_name) &
+                        (df_existing_summary["Method"]
+                         == string_encoding_method) &
+                        (df_existing_summary['Error_Multiplier']
+                         == float_error_multiplier)]) != 0
 
-            if not bool_file_is_processed:
-                (np_binary_encoding,
-                 int_file_size_bits) = np_data_to_binary_array(
-                    path_one_file, string_file_name)
+                if not bool_file_is_processed:
+                    (np_binary_encoding,
+                     int_file_size_bits) = np_data_to_binary_array(
+                         path_one_file, string_file_name)
 
-                for int_i in range(int_num_of_iteration):
-                    st_progress_bar.progress(
-                        int_counter / int_total_runs,
-                        text=(string_file + '_' + string_encoding_method +
-                              '_' + str(int_i)))
-                    int_counter += 1
+                    for int_i in range(int_num_of_iteration):
+                        st_progress_bar.progress(
+                            int_counter / int_total_runs,
+                            text=('[' + str(int_counter) + '/'
+                                  + str(int_total_runs) + '] ' + string_file
+                                  + '_' + string_encoding_method
+                                  + '_MULT: ' + str(float_error_multiplier)
+                                  + '_RUN: ' + str(int_i)))
+                        int_counter += 1
+                        print('\n[' + str(int_counter) + '/'
+                              + str(int_total_runs) + '] ' + string_file
+                              + '_' + string_encoding_method
+                              + '_MULT: ' + str(float_error_multiplier)
+                              + '_RUN: ' + str(int_i) + '\n')
 
-                    try:
-                        (list_encoded_info, list_decoded_info,
-                            np_decoded_array) = tuple_pipeline(
-                            string_encoding_method, np_binary_encoding,
-                            path_one_file, string_file,
-                            int_file_size_bits, False, 0)
-                    except Exception as exc_e:
-                        print(exc_e)
-                        # If the runtime error happens we have to create dummy
-                        # data
-                        list_encoded_info = [
-                            string_file_name, string_encoding_method,
-                            'Encoding', string_file_extension,
-                            None, None, None, None]
-                        list_decoded_info = list_encoded_info
-                        list_decoded_info[2] = 'Decoding'
-                        np_decoded_array = np.array([])
+                        try:
+                            # Error simulation without MESA
+                            (list_encoded_info, list_decoded_info,
+                             np_decoded_array,
+                             dict_error_results) = tuple_pipeline(
+                                 string_encoding_method, np_binary_encoding,
+                                 path_one_file, string_file,
+                                 int_file_size_bits, True, False, None,
+                                 float_error_multiplier)
+                        except Exception as exc_e:
+                            print(exc_e)
+                            # If the runtime error happens we have to create
+                            # dummy data
+                            list_encoded_info = [
+                                string_file_name, string_encoding_method,
+                                'Encoding', string_file_extension,
+                                None, None, None, None]
+                            list_decoded_info = list_encoded_info
+                            list_decoded_info[2] = 'Decoding'
+                            np_decoded_array = np.array([])
+                            dict_error_results = {
+                                'Number_of_substitutions': 0,
+                                'Number_of_deletions': 0,
+                                'Number_of_insertions': 0,
+                                'Total_number_of_errors': 0,
+                                'Base_error_ratio': 0}
 
-                    bool_similar_files = np.array_equal(
-                        np_binary_encoding, np_decoded_array)
-                    list_results.append(list_encoded_info +
-                                        [bool_similar_files])
-                    list_results.append(list_decoded_info +
-                                        [bool_similar_files])
+                        bool_similar_files = np.array_equal(
+                            np_binary_encoding, np_decoded_array)
+                        list_results.append(
+                            list_encoded_info
+                            + [bool_similar_files,
+                               float_error_multiplier,
+                               dict_error_results['Number_of_substitutions'],
+                               dict_error_results['Number_of_deletions'],
+                               dict_error_results['Number_of_insertions'],
+                               dict_error_results['Total_number_of_errors'],
+                               dict_error_results['Base_error_ratio']])
+                        list_results.append(
+                            list_decoded_info
+                            + [bool_similar_files,
+                               float_error_multiplier,
+                               dict_error_results['Number_of_substitutions'],
+                               dict_error_results['Number_of_deletions'],
+                               dict_error_results['Number_of_insertions'],
+                               dict_error_results['Total_number_of_errors'],
+                               dict_error_results['Base_error_ratio']])
 
     df_new_detail = pd.DataFrame(
         list_results, columns=pd.Series(
             ['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost',
-             'Time', 'OriFile_Size', 'Similarity']))
+             'Time', 'OriFile_Size', 'Similarity', 'Error_Multiplier',
+             'Number_of_substitutions', 'Number_of_deletions',
+             'Number_of_insertions', 'Total_number_of_errors',
+             'Base_error_ratio']))
 
     df_new_summary = df_generate_summary(df_new_detail)
 
