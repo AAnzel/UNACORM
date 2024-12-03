@@ -134,13 +134,13 @@ def create_upload_page():
 
     float_error_multiplier = st.number_input(
         'Choose error multiplier value or leave it empty to skip',
-        value=None, min_value=0.5, max_value=5, step=0.5)
+        value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5)
 
-    if (int_chosen_storage_length is not None
-            or float_error_multiplier is not None):
-        bool_simulate_errors = True
-    else:
+    if (int_chosen_storage_length is None and float_error_multiplier == 0.0):
         bool_simulate_errors = False
+    else:
+        bool_simulate_errors = True
 
     df_new_detail = None
     df_new_summary = None
@@ -149,10 +149,10 @@ def create_upload_page():
     list_cannot_encode_decode = []
     if (list_chosen_dna_encoding != [] and np_binary_encoding is not None):
         for string_encoding_method in list_chosen_dna_encoding:
-            # Runtime errors can occur if we simulate DNA degradation using
-            # MESA. These errors occur with some DNA Encoding methods, such as
-            # The2DCode that breaks if the error creates a homopolymer of
-            # length 3. This is why we have to catch errors
+            # ! Runtime errors can occur if we simulate DNA degradation using
+            # ! MESA. These errors occur with some DNA Encoding methods, such
+            # ! as The2DCode that breaks if the error creates a homopolymer of
+            # ! length 3. This is why we have to catch errors
             list_encoded_info = []
             try:
                 (list_encoded_info, list_decoded_info,
@@ -173,13 +173,33 @@ def create_upload_page():
                 list_decoded_info = list_encoded_info
                 list_decoded_info[2] = 'Decoding'
                 np_decoded_array = np.array([])
+                dict_error_results = {
+                    'Number_of_substitutions': 0,
+                    'Number_of_deletions': 0,
+                    'Number_of_insertions': 0,
+                    'Total_number_of_errors': 0,
+                    'Base_error_ratio': 0}
 
             bool_similar_files = np.array_equal(
                 np_binary_encoding, np_decoded_array)
-            list_results.append(list_encoded_info +
-                                [bool_similar_files])
-            list_results.append(list_decoded_info +
-                                [bool_similar_files])
+            list_results.append(
+                list_encoded_info
+                + [bool_similar_files,
+                   float_error_multiplier,
+                   dict_error_results['Number_of_substitutions'],
+                   dict_error_results['Number_of_deletions'],
+                   dict_error_results['Number_of_insertions'],
+                   dict_error_results['Total_number_of_errors'],
+                   dict_error_results['Base_error_ratio']])
+            list_results.append(
+                list_decoded_info
+                + [bool_similar_files,
+                   float_error_multiplier,
+                   dict_error_results['Number_of_substitutions'],
+                   dict_error_results['Number_of_deletions'],
+                   dict_error_results['Number_of_insertions'],
+                   dict_error_results['Total_number_of_errors'],
+                   dict_error_results['Base_error_ratio']])
 
         if list_cannot_encode_decode:
             st.error('Cannot encode/decode using the following methods:\t' +

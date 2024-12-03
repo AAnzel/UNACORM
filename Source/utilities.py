@@ -51,7 +51,7 @@ _FLOAT_NANOPORE_COST_PER_BASE = 0.000025
 _FLOAT_PACBIO_COST_PER_BASE = 0.000035
 _INT_SEQUENCING_COVERAGE = 100
 _FLOAT_SYNTHESIS_COST_PER_BASE = 0.1
-LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5]
+LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.5, 1.0, 1.5, 2.0]
 
 _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 encoding_2d = encoding_2d_tmp.api()  # Required because of the implementation
@@ -315,7 +315,11 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         int_time_encoding, int_original_size]
 
     list_modified_sequences = []
-    dict_error_results = {}
+    dict_error_results = {
+        'Number_of_substitutions': 0, 'Number_of_deletions': 0,
+        'Number_of_insertions': 0, 'Total_number_of_errors': 0,
+        'Base_error_ratio': 0}
+
     if not bool_simulate_error:
         list_modified_sequences = list_dna_sequences
     else:
