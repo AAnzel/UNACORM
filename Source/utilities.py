@@ -3,6 +3,7 @@ import errno
 import shutil
 import time
 import numpy as np
+import multiprocessing
 import bitarray as ba
 import streamlit as st
 
@@ -51,7 +52,7 @@ _FLOAT_NANOPORE_COST_PER_BASE = 0.000025
 _FLOAT_PACBIO_COST_PER_BASE = 0.000035
 _INT_SEQUENCING_COVERAGE = 100
 _FLOAT_SYNTHESIS_COST_PER_BASE = 0.1
-LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.5, 1.0, 1.5, 2.0]
+LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.05, 0.1, 0.5, 1.0, 1.5, 2.0, 2.5]
 
 _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 encoding_2d = encoding_2d_tmp.api()  # Required because of the implementation
@@ -257,6 +258,27 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
     return np_list_generated_seq
 
 
+def np_list_worker(str_encoding_method, list_np_data, path_file, bool_encode,
+                   mp_queue):
+    """
+    np_list_worker is a wrapper function for the np_list_encode_decode so that
+    this function is run in a new subprocess. This is necessary because some
+    encoding methods can completely fail
+
+    Args:
+        str_encoding_method (str): chosen encoding method
+        list_np_data (list or np.array): list of string DNA sequence if
+        encoding or numpy array of binary data when decoding
+        path_file (os.path): path of the original un-encoded file
+        bool_encode (bool): if True, encoding is performed, if False then
+        decoding
+        mp_queue (multiprocessing.Queue): queue object holding the results
+    """
+    np_list_results = np_list_encode_decode(
+        str_encoding_method, list_np_data, path_file, bool_encode)
+    mp_queue.put(np_list_results)  # Put the result in the queue
+
+
 @st.cache_data
 def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
                    string_file_name, int_original_size, bool_simulate_error,
@@ -296,10 +318,43 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
     string_input_file_basename = os.path.splitext(string_file_name)[0]
     string_file_extension = os.path.splitext(string_file_name)[1][1:]
 
+    # If the runtime error happens (encoding method fails) we have to create
+    # dummy data and initialize everything
+    list_dna_sequences = []
+    list_modified_sequences = []
+    list_encoded = [string_input_file_basename, string_encoding_method,
+                    'Encoding', string_file_extension, None, None, None, None]
+    list_decoded = list_encoded
+    list_decoded[2] = 'Decoding'
+    np_decoded_dna_sequences = np.array([])
+    dict_error_results = {
+        'Number_of_substitutions': 0, 'Number_of_deletions': 0,
+        'Number_of_insertions': 0, 'Total_number_of_errors': 0,
+        'Base_error_ratio': 0}
+
     # We time the encoding process
     int_start_time = time.time()
-    list_dna_sequences = np_list_encode_decode(
-        string_encoding_method, np_bit_array, path_input_file, True)
+
+    # Create a queue to hold results from the worker
+    mp_encoding_queue = multiprocessing.Queue()
+    # Create a Process to run the worker function
+    mp_encoding_process = multiprocessing.Process(
+        target=np_list_worker,
+        args=(string_encoding_method, np_bit_array, path_input_file, True,
+              mp_encoding_queue))
+
+    mp_encoding_process.start()  # Start the process
+    mp_encoding_process.join()   # Wait for the process to finish
+
+    if mp_encoding_process.exitcode != 0:
+        print("Subprocess encoding failed with exit code: ",
+              mp_encoding_process.exitcode)
+        return (list_encoded, list_decoded, np_decoded_dna_sequences,
+                dict_error_results)
+
+    if not mp_encoding_queue.empty():
+        list_dna_sequences = mp_encoding_queue.get()  # Get the results
+
     int_time_encoding = time.time() - int_start_time
 
     list_dna_sequences = [string_dna.upper()
@@ -313,12 +368,6 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
         string_input_file_basename, string_encoding_method, 'Encoding',
         '.' + string_file_extension, int_encoded_size, int_cost_encoding,
         int_time_encoding, int_original_size]
-
-    list_modified_sequences = []
-    dict_error_results = {
-        'Number_of_substitutions': 0, 'Number_of_deletions': 0,
-        'Number_of_insertions': 0, 'Total_number_of_errors': 0,
-        'Base_error_ratio': 0}
 
     if not bool_simulate_error:
         list_modified_sequences = list_dna_sequences
@@ -345,9 +394,27 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
 
     # We time the decoding process
     int_start_time = time.time()
-    np_decoded_dna_sequences = np_list_encode_decode(
-        string_encoding_method, list_modified_sequences, path_input_file,
-        False)
+
+    # Create a queue to hold results from the worker
+    mp_decoding_queue = multiprocessing.Queue()
+    # Create a Process to run the worker function
+    mp_decoding_process = multiprocessing.Process(
+        target=np_list_worker,
+        args=(string_encoding_method, list_modified_sequences, path_input_file,
+              False, mp_decoding_queue))
+
+    mp_decoding_process.start()  # Start the process
+    mp_decoding_process.join()   # Wait for the process to finish
+
+    if mp_decoding_process.exitcode != 0:
+        print("Subprocess decoding failed with exit code: ",
+              mp_decoding_process.exitcode)
+        return (list_encoded, list_decoded, np_decoded_dna_sequences,
+                dict_error_results)
+
+    if not mp_decoding_queue.empty():
+        np_decoded_dna_sequences = mp_decoding_queue.get()  # Get the results
+
     int_time_decoding = time.time() - int_start_time
 
     int_cost_decoding = float_calculate_decoding_cost(list_dna_sequences)

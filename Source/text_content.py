@@ -133,3 +133,23 @@ STRING_TIME_HELP = '''
 STRING_SIZE_HELP = '''
     The size of resulting files from encoding and decoding processes.
 '''
+
+STRING_MUTAGENESIS_HELP = '''
+    High mutagenesis kit adopted from Press _et al._[1] is used as a baseline.
+    This baseline translates to an error rate of 3.6% and includes deletions,
+    insertions, and substitutions. We use the multiplier to increase or
+    decrease the baseline error rate.
+    | Multiplier | Error Rate |
+    | --- | --- |
+    | 0 | No errors (0%) |
+    | 0.05 | Low (0.18%) |
+    | 0.1 | Moderately-Low (0.36%) |
+    | 0.5 | Moderate (1.8%) |
+    | 1.0 | Moderately-High (3.6%) |
+    | 1.5 | High (5.4%) |
+    
+    [1] W.H. Press, J.A. Hawkins, S.K. Jones, J.M. Schaub, I.J. Finkelstein,
+    HEDGES error-correcting code for DNA storage corrects indels and allows
+    sequence constraints, Proc. Natl. Acad. Sci. U.S.A. 117 (31) 18489-18496,
+    https://doi.org/10.1073/pnas.2004821117 (2020).
+'''

@@ -218,3 +218,7 @@ def visualize_time_benchmark_bar(list_files_chosen, df_concat):
         lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_time
+
+# TODO: Add information density (y) over base error ratio (x) line chart
+# TODO: like in DNA Aeon
+# TODO: Add failure rate (y) over dna encoding methods (x) bar chart

@@ -113,32 +113,14 @@ def run_precalculation(int_num_of_iteration):
                               + '_MULT: ' + str(float_error_multiplier)
                               + '_RUN: ' + str(int_i) + '\n')
 
-                        try:
-                            # Error simulation without MESA
-                            (list_encoded_info, list_decoded_info,
-                             np_decoded_array,
-                             dict_error_results) = tuple_pipeline(
-                                 string_encoding_method, np_binary_encoding,
-                                 path_one_file, string_file,
-                                 int_file_size_bits, True, False, None,
-                                 float_error_multiplier)
-                        except Exception as exc_e:
-                            print(exc_e)
-                            # If the runtime error happens we have to create
-                            # dummy data
-                            list_encoded_info = [
-                                string_file_name, string_encoding_method,
-                                'Encoding', string_file_extension,
-                                None, None, None, None]
-                            list_decoded_info = list_encoded_info
-                            list_decoded_info[2] = 'Decoding'
-                            np_decoded_array = np.array([])
-                            dict_error_results = {
-                                'Number_of_substitutions': 0,
-                                'Number_of_deletions': 0,
-                                'Number_of_insertions': 0,
-                                'Total_number_of_errors': 0,
-                                'Base_error_ratio': 0}
+                        # Error simulation without MESA
+                        (list_encoded_info, list_decoded_info,
+                            np_decoded_array,
+                            dict_error_results) = tuple_pipeline(
+                                string_encoding_method, np_binary_encoding,
+                                path_one_file, string_file,
+                                int_file_size_bits, True, False, None,
+                                float_error_multiplier)
 
                         bool_similar_files = np.array_equal(
                             np_binary_encoding, np_decoded_array)

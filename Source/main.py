@@ -133,9 +133,10 @@ def create_upload_page():
         value=None, min_value=1, step=1, disabled=True)
 
     float_error_multiplier = st.number_input(
-        'Choose error multiplier value or leave it empty to skip',
+        'Choose error multiplier value or leave it 0 to skip',
         value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5)
+        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
+        help=tc.STRING_MUTAGENESIS_HELP)
 
     if (int_chosen_storage_length is None and float_error_multiplier == 0.0):
         bool_simulate_errors = False
@@ -154,31 +155,19 @@ def create_upload_page():
             # ! as The2DCode that breaks if the error creates a homopolymer of
             # ! length 3. This is why we have to catch errors
             list_encoded_info = []
-            try:
-                (list_encoded_info, list_decoded_info,
-                 np_decoded_array, dict_error_results) = uti.tuple_pipeline(
-                     string_encoding_method, np_binary_encoding,
-                     path_input_file, string_input_file, original_file_size,
-                     bool_simulate_errors,
-                     False,  # TODO: Add logic for this
-                     int_chosen_storage_length,
-                     float_error_multiplier)
-            except Exception as exc_e:
-                print(exc_e)
+
+            (list_encoded_info, list_decoded_info,
+                np_decoded_array, dict_error_results) = uti.tuple_pipeline(
+                    string_encoding_method, np_binary_encoding,
+                    path_input_file, string_input_file, original_file_size,
+                    bool_simulate_errors,
+                    False,  # TODO: Add logic for this
+                    int_chosen_storage_length,
+                    float_error_multiplier)
+
+            # If error occured, we note it
+            if len(np_decoded_array) == 0:
                 list_cannot_encode_decode.append(string_encoding_method)
-                # If the runtime error happens we have to create dummy data
-                list_encoded_info = [string_file_name, string_encoding_method,
-                                     'Encoding', string_file_extension,
-                                     None, None, None, None]
-                list_decoded_info = list_encoded_info
-                list_decoded_info[2] = 'Decoding'
-                np_decoded_array = np.array([])
-                dict_error_results = {
-                    'Number_of_substitutions': 0,
-                    'Number_of_deletions': 0,
-                    'Number_of_insertions': 0,
-                    'Total_number_of_errors': 0,
-                    'Base_error_ratio': 0}
 
             bool_similar_files = np.array_equal(
                 np_binary_encoding, np_decoded_array)
@@ -256,6 +245,14 @@ def create_benchmark_page():
     st.header('Benchmark', help=tc.STRING_MAIN_BENCHMARK_HELP)
     display_processed_data(df_existing_summary, df_existing_detail)
     st.markdown('---')
+
+    float_error_multiplier = st.slider(  # TODO: Continue from here! :)
+        'Choose error multiplier value or leave it 0 to skip',
+        value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
+        help=tc.STRING_MUTAGENESIS_HELP)
+    with st.expander('What is error multiplier?'):
+        st.info(tc.STRING_MUTAGENESIS_HELP)
 
     st.header('Information Density', help=tc.STRING_DENSITY_HELP)
     chart = vis.visualize_density_benchmark(df_existing_summary)
