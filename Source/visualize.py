@@ -105,7 +105,7 @@ def visualize_cost_benchmark_whisker(list_files_chosen, df_detail):
     chart_cost = px.box(
         df_tmp,
         x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
-        facet_col_wrap=4,
+       facet_col_wrap=4,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
@@ -140,7 +140,7 @@ def visualize_cost_benchmark_bar(list_files_chosen, df_detail):
     chart_cost = px.bar(
         df_tmp,
         x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
-        facet_col_wrap=4,
+       facet_col_wrap=4,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
@@ -176,7 +176,7 @@ def visualize_time_benchmark_whisker(list_files_chosen, df_detail):
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME,
         category_orders={'Filename': list_files_chosen})
 
@@ -208,7 +208,7 @@ def visualize_time_benchmark_bar(list_files_chosen, df_detail):
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE * (
             int((len(list_files_chosen) - 1) / 4) + 1),
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,  facet_col_wrap=4,
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME, barmode='group',
         category_orders={'Filename': list_files_chosen})
 
@@ -218,9 +218,25 @@ def visualize_time_benchmark_bar(list_files_chosen, df_detail):
     return chart_time
 
 
-def visualize_base_error_line(list_files_chosen, df_detail):
-    
-    
+def visualize_base_error_line_per_file(list_files_chosen,
+                                       df_measure_sum_concat):
+    df_tmp = df_measure_sum_concat[(
+        df_measure_sum_concat['Filename'].isin(
+            list_files_chosen))].sort_values('Method')
+
+    chart_base_error = px.line(
+        df_tmp, x='Base_error_ratio', y='Information_Density', color='Method',
+        facet_col='Filename',
+        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
+        height=_INT_CHART_ROW_SIZE * (
+            int((len(list_files_chosen) - 1) / 4) + 1),
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
+        template=_STRING_PLOTLY_THEME,
+        category_orders={'Filename': list_files_chosen})
+
+    chart_base_error.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True))
+
     return chart_base_error
 
 
