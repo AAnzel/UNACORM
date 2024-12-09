@@ -90,7 +90,7 @@ def visualize_cost_benchmark_whisker(list_files_chosen, df_detail):
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_detail (dataframe): detail benchmarking dataset
+        df_detail (pd.DataFrame): detail benchmarking dataset
 
     Returns:
         chart_cost (px.Chart): chart with costs
@@ -125,7 +125,7 @@ def visualize_cost_benchmark_bar(list_files_chosen, df_detail):
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_detail (dataframe): detail benchmarking dataset
+        df_detail (pd.DataFrame): detail benchmarking dataset
 
     Returns:
         chart_cost (px.Chart): chart with costs
@@ -160,7 +160,7 @@ def visualize_time_benchmark_whisker(list_files_chosen, df_detail):
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_detail (dataframe): detail benchmarking dataset
+        df_detail (pd.DataFrame): detail benchmarking dataset
 
     Returns:
         chart_time (px.Chart): chart with times
@@ -193,7 +193,7 @@ def visualize_time_benchmark_bar(list_files_chosen, df_detail):
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_detail (dataframe): detail benchmarking dataset
+        df_detail (pd.DataFrame): detail benchmarking dataset
 
     Returns:
         chart_time (px.Chart): chart with times
@@ -267,11 +267,50 @@ def visualize_base_error_general(df_measure_sum_concat):
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
 
-    chart_base_error.update_layout(yaxis_title='Information_Density(b/nt)')
+    chart_base_error.update_layout(yaxis_title='Information Density(b/nt)')
     chart_base_error.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_base_error
 
 
-# TODO: Add failure rate (y) over dna encoding methods (x) bar chart
+def visualize_failure_rate_general(df_detail):
+    """
+    visualize_failure_rate_general function is used for visualizing the failure
+    rates for each method across all runs, files, and error multipliers
+
+    Args:
+        df_detail (pd.DataFrame): detail benchmarking dataset
+
+    Returns:
+        chart_density (px.Chart): chart with information density
+    """
+    df_tmp = df_detail.copy()
+    df_tmp['Is_Failure'] = (df_tmp['Total_number_of_errors'] == 0) \
+        & (df_tmp['Base_error_ratio'] == 0)
+
+    df_failure_counts = df_tmp.groupby('Method')[
+        'Is_Failure'].sum().reset_index()
+    df_failure_counts.rename(columns={'Is_Failure': 'Number_of_Failures'},
+                             inplace=True)
+
+    df_total_counts = df_tmp.groupby('Method').size().reset_index(
+        name='Total_Attempts')
+
+    failure_rate_df = df_failure_counts.merge(df_total_counts, on='Method')
+    failure_rate_df['Failure Rate (%)'] = (
+        failure_rate_df['Number_of_Failures']
+        / failure_rate_df['Total_Attempts']) * 100
+
+    df_tmp = df_tmp.merge(failure_rate_df[['Method', 'Failure Rate (%)']],
+                          on='Method', how='left')
+    df_tmp.drop(columns=['Is_Failure'], inplace=True)
+
+    chart_failure_rate = px.bar(
+        df_tmp, x='Method', y='Failure Rate (%)',
+        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
+
+    chart_failure_rate.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True))
+
+    return chart_failure_rate
