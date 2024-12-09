@@ -83,21 +83,21 @@ def visualize_density_benchmark(df_measure_sum_concat):
     return chart_density
 
 
-def visualize_cost_benchmark_whisker(list_files_chosen, df_concat):
+def visualize_cost_benchmark_whisker(list_files_chosen, df_detail):
     """
     visualize_cost_benchmark_whisker function is used for visualizing the
     encoding/decoding costs for each encoding method using a whisker chart
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_concat (dataframe): detail benchmarking dataset
+        df_detail (dataframe): detail benchmarking dataset
 
     Returns:
         chart_cost (px.Chart): chart with costs
     """
 
-    df_tmp = df_concat[
-        df_concat['Filename'].isin(list_files_chosen)].groupby(
+    df_tmp = df_detail[
+        df_detail['Filename'].isin(list_files_chosen)].groupby(
             ['Filename', 'Method', 'Transformation',
                 'Size', 'Type']).mean().sort_values('Method').reset_index(
                 ).rename(columns={'Cost': 'Cost($)'})
@@ -118,21 +118,21 @@ def visualize_cost_benchmark_whisker(list_files_chosen, df_concat):
     return chart_cost
 
 
-def visualize_cost_benchmark_bar(list_files_chosen, df_concat):
+def visualize_cost_benchmark_bar(list_files_chosen, df_detail):
     """
     visualize_cost_benchmark_bar function is used for visualizing the
     encoding/decoding costs for each encoding method using a bar chart
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_concat (dataframe): detail benchmarking dataset
+        df_detail (dataframe): detail benchmarking dataset
 
     Returns:
         chart_cost (px.Chart): chart with costs
     """
 
-    df_tmp = df_concat[
-        df_concat['Filename'].isin(list_files_chosen)].groupby(
+    df_tmp = df_detail[
+        df_detail['Filename'].isin(list_files_chosen)].groupby(
             ['Filename', 'Method', 'Transformation',
              'Size', 'Type']).mean().sort_values('Method').reset_index(
              ).rename(columns={'Cost': 'Cost($)'})
@@ -153,22 +153,21 @@ def visualize_cost_benchmark_bar(list_files_chosen, df_concat):
     return chart_cost
 
 
-def visualize_time_benchmark_whisker(list_files_chosen, df_concat):
+def visualize_time_benchmark_whisker(list_files_chosen, df_detail):
     """
     visualize_time_benchmark_whisker function is used for visualizing run times
     it took each method to encode/decode files using a whisker chart
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_concat (dataframe): concanated detail precalculated data and data
-        from uploaded file
+        df_detail (dataframe): detail benchmarking dataset
 
     Returns:
         chart_time (px.Chart): chart with times
     """
 
-    df_tmp = df_concat[
-        df_concat['Filename'].isin(list_files_chosen)].sort_values(
+    df_tmp = df_detail[
+        df_detail['Filename'].isin(list_files_chosen)].sort_values(
             'Method').rename(columns={'Time': 'log(Time(s))'})
 
     chart_time = px.box(
@@ -187,22 +186,21 @@ def visualize_time_benchmark_whisker(list_files_chosen, df_concat):
     return chart_time
 
 
-def visualize_time_benchmark_bar(list_files_chosen, df_concat):
+def visualize_time_benchmark_bar(list_files_chosen, df_detail):
     """
     visualize_time_benchmark_bar function is used for visualizing run times
     it took each method to encode/decode files using a bar chart
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
-        df_concat (dataframe): concanated detail precalculated data and data
-        from uploaded file
+        df_detail (dataframe): detail benchmarking dataset
 
     Returns:
         chart_time (px.Chart): chart with times
     """
 
-    df_tmp = df_concat[
-        df_concat['Filename'].isin(list_files_chosen)].sort_values(
+    df_tmp = df_detail[
+        df_detail['Filename'].isin(list_files_chosen)].sort_values(
             'Method').rename(columns={'Time': 'log(Time(s))'})
     chart_time = px.bar(
         df_tmp, x='Method', y='log(Time(s))', color='Transformation',
@@ -218,6 +216,14 @@ def visualize_time_benchmark_bar(list_files_chosen, df_concat):
         lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_time
+
+
+def visualize_base_error_line(list_files_chosen, df_detail):
+    
+    
+    return chart_base_error
+
+
 
 # TODO: Add information density (y) over base error ratio (x) line chart
 # TODO: like in DNA Aeon
