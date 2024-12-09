@@ -246,6 +246,19 @@ def create_benchmark_page():
     display_processed_data(df_existing_summary, df_existing_detail)
     st.markdown('---')
 
+    st.header('Information Density', help=tc.STRING_DENSITY_HELP)
+    chart_density = vis.visualize_density_benchmark(df_existing_summary)
+    st.plotly_chart(chart_density, use_container_width=True)
+
+    st.header('Failure Rate', help=None)  # TODO: Add new help
+    chart_failure_rate = vis.visualize_failure_rate_general(
+        df_existing_summary)
+    st.plotly_chart(chart_failure_rate, use_container_width=True)
+
+    st.header('Base Error', help=None)  # TODO: Add new help
+    chart_base_error = vis.visualize_base_error_general(df_existing_summary)
+    st.plotly_chart(chart_base_error, use_container_width=True)
+
     float_error_multiplier = st.slider(  # TODO: Continue from here! :)
         'Choose error multiplier value or leave it 0 to skip',
         value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
@@ -253,10 +266,6 @@ def create_benchmark_page():
         help=tc.STRING_MUTAGENESIS_HELP)
     with st.expander('What is error multiplier?'):
         st.info(tc.STRING_MUTAGENESIS_HELP)
-
-    st.header('Information Density', help=tc.STRING_DENSITY_HELP)
-    chart = vis.visualize_density_benchmark(df_existing_summary)
-    st.plotly_chart(chart, use_container_width=True)
 
     list_files_to_visualize = list(
         pd.unique(df_existing_summary['Filename']))

@@ -286,8 +286,8 @@ def visualize_failure_rate_general(df_detail):
         chart_density (px.Chart): chart with information density
     """
     df_tmp = df_detail.copy()
-    df_tmp['Is_Failure'] = (df_tmp['Total_number_of_errors'] == 0) \
-        & (df_tmp['Base_error_ratio'] == 0)
+    df_tmp['Is_Failure'] = (df_tmp['Mean_Num_of_Errors'] == 0) \
+        & (df_tmp['Mean_Base_Error_Ratio'] == 0)
 
     df_failure_counts = df_tmp.groupby('Method')[
         'Is_Failure'].sum().reset_index()
@@ -304,12 +304,17 @@ def visualize_failure_rate_general(df_detail):
 
     df_tmp = df_tmp.merge(failure_rate_df[['Method', 'Failure Rate (%)']],
                           on='Method', how='left')
-    df_tmp.drop(columns=['Is_Failure'], inplace=True)
+
+    df_tmp = df_tmp.filter(['Method', 'Failure Rate (%)']).groupby(
+        ['Method']).agg({'Failure Rate (%)': 'first'}).reset_index()
+    print(df_tmp)
 
     chart_failure_rate = px.bar(
         df_tmp, x='Method', y='Failure Rate (%)',
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
 
+    chart_failure_rate.update_traces(
+        marker_color=_STRING_DENSITY_MARKER_COLOR)
     chart_failure_rate.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
