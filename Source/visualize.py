@@ -105,7 +105,7 @@ def visualize_cost_benchmark_whisker(list_files_chosen, df_detail):
     chart_cost = px.box(
         df_tmp,
         x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
-       facet_col_wrap=4,
+        facet_col_wrap=4,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
@@ -140,7 +140,7 @@ def visualize_cost_benchmark_bar(list_files_chosen, df_detail):
     chart_cost = px.bar(
         df_tmp,
         x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
-       facet_col_wrap=4,
+        facet_col_wrap=4,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * (
@@ -218,8 +218,18 @@ def visualize_time_benchmark_bar(list_files_chosen, df_detail):
     return chart_time
 
 
-def visualize_base_error_line_per_file(list_files_chosen,
-                                       df_measure_sum_concat):
+def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat):
+    """
+    visualize_base_errorper_file function is used for visualizing base
+    error values for each method per file across all runs
+
+    Args:
+        list_files_chosen (list): names of files that are to be visualized
+        df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+
+    Returns:
+        chart_base_error (px.Chart): chart with base error values
+    """
     df_tmp = df_measure_sum_concat[(
         df_measure_sum_concat['Filename'].isin(
             list_files_chosen))].sort_values('Method')
@@ -240,7 +250,28 @@ def visualize_base_error_line_per_file(list_files_chosen,
     return chart_base_error
 
 
+def visualize_base_error_general(df_measure_sum_concat):
+    """
+    visualize_base_error_general function is used for visualizing base error
+    values for each method across all runs and files
 
-# TODO: Add information density (y) over base error ratio (x) line chart
-# TODO: like in DNA Aeon
+    Args:
+        df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+
+    Returns:
+        chart_base_error (px.Chart): chart with base error values
+    """
+    chart_base_error = px.line(
+        df_measure_sum_concat.sort_values('Method'), x='Base_error_ratio',
+        y='Information_Density', color='Method',
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
+
+    chart_base_error.update_layout(yaxis_title='Information_Density(b/nt)')
+    chart_base_error.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True))
+
+    return chart_base_error
+
+
 # TODO: Add failure rate (y) over dna encoding methods (x) bar chart
