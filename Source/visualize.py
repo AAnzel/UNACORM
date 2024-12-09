@@ -78,7 +78,7 @@ def visualize_density_benchmark(df_measure_sum_concat):
         marker_color=_STRING_DENSITY_MARKER_COLOR)
     chart_density.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
-    chart_density.update_layout(yaxis_title='Information_Density(b/nt)')
+    chart_density.update_layout(yaxis_title='Information_Density (b/nt)')
     # TODO: Make it into a bar chart for uploaded data
     return chart_density
 
@@ -262,15 +262,15 @@ def visualize_base_error_general(df_measure_sum_concat):
         chart_base_error (px.Chart): chart with base error values
     """
     chart_base_error = px.line(
-        df_measure_sum_concat.sort_values('Method'), x='Base_error_ratio',
+        df_measure_sum_concat.sort_values('Method'), x='Mean_Base_Error_Ratio',
         y='Information_Density', color='Method',
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
 
-    chart_base_error.update_layout(yaxis_title='Information Density(b/nt)')
+    chart_base_error.update_layout(yaxis_title='Information Density (b/nt)')
     chart_base_error.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
-
+    # ! FIX: Find the appropriate aggregation
     return chart_base_error
 
 
@@ -307,7 +307,6 @@ def visualize_failure_rate_general(df_detail):
 
     df_tmp = df_tmp.filter(['Method', 'Failure Rate (%)']).groupby(
         ['Method']).agg({'Failure Rate (%)': 'first'}).reset_index()
-    print(df_tmp)
 
     chart_failure_rate = px.bar(
         df_tmp, x='Method', y='Failure Rate (%)',
