@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1733218627_099971_test.txt",
+        "input": "../Data/Original/Test/test.txt",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",

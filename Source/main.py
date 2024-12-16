@@ -107,14 +107,11 @@ def create_upload_page():
         if os.path.exists(path_input_file):
             st.success('The file is successfully uploaded')
 
-    string_file_name, string_file_extension = os.path.splitext(
-        string_input_file)
-
     st.write('Uploaded path data:\t', path_input_file)
 
     if path_input_file != '':
         np_binary_encoding, original_file_size = uti.np_data_to_binary_array(
-            path_input_file, string_file_name)
+            path_input_file)
     else:
         np_binary_encoding = None
         original_file_size = None

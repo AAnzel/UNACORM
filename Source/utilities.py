@@ -1,4 +1,6 @@
 import os
+import sys
+import io
 import errno
 import shutil
 import time
@@ -183,7 +185,6 @@ def float_calculate_decoding_cost(
     return float_cost_total
 
 
-@st.cache_data
 def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
                           bool_encode):
     """
@@ -258,28 +259,6 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file,
     return np_list_generated_seq
 
 
-def np_list_worker(str_encoding_method, list_np_data, path_file, bool_encode,
-                   mp_queue):
-    """
-    np_list_worker is a wrapper function for the np_list_encode_decode so that
-    this function is run in a new subprocess. This is necessary because some
-    encoding methods can completely fail
-
-    Args:
-        str_encoding_method (str): chosen encoding method
-        list_np_data (list or np.array): list of string DNA sequence if
-        encoding or numpy array of binary data when decoding
-        path_file (os.path): path of the original un-encoded file
-        bool_encode (bool): if True, encoding is performed, if False then
-        decoding
-        mp_queue (multiprocessing.Queue): queue object holding the results
-    """
-    np_list_results = np_list_encode_decode(
-        str_encoding_method, list_np_data, path_file, bool_encode)
-    mp_queue.put(np_list_results)  # Put the result in the queue
-
-
-@st.cache_data
 def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
                    string_file_name, int_original_size, bool_simulate_error,
                    bool_use_mesa, int_storage_length, float_error_multiplier):
@@ -335,25 +314,23 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
     # We time the encoding process
     int_start_time = time.time()
 
-    # Create a queue to hold results from the worker
-    mp_encoding_queue = multiprocessing.Queue()
-    # Create a Process to run the worker function
-    mp_encoding_process = multiprocessing.Process(
-        target=np_list_worker,
-        args=(string_encoding_method, np_bit_array, path_input_file, True,
-              mp_encoding_queue))
+    mp_queue = multiprocessing.Queue()
 
-    mp_encoding_process.start()  # Start the process
+    mp_encoding_process = multiprocessing.Process(
+        target=run_capturing_process,
+        args=(mp_queue, np_list_encode_decode,
+              (string_encoding_method, np_bit_array, path_input_file, True)),
+        name="Encoding_" + string_encoding_method)
+
+    mp_encoding_process.start()
+    list_dna_sequences = print_output(mp_queue)
     mp_encoding_process.join()   # Wait for the process to finish
 
-    if mp_encoding_process.exitcode != 0:
+    if mp_encoding_process.exitcode != 0 or list_dna_sequences in [None, []]:
         print("Subprocess encoding failed with exit code: ",
               mp_encoding_process.exitcode)
-        return (list_encoded, list_decoded, np_decoded_dna_sequences,
+        return (list_encoded, list_decoded, list_dna_sequences,
                 dict_error_results)
-
-    if not mp_encoding_queue.empty():
-        list_dna_sequences = mp_encoding_queue.get()  # Get the results
 
     int_time_encoding = time.time() - int_start_time
 
@@ -395,25 +372,26 @@ def tuple_pipeline(string_encoding_method, np_bit_array, path_input_file,
     # We time the decoding process
     int_start_time = time.time()
 
-    # Create a queue to hold results from the worker
-    mp_decoding_queue = multiprocessing.Queue()
-    # Create a Process to run the worker function
-    mp_decoding_process = multiprocessing.Process(
-        target=np_list_worker,
-        args=(string_encoding_method, list_modified_sequences, path_input_file,
-              False, mp_decoding_queue))
+    mp_queue = multiprocessing.Queue()
 
-    mp_decoding_process.start()  # Start the process
+    mp_decoding_process = multiprocessing.Process(
+        target=run_capturing_process,
+        args=(mp_queue, np_list_encode_decode,
+              (string_encoding_method, list_modified_sequences,
+               path_input_file, False,)),
+        name="Decoding_" + string_encoding_method)
+
+    mp_decoding_process.start()
+    np_decoded_dna_sequences = print_output(mp_queue)
     mp_decoding_process.join()   # Wait for the process to finish
 
-    if mp_decoding_process.exitcode != 0:
+    if mp_decoding_process.exitcode != 0 \
+            or np_decoded_dna_sequences is None \
+            or len(np_decoded_dna_sequences) == 0:
         print("Subprocess decoding failed with exit code: ",
               mp_decoding_process.exitcode)
         return (list_encoded, list_decoded, np_decoded_dna_sequences,
                 dict_error_results)
-
-    if not mp_decoding_queue.empty():
-        np_decoded_dna_sequences = mp_decoding_queue.get()  # Get the results
 
     int_time_decoding = time.time() - int_start_time
 
@@ -495,14 +473,13 @@ def df_generate_summary(df_report):
 
 
 @st.cache_data
-def np_data_to_binary_array(path_original_file, string_file_name):
+def np_data_to_binary_array(path_original_file):
     """
     np_data_to_binary_array function is used to convert the original file to
     its binary representation contained in a numpy array
 
     Args:
         path_original_file (os.path): path of the original file
-        string_file_name (string): name of the file without extension
 
     Returns:
         binary_numpy_content (np.array): boolean array representing the
@@ -526,3 +503,52 @@ def np_data_to_binary_array(path_original_file, string_file_name):
             errno.ENOENT, os.strerror(errno.ENOENT), path_original_file)
 
     return np_binary_numpy_content, int_translated_file_size
+
+
+def run_capturing_process(queue, target, args):
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+
+    # Redirect stdout and stderr to capture output
+    sys.stdout = io.StringIO()
+    sys.stderr = io.StringIO()
+
+    try:
+        # Call the target function and capture its return value
+        result = target(*args)
+        
+        # Capture output and error messages
+        output = sys.stdout.getvalue()
+        error_output = sys.stderr.getvalue()
+
+        # Send captured stdout and stderr to the queue
+        if output:
+            queue.put(("stdout", output))
+        if error_output:
+            queue.put(("stderr", error_output))
+
+        # Send the result (which can be any Python object) to the queue
+        queue.put(("result", result))  # Send result back
+        
+    except Exception as e:
+        print(f"Error during processing: {e}", file=sys.stderr)
+    finally:
+        # Signal completion with a sentinel value
+        queue.put(("done", None))  # Send a done signal to indicate completion
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
+
+def print_output(queue):
+    while True:
+        try:
+            recv_type, recv_value = queue.get()
+            if recv_type == "stdout":
+                print(recv_value, end='')
+            elif recv_type == "stderr":
+                print(recv_value, end='', file=sys.stderr)
+            elif recv_type == "result":
+                return recv_value  # Return the result for further use
+            elif recv_type == "done":
+                break  # Exit loop when done signal is received
+        except EOFError:
+            break
