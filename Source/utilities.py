@@ -505,7 +505,20 @@ def np_data_to_binary_array(path_original_file):
     return np_binary_numpy_content, int_translated_file_size
 
 
-def run_capturing_process(queue, target, args):
+def run_capturing_process(mp_queue, function_target, tuple_args):
+    """
+    run_capturing_process is a wrapper functions that runs the
+    np_list_encode_decode (given here as function_target argument) in new
+    process
+
+    Args:
+        mp_queue (multiprocessing.Queue()): multiprocessing queue holding
+        function_target stdout, stderr, and return value
+        function_target (function): passed function that is run in a new
+        process. It is always np_list_encode_decode
+        tuple_args (tuple): tuple of arguments passed to the function_target as
+        input
+    """
     original_stdout = sys.stdout
     original_stderr = sys.stderr
 
@@ -514,34 +527,47 @@ def run_capturing_process(queue, target, args):
     sys.stderr = io.StringIO()
 
     try:
-        # Call the target function and capture its return value
-        result = target(*args)
-        
+        # Call the encode/decode function and capture its return value
+        np_list_generated_seq = function_target(*tuple_args)
+
         # Capture output and error messages
         output = sys.stdout.getvalue()
         error_output = sys.stderr.getvalue()
 
         # Send captured stdout and stderr to the queue
         if output:
-            queue.put(("stdout", output))
+            mp_queue.put(("stdout", output))
         if error_output:
-            queue.put(("stderr", error_output))
+            mp_queue.put(("stderr", error_output))
 
         # Send the result (which can be any Python object) to the queue
-        queue.put(("result", result))  # Send result back
-        
+        mp_queue.put(("result", np_list_generated_seq))  # Send result back
+
     except Exception as e:
         print(f"Error during processing: {e}", file=sys.stderr)
     finally:
         # Signal completion with a sentinel value
-        queue.put(("done", None))  # Send a done signal to indicate completion
+        mp_queue.put(("done", None))  # Send a done signal to indicate finish
         sys.stdout = original_stdout
         sys.stderr = original_stderr
 
-def print_output(queue):
+
+def print_output(mp_queue):
+    """
+    print_output function prints stderr and stdout of a function that is
+    running in a new process. It also returns the function return values
+
+    Args:
+        mp_queue (multiprocessing.Queue()): multiprocessing queue holding
+        function_target stdout, stderr, and return value
+
+    Returns:
+        list or np.array: returns a list of np.array, as defined in
+        np_list_encode_decode function
+    """
     while True:
         try:
-            recv_type, recv_value = queue.get()
+            recv_type, recv_value = mp_queue.get()
             if recv_type == "stdout":
                 print(recv_value, end='')
             elif recv_type == "stderr":
