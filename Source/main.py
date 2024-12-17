@@ -279,15 +279,16 @@ def create_benchmark_page():
 
     st.markdown('---')
     if string_selected_visualization == 'Whisker Chart':
-        chart_cost_all = vis.visualize_cost_benchmark_whisker(
-            list_files_chosen, df_existing_detail)
-        chart_time_all = vis.visualize_time_benchmark_whisker(
-            list_files_chosen, df_existing_detail)
+        bool_whisker_chart = True
     else:
-        chart_cost_all = vis.visualize_cost_benchmark_bar(
-            list_files_chosen, df_existing_detail)
-        chart_time_all = vis.visualize_time_benchmark_bar(
-            list_files_chosen, df_existing_detail)
+        bool_whisker_chart = False
+
+    chart_cost_all = vis.visualize_cost_benchmark(
+        list_files_chosen, df_existing_detail, float_error_multiplier,
+        bool_whisker_chart)
+    chart_time_all = vis.visualize_time_benchmark(
+        list_files_chosen, df_existing_detail, float_error_multiplier,
+        bool_whisker_chart)
 
     st.header('Cost', help=tc.STRING_COST_HELP)
     st.plotly_chart(chart_cost_all, use_container_width=True)

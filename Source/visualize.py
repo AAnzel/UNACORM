@@ -18,6 +18,8 @@ _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 
 
+# ! TODO: Decide if we want to visualize measures only for successful encode
+# ! and decode processes. If so, we should use the failure rate filter
 def visualize_uploaded(df_report):
     """
     visualize_uploaded function is used for visualizing the time, cost,
@@ -83,102 +85,109 @@ def visualize_density_benchmark(df_measure_sum_concat):
     return chart_density
 
 
-def visualize_cost_benchmark_whisker(list_files_chosen, df_detail):
+def visualize_cost_benchmark(list_files_chosen, df_detail,
+                             float_error_multiplier, bool_whisker):
     """
-    visualize_cost_benchmark_whisker function is used for visualizing the
-    encoding/decoding costs for each encoding method using a whisker chart
+    visualize_cost_benchmark function is used for visualizing the
+    encoding/decoding costs for each encoding method
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
         df_detail (pd.DataFrame): detail benchmarking dataset
+        float_error_multiplier (float): selected error multiplier to filter the
+        df_detail
+        bool_whisker (bool): determines if the chart should be whisker or bar.
+        Default: True
 
     Returns:
         chart_cost (px.Chart): chart with costs
     """
 
     df_tmp = df_detail[
-        df_detail['Filename'].isin(list_files_chosen)].groupby(
-            ['Filename', 'Method', 'Transformation',
-                'Size', 'Type']).mean().sort_values('Method').reset_index(
-                ).rename(columns={'Cost': 'Cost($)'})
+        (df_detail['Filename'].isin(list_files_chosen)
+         & (df_detail['Error_Multiplier'] == float_error_multiplier))].groupby(
+             ['Filename', 'Method', 'Transformation',
+              'Size', 'Type']).mean().sort_values('Method').reset_index(
+                  ).rename(columns={'Cost': 'Cost($)'})
 
-    chart_cost = px.box(
-        df_tmp,
-        x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
-        facet_col_wrap=4,
-        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        height=_INT_CHART_ROW_SIZE * (
-            int((len(list_files_chosen) - 1) / 4) + 1),
-        template=_STRING_PLOTLY_THEME,
-        category_orders={'Filename': list_files_chosen})
+    chart_cost = None
+
+    if bool_whisker:
+        chart_cost = px.box(
+            df_tmp,
+            x='Method', y='Cost($)', color='Transformation',
+            facet_col='Filename', facet_col_wrap=4,
+            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            height=_INT_CHART_ROW_SIZE * (
+                int((len(list_files_chosen) - 1) / 4) + 1),
+            template=_STRING_PLOTLY_THEME,
+            category_orders={'Filename': list_files_chosen})
+
+    else:
+        chart_cost = px.bar(
+            df_tmp,
+            x='Method', y='Cost($)', color='Transformation',
+            facet_col='Filename', facet_col_wrap=4,
+            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            height=_INT_CHART_ROW_SIZE * (
+                int((len(list_files_chosen) - 1) / 4) + 1),
+            template=_STRING_PLOTLY_THEME, barmode='group',
+            category_orders={'Filename': list_files_chosen})
+
     chart_cost.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
     return chart_cost
 
 
-def visualize_cost_benchmark_bar(list_files_chosen, df_detail):
+def visualize_time_benchmark(list_files_chosen, df_detail,
+                             float_error_multiplier, bool_whisker=True):
     """
-    visualize_cost_benchmark_bar function is used for visualizing the
-    encoding/decoding costs for each encoding method using a bar chart
+    visualize_time_benchmark function is used for visualizing run times it took
+    each method to encode/decode files
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
         df_detail (pd.DataFrame): detail benchmarking dataset
-
-    Returns:
-        chart_cost (px.Chart): chart with costs
-    """
-
-    df_tmp = df_detail[
-        df_detail['Filename'].isin(list_files_chosen)].groupby(
-            ['Filename', 'Method', 'Transformation',
-             'Size', 'Type']).mean().sort_values('Method').reset_index(
-             ).rename(columns={'Cost': 'Cost($)'})
-
-    chart_cost = px.bar(
-        df_tmp,
-        x='Method', y='Cost($)', color='Transformation', facet_col='Filename',
-        facet_col_wrap=4,
-        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        height=_INT_CHART_ROW_SIZE * (
-            int((len(list_files_chosen) - 1) / 4) + 1),
-        template=_STRING_PLOTLY_THEME, barmode='group',
-        category_orders={'Filename': list_files_chosen})
-    chart_cost.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
-
-    return chart_cost
-
-
-def visualize_time_benchmark_whisker(list_files_chosen, df_detail):
-    """
-    visualize_time_benchmark_whisker function is used for visualizing run times
-    it took each method to encode/decode files using a whisker chart
-
-    Args:
-        list_files_chosen (list): names of files that are to be visualized
-        df_detail (pd.DataFrame): detail benchmarking dataset
+        float_error_multiplier (float): selected error multiplier to filter the
+        df_detail
+        bool_whisker (bool): determines if the chart should be whisker or bar.
+        Default: True
 
     Returns:
         chart_time (px.Chart): chart with times
     """
 
     df_tmp = df_detail[
-        df_detail['Filename'].isin(list_files_chosen)].sort_values(
-            'Method').rename(columns={'Time': 'log(Time(s))'})
+        (df_detail['Filename'].isin(list_files_chosen)
+         & (df_detail['Error_Multiplier']
+            == float_error_multiplier))].sort_values('Method').rename(
+                columns={'Time': 'log(Time(s))'})
 
-    chart_time = px.box(
-        df_tmp, x='Method', y='log(Time(s))', color='Transformation',
-        log_y=True, facet_col='Filename',
-        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
-        height=_INT_CHART_ROW_SIZE * (
-            int((len(list_files_chosen) - 1) / 4) + 1),
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
-        template=_STRING_PLOTLY_THEME,
-        category_orders={'Filename': list_files_chosen})
+    chart_time = None
+
+    if bool_whisker:
+        chart_time = px.box(
+            df_tmp, x='Method', y='log(Time(s))', color='Transformation',
+            log_y=True, facet_col='Filename',
+            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            height=_INT_CHART_ROW_SIZE * (
+                int((len(list_files_chosen) - 1) / 4) + 1),
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
+            template=_STRING_PLOTLY_THEME,
+            category_orders={'Filename': list_files_chosen})
+    else:
+        chart_time = px.bar(
+            df_tmp, x='Method', y='log(Time(s))', color='Transformation',
+            log_y=True, facet_col='Filename',
+            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            height=_INT_CHART_ROW_SIZE * (
+                int((len(list_files_chosen) - 1) / 4) + 1),
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
+            template=_STRING_PLOTLY_THEME, barmode='group',
+            category_orders={'Filename': list_files_chosen})
 
     chart_time.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
@@ -186,39 +195,8 @@ def visualize_time_benchmark_whisker(list_files_chosen, df_detail):
     return chart_time
 
 
-def visualize_time_benchmark_bar(list_files_chosen, df_detail):
-    """
-    visualize_time_benchmark_bar function is used for visualizing run times
-    it took each method to encode/decode files using a bar chart
-
-    Args:
-        list_files_chosen (list): names of files that are to be visualized
-        df_detail (pd.DataFrame): detail benchmarking dataset
-
-    Returns:
-        chart_time (px.Chart): chart with times
-    """
-
-    df_tmp = df_detail[
-        df_detail['Filename'].isin(list_files_chosen)].sort_values(
-            'Method').rename(columns={'Time': 'log(Time(s))'})
-    chart_time = px.bar(
-        df_tmp, x='Method', y='log(Time(s))', color='Transformation',
-        log_y=True, facet_col='Filename',
-        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
-        height=_INT_CHART_ROW_SIZE * (
-            int((len(list_files_chosen) - 1) / 4) + 1),
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
-        template=_STRING_PLOTLY_THEME, barmode='group',
-        category_orders={'Filename': list_files_chosen})
-
-    chart_time.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
-
-    return chart_time
-
-
-def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat):
+def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat,
+                                  float_error_multiplier):
     """
     visualize_base_errorper_file function is used for visualizing base
     error values for each method per file across all runs
@@ -226,6 +204,8 @@ def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat):
     Args:
         list_files_chosen (list): names of files that are to be visualized
         df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+        float_error_multiplier (float): selected error multiplier to filter the
+        df_detail
 
     Returns:
         chart_base_error (px.Chart): chart with base error values
