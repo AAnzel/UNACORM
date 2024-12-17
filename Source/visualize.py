@@ -18,8 +18,8 @@ _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 
 
-# ! TODO: Decide if we want to visualize measures only for successful encode
-# ! and decode processes. If so, we should use the failure rate filter
+# TODO: Decide if we want to visualize measures only for successful encode
+# TODO: and decode processes. If so, we should use the failure rate filter
 def visualize_uploaded(df_report):
     """
     visualize_uploaded function is used for visualizing the time, cost,
@@ -244,6 +244,8 @@ def visualize_base_error_general(df_measure_sum_concat):
     chart_base_error = px.line(
         df_measure_sum_concat.sort_values('Method'), x='Mean_Base_Error_Ratio',
         y='Information_Density', color='Method',
+        facet_col='Error_Multiplier', facet_col_wrap=3,
+        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
 
