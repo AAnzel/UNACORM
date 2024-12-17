@@ -259,7 +259,7 @@ def create_benchmark_page():
     float_error_multiplier = st.slider(  # TODO: Continue from here! :)
         'Choose error multiplier value or leave it 0 to skip',
         value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
+        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5, format='%1f',
         help=tc.STRING_MUTAGENESIS_HELP)
     with st.expander('What is error multiplier?'):
         st.info(tc.STRING_MUTAGENESIS_HELP)
@@ -347,7 +347,7 @@ def main():
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    st_col_1, st_col_2, _ = st.columns([1, 1, 3])
+    st_col_1, st_col_2, _ = st.columns([1, 1, 2])
     st_col_1.title('UNACORM')
     st_col_1.markdown('The **U**nified D**NA** En**co**dings Platfo**rm**')
     st_col_2.markdown('')
