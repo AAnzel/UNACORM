@@ -134,6 +134,8 @@ def create_upload_page():
         value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
         max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
         help=tc.STRING_MUTAGENESIS_HELP)
+    with st.expander('What is error multiplier?'):
+        st.info(tc.STRING_MUTAGENESIS_HELP)
 
     if (int_chosen_storage_length is None and float_error_multiplier == 0.0):
         bool_simulate_errors = False
