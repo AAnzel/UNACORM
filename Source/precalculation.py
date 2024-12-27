@@ -5,6 +5,7 @@ import streamlit as st
 
 from utilities import PATH_ORIGINAL_DATA, LIST_ENCODING_METHODS
 from utilities import PATH_EXISTING_SUMMARY, PATH_EXISTING_DETAIL
+from utilities import PATH_INTERMEDIARY_SUMMARY, PATH_INTERMEDIARY_DETAIL
 from utilities import np_data_to_binary_array, tuple_pipeline
 from utilities import df_generate_summary, LIST_FLOAT_ERROR_MULTIPLIERS
 
@@ -21,6 +22,34 @@ __status__ = 'Stable'
 
 _NUMBER_OF_EXPERIMENT_RUNS = 5
 _BOOL_NO_USER_INTERACTION = True
+
+
+def save_intermediary(list_results):
+    """
+    save_intermediary saves intermediary detail and summary benchmark data
+
+    Args:
+        list_results (list): a list containing benchmark results calculated so
+        far
+
+    Returns:
+        None
+    """
+
+    df_intermediary_detail = pd.DataFrame(
+        list_results, columns=pd.Series(
+            ['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost',
+             'Time', 'OriFile_Size', 'Similarity', 'Error_Multiplier',
+             'Number_of_substitutions', 'Number_of_deletions',
+             'Number_of_insertions', 'Total_number_of_errors',
+             'Base_error_ratio']))
+
+    df_intermediary_summary = df_generate_summary(df_intermediary_detail)
+
+    df_intermediary_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
+    df_intermediary_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
+
+    return None
 
 
 def run_precalculation(int_num_of_iteration):
@@ -66,6 +95,11 @@ def run_precalculation(int_num_of_iteration):
                  'Error_Multiplier', 'Number_of_substitutions',
                  'Number_of_deletions', 'Number_of_insertions',
                  'Total_number_of_errors', 'Base_error_ratio']))
+
+    st.header('Existed precalculated details')
+    st.dataframe(df_existing_detail)
+    st.header('Existed precalculated summary')
+    st.dataframe(df_existing_summary)
 
     list_results = []
     list_original_files = os.listdir(PATH_ORIGINAL_DATA)
@@ -143,6 +177,9 @@ def run_precalculation(int_num_of_iteration):
                                dict_error_results['Total_number_of_errors'],
                                dict_error_results['Base_error_ratio']])
 
+            # We save the intermediary result
+            save_intermediary(list_results)
+
     df_new_detail = pd.DataFrame(
         list_results, columns=pd.Series(
             ['Filename', 'Method', 'Transformation', 'Type', 'Size', 'Cost',
@@ -156,13 +193,8 @@ def run_precalculation(int_num_of_iteration):
     st_progress_bar.empty()
     st.header('Recently calculated details')
     st.dataframe(df_new_detail)
-    st.header('Existed precalculated details')
-    st.dataframe(df_existing_detail)
-
     st.header('Recently calculated summary')
     st.dataframe(df_new_summary)
-    st.header('Existed precalculated summary')
-    st.dataframe(df_existing_summary)
 
     st.write('Do you want to merge new data into pickle file?')
     if st.button('Merge new data to pickle') or _BOOL_NO_USER_INTERACTION:

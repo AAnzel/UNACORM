@@ -40,6 +40,8 @@ PATH_ORIGINAL_DATA = os.path.join(PATH_ROOT_DATA, 'Original', 'Test')  # TODO: R
 PATH_CACHE_DATA = os.path.join(PATH_ROOT_DATA, 'cache_data')
 PATH_EXISTING_DETAIL = os.path.join(PATH_CACHE_DATA, 'pre_detail.pkl')
 PATH_EXISTING_SUMMARY = os.path.join(PATH_CACHE_DATA, 'pre_summary.pkl')
+PATH_INTERMEDIARY_DETAIL = os.path.join(PATH_CACHE_DATA, 'int_detail.pkl')
+PATH_INTERMEDIARY_SUMMARY = os.path.join(PATH_CACHE_DATA, 'int_summary.pkl')
 _PATH_ORIGINAL_TRANSLATED = os.path.join(
     PATH_ROOT_DATA, 'Translated_Binary')  # This is where we keep boolean
 # representations of the original data
