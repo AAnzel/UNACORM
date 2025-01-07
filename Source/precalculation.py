@@ -96,9 +96,9 @@ def run_precalculation(int_num_of_iteration):
                  'Number_of_deletions', 'Number_of_insertions',
                  'Total_number_of_errors', 'Base_error_ratio']))
 
-    st.header('Existed precalculated details')
+    st.header('Existing precalculated details')
     st.dataframe(df_existing_detail)
-    st.header('Existed precalculated summary')
+    st.header('Existing precalculated summary')
     st.dataframe(df_existing_summary)
 
     list_results = []
