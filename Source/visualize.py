@@ -11,9 +11,9 @@ __email__ = 'AnzelA@rki.de'
 __status__ = 'Stable'
 
 
-_DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2
-_STRING_PLOTLY_THEME = 'plotly_dark'
+_STRING_PLOTLY_THEME = 'simple_white'  # 'plotly_dark'
 _STRING_DENSITY_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
+_DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2 if _STRING_PLOTLY_THEME == 'plotly_dark' else  px.colors.qualitative.D3  # noqa
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 

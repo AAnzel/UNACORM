@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Original/Test/test.txt",
+        "input": "../Data/Uploaded/1753886050_1512094_to_do_list.txt",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",

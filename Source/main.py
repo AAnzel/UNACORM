@@ -350,20 +350,14 @@ def main():
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    st_col_1, st_col_2, _ = st.columns([1, 1, 2])
-    st_col_1.title('UNACORM')
-    st_col_1.markdown('The **U**nified D**NA** En**co**dings Platfo**rm**')
-    st_col_2.markdown('')
-    st_col_2.markdown('')
-    st_col_2.image(
-        os.path.join(uti.PATH_CACHE_DATA, 'images', 'github-mark-white.png'),
-        width=60)
-    st.markdown('')
-    st.markdown('')
-    st.markdown('')
+    st.image(
+        os.path.join(uti.PATH_CACHE_DATA, 'images', 'Logo.png'),
+        width=400, output_format='png')
 
     st_tab_benchmark, st_tab_upload, st_tab_about, st_tab_contact = st.tabs(
-        ['📊 BENCHMARK', '📂 FILE UPLOAD', 'ℹ️ ABOUT', '✉️ CONTACT'])
+        [':material/Monitoring: BENCHMARK',
+         ':material/Upload_File: FILE UPLOAD', ':material/Info: ABOUT',
+         ':material/Mail: CONTACT'])
 
     with st_tab_benchmark:
         create_benchmark_page()
