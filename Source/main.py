@@ -311,7 +311,7 @@ def main():
     st.set_page_config(page_title='UNACORM', layout='wide',
                        initial_sidebar_state='collapsed')
 
-    st.markdown('''
+    st.html('''
                     <style>
 
                         #MainMenu {visibility: hidden;}
@@ -347,14 +347,12 @@ def main():
                         }
 
                     </style>
-                ''', unsafe_allow_html=True)
+                ''')
 
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    st.image(
-        os.path.join(uti.PATH_CACHE_DATA, 'images', 'Logo.png'),
-        width=400, output_format='png')
+    st.image(os.path.join(uti.PATH_CACHE_DATA, 'images', 'Logo.png'))
 
     st_tab_benchmark, st_tab_upload, st_tab_about, st_tab_contact = st.tabs(
         [':material/Monitoring: BENCHMARK',
