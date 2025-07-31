@@ -96,60 +96,51 @@ STRING_ABOUT_PAGE = '''
     [LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)
 '''
 
-STRING_MAIN_BENCHMARK_HELP = '''
-    The benchmark dataset includes summarized results for all encoding methods 
-    and benchmark files. This dataset does not differentiate between the various 
-    runs of each encoding method for every benchmark file.
-'''
+STRING_MAIN_BENCHMARK_HELP = (':primary-background['
+    'The benchmark dataset includes summarized results for all encoding ' 
+    'methods and benchmark files. This dataset does not differentiate between ' 
+    'the various runs of each encoding method for every benchmark file.]')
 
-STRING_DETAILED_HELP = '''
-    The detailed dataset contains information on both encoding and decoding 
-    across multiple runs.
-'''
+STRING_DETAILED_HELP = (':primary-background['
+    'The detailed dataset contains information on both encoding and decoding '
+    'across multiple runs.]')
 
-STRING_DENSITY_HELP = '''
-    Information Density measures the difference in size between an encoded file
-    and its original counterpart. For instance, if the original file consists
-    of 300 bits and encoding it using a specific method produces a DNA strand
-    of 100 bases (nucleotides), the Information Density would be 3. A higher
-    value indicates that the encoding method can store more data efficiently,
-    leading to enhanced cost-effectiveness.
-'''
+STRING_DENSITY_HELP = (':primary-background['
+    'Information Density measures the difference in size between an encoded '
+    'file and its original counterpart. For instance, if the original file '
+    'consists of 300 bits and encoding it using a specific method produces a '
+    'DNA strand of 100 bases (nucleotides), the Information Density would be '
+    '3. A higher value indicates that the encoding method can store more data '
+    'efficiently, leading to enhanced cost-effectiveness.]')
 
-STRING_COST_HELP = '''
-    The cost of both encoding and decoding is calculated based on the number 
-    of nucleotides in the encoded file. For synthesis, the lengths of 
-    oligonucleotides are also considered. For sequencing, we default to using 
-    PacBio as the sequencing technology.
-'''
+STRING_COST_HELP = (':primary-background['
+    'The cost of both encoding and decoding is calculated based on the number '
+    'of nucleotides in the encoded file. For synthesis, the lengths of '
+    'oligonucleotides are also considered. For sequencing, we default to '
+    'using PacBio as the sequencing technology.]')
 
-STRING_TIME_HELP = '''
-    The time taken for the encoding and decoding processes is measured for each 
-    method and each file. These values should be used only as a reference, as 
-    the implementations of encodings can vary to some degree depending on the 
-    programming language used.
-'''
+STRING_TIME_HELP = (':primary-background['
+    'The time taken for the encoding and decoding processes is measured for '
+    'each method and each file. These values should be used only as a '
+    'reference, as the implementations of encodings can vary to some degree '
+    'depending on the programming language used.]')
 
-STRING_SIZE_HELP = '''
-    The size of resulting files from encoding and decoding processes.
-'''
+STRING_SIZE_HELP = (':primary-background['
+    'The size of resulting files from encoding and decoding processes.]')
 
-STRING_MUTAGENESIS_HELP = '''
-    High mutagenesis kit adopted from Press _et al._[1] is used as a baseline.
-    This baseline translates to an error rate of 3.6% and includes deletions,
-    insertions, and substitutions. We use the multiplier to increase or
-    decrease the baseline error rate.
-    | Multiplier | Error Rate |
-    | --- | --- |
-    | 0 | No errors (0%) |
-    | 0.05 | Low (0.18%) |
-    | 0.1 | Moderately-Low (0.36%) |
-    | 0.5 | Moderate (1.8%) |
-    | 1.0 | Moderately-High (3.6%) |
-    | 1.5 | High (5.4%) |
+STRING_MUTAGENESIS_HELP = (':primary-background['
+    'High mutagenesis kit adopted from Press _et al._[1] is used as a '
+    'baseline. This baseline translates to an error rate of 3.6% and includes '
+    'deletions, insertions, and substitutions. We use the multiplier to '
+    'increase or decrease the baseline error rate.] \n\n'
+    '\n| Multiplier | Error Rate | ' +
+    '\n| :--- | :--- | \n| 0 | No errors (0%) | \n| 0.05 | Low (0.18%) | ' +
+    '\n| 0.1 | Moderately-Low (0.36%) | \n| 0.5 | Moderate (1.8%) | ' +
+    '\n| 1.0 | Moderately-High (3.6%) | \n| 1.5 | High (5.4%) | \n\n'
+    ':primary-background['
+    '[1] W.H. Press, J.A. Hawkins, S.K. Jones, J.M. Schaub, I.J. Finkelstein, '
+    'HEDGES error-correcting code for DNA storage corrects indels and allows '
+    'sequence constraints, Proc. Natl. Acad. Sci. USA 117 (31) 18489-18496, '
+    'https://doi.org/10.1073/pnas.2004821117 (2020).]\n')
+
     
-    [1] W.H. Press, J.A. Hawkins, S.K. Jones, J.M. Schaub, I.J. Finkelstein,
-    HEDGES error-correcting code for DNA storage corrects indels and allows
-    sequence constraints, Proc. Natl. Acad. Sci. U.S.A. 117 (31) 18489-18496,
-    https://doi.org/10.1073/pnas.2004821117 (2020).
-'''
