@@ -3,6 +3,7 @@ import time
 import numpy as np
 import streamlit as st
 import pandas as pd
+import base64
 
 import visualize as vis
 import utilities as uti
@@ -58,7 +59,7 @@ def create_contact_page():
     Returns:
         None
     """
-    st_col_1, st_col_2, st_col_3 = st.columns([1, 2, 1])
+    st_col_1, st_col_2, st_col_3 = st.columns([1, 3, 1])
     st_col_2.header('Contact Us')
     st_col_2.markdown(tc.STRING_CONTACT_PAGE)
 
@@ -72,7 +73,7 @@ def create_about_page():
     Returns:
         None
     """
-    st_col_1, st_col_2, st_col_3 = st.columns([1, 2, 1])
+    st_col_1, st_col_2, st_col_3 = st.columns([1, 3, 1])
     st_col_2.header('About')
     st_col_2.markdown(tc.STRING_ABOUT_PAGE)
 
@@ -314,8 +315,7 @@ def main():
     st.html('''
                     <style>
 
-                        #MainMenu {visibility: hidden;}
-                        .stDeployButton {display:none;}
+                        .stAppToolbar {visibility:hidden;}
                         footer {visibility: hidden;}
 
                         .block-container {
@@ -324,6 +324,10 @@ def main():
 
                         button[title="View fullscreen"]{
                             visibility: hidden;}
+
+                        .stMain [data-testid="stHtml"] {
+                            height: 120px;
+                        }
 
                         .stTabs [data-baseweb="tab-list"] {
                             gap: 80px;
@@ -343,7 +347,7 @@ def main():
                             border-radius: 4px 4px 0px 0px;
                             gap: 1px;
                             padding-top: 5px;
-                            padding-bottom: 10px;
+                            padding-bottom: 5px;
                         }
 
                     </style>
@@ -352,7 +356,10 @@ def main():
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    st.image(os.path.join(uti.PATH_CACHE_DATA, 'images', 'Logo.png'))
+    with open(os.path.join(
+            uti.PATH_CACHE_DATA, 'images', 'Logo.png'), 'rb') as f:
+        image_b64 = base64.b64encode(f.read()).decode()
+        st.html(f"<img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/>") # noqa
 
     st_tab_benchmark, st_tab_upload, st_tab_about, st_tab_contact = st.tabs(
         [':material/Monitoring: BENCHMARK',
