@@ -310,6 +310,8 @@ def main():
     """
 
     st.set_page_config(page_title='UNACORM', layout='wide',
+                       page_icon=os.path.join(
+                           uti.PATH_CACHE_DATA, 'images', 'Icon.png'),
                        initial_sidebar_state='collapsed')
 
     st.html('''
