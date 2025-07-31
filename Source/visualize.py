@@ -1,5 +1,5 @@
 import plotly.express as px
-
+import streamlit as st
 
 __author__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian']
 __copyright__ = ''
@@ -11,7 +11,8 @@ __email__ = 'AnzelA@rki.de'
 __status__ = 'Stable'
 
 
-_STRING_PLOTLY_THEME = 'simple_white'  # 'plotly_dark'
+
+_STRING_PLOTLY_THEME = 'simple_white' if st.get_option('theme.base') == 'light' else 'plotly_dark'  # noqa
 _STRING_DENSITY_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2 if _STRING_PLOTLY_THEME == 'plotly_dark' else  px.colors.qualitative.D3  # noqa
 _INT_CHART_ROW_SIZE = 400
