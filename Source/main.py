@@ -30,6 +30,7 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
         data=df_summary.to_csv(index=False).encode('utf-8'),
         file_name='summary_data.csv',
         mime='text/csv',
+        icon=":material/download:",
         key='Download_Summary_' + string_key
     )
 
@@ -43,6 +44,7 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
             data=df_detail.to_csv(index=False).encode('utf-8'),
             file_name='detail_data.csv',
             mime='text/csv',
+            icon=":material/download:",
             key='Download_Detail_' + string_key
         )
 
