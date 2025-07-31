@@ -13,7 +13,7 @@ __status__ = 'Stable'
 
 
 _STRING_PLOTLY_THEME = 'simple_white' if st.get_option('theme.base') == 'light' else 'plotly_dark'  # noqa
-_STRING_DENSITY_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else 'black'  # noqa
+_STRING_DENSITY_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else '#43464b'  # noqa
 _DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2 if _STRING_PLOTLY_THEME == 'plotly_dark' else  px.colors.qualitative.D3  # noqa
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
@@ -41,21 +41,22 @@ def visualize_uploaded(df_report):
         barmode='group', text_auto=True,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE,
-        template=_STRING_PLOTLY_THEME).update_layout(yaxis_title='Size(b)')
+        template=_STRING_PLOTLY_THEME).update_layout(
+            yaxis_title='Size(b)', yaxis_showgrid=True)
 
     chart_time = px.bar(
         df_report, x='Method', y='Time', color='Transformation',
         barmode='group', height=_INT_CHART_ROW_SIZE,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
-            yaxis_title='Time(s)')
+            yaxis_title='Time(s)', yaxis_showgrid=True)
 
     chart_cost = px.bar(
         df_report, x='Method', y='Cost', color='Transformation',
         barmode='group', height=_INT_CHART_ROW_SIZE,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
-            yaxis_title='Cost($)')
+            yaxis_title='Cost($)', yaxis_showgrid=True)
 
     return chart_size, chart_time, chart_cost
 
@@ -83,6 +84,8 @@ def visualize_density_benchmark(df_measure_sum_concat):
         lambda xaxis: xaxis.update(showticklabels=True))
     chart_density.update_layout(yaxis_title='Information_Density (b/nt)')
     # TODO: Make it into a bar chart for uploaded data
+    chart_density.update_yaxes(showgrid=True)
+
     return chart_density
 
 
@@ -140,6 +143,8 @@ def visualize_cost_benchmark(list_files_chosen, df_detail,
     chart_cost.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
+    chart_cost.update_yaxes(showgrid=True)
+
     return chart_cost
 
 
@@ -192,6 +197,7 @@ def visualize_time_benchmark(list_files_chosen, df_detail,
 
     chart_time.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
+    chart_time.update_yaxes(showgrid=True)
 
     return chart_time
 
@@ -228,6 +234,8 @@ def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat,
     chart_base_error.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
 
+    chart_base_error.update_yaxes(showgrid=True)
+
     return chart_base_error
 
 
@@ -254,6 +262,8 @@ def visualize_base_error_general(df_measure_sum_concat):
     chart_base_error.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
     # ! FIX: Find the appropriate aggregation
+    chart_base_error.update_yaxes(showgrid=True)
+
     return chart_base_error
 
 
@@ -292,12 +302,15 @@ def visualize_failure_rate_general(df_detail):
         ['Method']).agg({'Failure Rate (%)': 'first'}).reset_index()
 
     chart_failure_rate = px.bar(
-        df_tmp, x='Method', y='Failure Rate (%)',
+        df_tmp, x='Method', y='Failure Rate (%)', text='Failure Rate (%)',
         height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
 
     chart_failure_rate.update_traces(
         marker_color=_STRING_DENSITY_MARKER_COLOR)
     chart_failure_rate.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True))
+
+    chart_failure_rate.update_yaxes(range=[0, 100], showgrid=True)
+    chart_failure_rate.update_traces(texttemplate='%{y:.2f}%')
 
     return chart_failure_rate

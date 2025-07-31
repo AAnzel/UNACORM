@@ -317,7 +317,8 @@ def main():
     st.html('''
                     <style>
 
-                        .stAppToolbar {visibility:hidden;}
+                        .stMainMenu {visibility:hidden;}
+                        .stAppDeployButton {visibility:hidden;}
                         footer {visibility: hidden;}
 
                         .block-container {
