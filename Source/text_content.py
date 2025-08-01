@@ -97,8 +97,8 @@ STRING_ABOUT_PAGE = '''
 '''
 
 STRING_MAIN_BENCHMARK_HELP = (':primary-background['
-    'The benchmark dataset includes summarized results for all encoding ' 
-    'methods and benchmark files. This dataset does not differentiate between ' 
+    'The benchmark dataset includes summarized results for all encoding '
+    'methods and benchmark files. This dataset does not differentiate between '
     'the various runs of each encoding method for every benchmark file.]')
 
 STRING_DETAILED_HELP = (':primary-background['
@@ -143,4 +143,6 @@ STRING_MUTAGENESIS_HELP = (':primary-background['
     'sequence constraints, Proc. Natl. Acad. Sci. USA 117 (31) 18489-18496, '
     'https://doi.org/10.1073/pnas.2004821117 (2020).]\n')
 
-    
+STRING_FAILURE_RATE_HELP = ""  # TODO: Finish this
+
+STRING_BASE_ERROR_HELP = ""  # TODO: Finish this
