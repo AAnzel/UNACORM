@@ -128,17 +128,19 @@ def create_upload_page():
 
     st.warning('The length of processing time depends on chosen methods')
 
-    int_chosen_storage_length = st.number_input(
-        'Choose length of storage (in months) or leave it empty to skip',
-        value=None, min_value=1, step=1, disabled=True)
+    st_col_1, _, st_col_2 = st.columns([4, 1, 4])
 
-    float_error_multiplier = st.number_input(
-        'Choose error multiplier value or leave it 0 to skip',
-        value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
-        help=tc.STRING_MUTAGENESIS_HELP)
-    with st.expander('What is error multiplier?'):
-        st.info(tc.STRING_MUTAGENESIS_HELP)
+    with st_col_1:
+        int_chosen_storage_length = st.number_input(
+            'Choose length of storage (in months) or leave it empty to skip',
+            value=None, min_value=1, step=1, disabled=True)
+
+    with st_col_2:
+        float_error_multiplier = st.number_input(
+            'Choose error multiplier value or leave it 0 to skip',
+            value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
+            help=tc.STRING_MUTAGENESIS_HELP)
 
     if (int_chosen_storage_length is None and float_error_multiplier == 0.0):
         bool_simulate_errors = False
@@ -244,6 +246,8 @@ def create_benchmark_page():
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
+    st.info(tc.STRING_INTRODUCTION)
+
     st.header('Benchmark', help=tc.STRING_MAIN_BENCHMARK_HELP)
     display_processed_data(df_existing_summary, df_existing_detail)
     st.markdown('---')
@@ -261,10 +265,8 @@ def create_benchmark_page():
     chart_base_error = vis.visualize_base_error_general(df_existing_summary)
     st.plotly_chart(chart_base_error, use_container_width=True)
 
-    st.header('Visualizing Cost and Runtime per Error Multiplier', help=None)  # TODO: Add new help
-
-    with st.expander('What is error multiplier?'):
-        st.info(tc.STRING_MUTAGENESIS_HELP)
+    st.header('Cost and Runtime per Error Multiplier', help=None)  # TODO: Add new help
+    st.markdown('---')
 
     st_col_1, _, st_col_2 = st.columns([4, 1, 8])
 
@@ -272,8 +274,11 @@ def create_benchmark_page():
         float_error_multiplier = st.slider(
             'Choose error multiplier value or leave it 0 to skip',
             value=0.0, min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5, format='%1f',
-            help=tc.STRING_MUTAGENESIS_HELP)
+            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1], step=0.5,
+            format='%1f')
+        with st.popover('What is error multiplier?', icon=':material/help:',
+                use_container_width=True):
+            st.markdown(tc.STRING_MUTAGENESIS_HELP)
 
     list_files_to_visualize = list(
         pd.unique(df_existing_summary['Filename']))
@@ -284,10 +289,10 @@ def create_benchmark_page():
         ' and Time Charts)', default=list_files_to_visualize,
         options=list_files_to_visualize, placeholder='Choose files')
 
+    st.html('<br>')
     string_selected_visualization = st.radio(
         'Visualize using', ['Whisker Chart', 'Bar Chart'], horizontal=True)
 
-    st.markdown('---')
     if string_selected_visualization == 'Whisker Chart':
         bool_whisker_chart = True
     else:
