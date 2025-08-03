@@ -1,20 +1,27 @@
 import plotly.express as px
 import streamlit as st
 
-__author__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian']
-__copyright__ = ''
-__credits__ = ['Aleksandar Anžel', 'Ihsan Tri Heldian', 'Chisom Ezekannagha']
-__license__ = 'GNU General Public License v3.0'
-__version__ = '1.0.0'
-__maintainer__ = 'Aleksandar Anžel'
-__email__ = 'AnzelA@rki.de'
-__status__ = 'Stable'
+__author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
+__copyright__ = ""
+__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Ezekannagha"]
+__license__ = "GNU General Public License v3.0"
+__version__ = "1.0.0"
+__maintainer__ = "Aleksandar Anžel"
+__email__ = "AnzelA@rki.de"
+__status__ = "Stable"
 
 
-
-_STRING_PLOTLY_THEME = 'simple_white' if st.get_option('theme.base') == 'light' else 'plotly_dark'  # noqa
-_STRING_DENSITY_MARKER_COLOR = 'white' if _STRING_PLOTLY_THEME == 'plotly_dark' else '#43464b'  # noqa
-_DISCRETE_COLOR_PALLETE = px.colors.qualitative.Dark2 if _STRING_PLOTLY_THEME == 'plotly_dark' else  px.colors.qualitative.D3  # noqa
+_STRING_PLOTLY_THEME = (
+    "simple_white" if st.get_option("theme.base") == "light" else "plotly_dark"
+)
+_STRING_DENSITY_MARKER_COLOR = (
+    "white" if _STRING_PLOTLY_THEME == "plotly_dark" else "#43464b"
+)
+_DISCRETE_COLOR_PALLETE = (
+    px.colors.qualitative.Dark2
+    if _STRING_PLOTLY_THEME == "plotly_dark"
+    else px.colors.qualitative.D3
+)
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
 
@@ -37,26 +44,40 @@ def visualize_uploaded(df_report):
     """
 
     chart_size = px.bar(
-        df_report, x='Method', y='Size', color='Transformation',
-        barmode='group', text_auto=True,
+        df_report,
+        x="Method",
+        y="Size",
+        color="Transformation",
+        barmode="group",
+        text_auto=True,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE,
-        template=_STRING_PLOTLY_THEME).update_layout(
-            yaxis_title='Size(b)', yaxis_showgrid=True)
+        template=_STRING_PLOTLY_THEME,
+    ).update_layout(yaxis_title="Size(b)", yaxis_showgrid=True)
 
     chart_time = px.bar(
-        df_report, x='Method', y='Time', color='Transformation',
-        barmode='group', height=_INT_CHART_ROW_SIZE,
+        df_report,
+        x="Method",
+        y="Time",
+        color="Transformation",
+        barmode="group",
+        height=_INT_CHART_ROW_SIZE,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
-            yaxis_title='Time(s)', yaxis_showgrid=True)
+        text_auto=True,
+        template=_STRING_PLOTLY_THEME,
+    ).update_layout(yaxis_title="Time(s)", yaxis_showgrid=True)
 
     chart_cost = px.bar(
-        df_report, x='Method', y='Cost', color='Transformation',
-        barmode='group', height=_INT_CHART_ROW_SIZE,
+        df_report,
+        x="Method",
+        y="Cost",
+        color="Transformation",
+        barmode="group",
+        height=_INT_CHART_ROW_SIZE,
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True, template=_STRING_PLOTLY_THEME).update_layout(
-            yaxis_title='Cost($)', yaxis_showgrid=True)
+        text_auto=True,
+        template=_STRING_PLOTLY_THEME,
+    ).update_layout(yaxis_title="Cost($)", yaxis_showgrid=True)
 
     return chart_size, chart_time, chart_cost
 
@@ -75,22 +96,24 @@ def visualize_density_benchmark(df_measure_sum_concat):
         chart_density (px.Chart): chart with information density
     """
     chart_density = px.box(
-        df_measure_sum_concat.sort_values('Method'),
-        y="Information_Density", x='Method',
-        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
-    chart_density.update_traces(
-        marker_color=_STRING_DENSITY_MARKER_COLOR)
-    chart_density.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
-    chart_density.update_layout(yaxis_title='Information_Density (b/nt)')
+        df_measure_sum_concat.sort_values("Method"),
+        y="Information_Density",
+        x="Method",
+        height=_INT_CHART_ROW_SIZE * 1.5,
+        template=_STRING_PLOTLY_THEME,
+    )
+    chart_density.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
+    chart_density.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
+    chart_density.update_layout(yaxis_title="Information_Density (b/nt)")
     # TODO: Make it into a bar chart for uploaded data
     chart_density.update_yaxes(showgrid=True)
 
     return chart_density
 
 
-def visualize_cost_benchmark(list_files_chosen, df_detail,
-                             float_error_multiplier, bool_whisker):
+def visualize_cost_benchmark(
+    list_files_chosen, df_detail, float_error_multiplier, bool_whisker
+):
     """
     visualize_cost_benchmark function is used for visualizing the
     encoding/decoding costs for each encoding method
@@ -107,49 +130,63 @@ def visualize_cost_benchmark(list_files_chosen, df_detail,
         chart_cost (px.Chart): chart with costs
     """
 
-    df_tmp = df_detail[
-        (df_detail['Filename'].isin(list_files_chosen)
-         & (df_detail['Error_Multiplier'] == float_error_multiplier))].groupby(
-             ['Filename', 'Method', 'Transformation',
-              'Size', 'Type']).mean().sort_values('Method').reset_index(
-                  ).rename(columns={'Cost': 'Cost($)'})
+    df_tmp = (
+        df_detail[
+            (
+                df_detail["Filename"].isin(list_files_chosen)
+                & (df_detail["Error_Multiplier"] == float_error_multiplier)
+            )
+        ]
+        .groupby(["Filename", "Method", "Transformation", "Size", "Type"])
+        .mean()
+        .sort_values("Method")
+        .reset_index()
+        .rename(columns={"Cost": "Cost($)"})
+    )
 
     chart_cost = None
 
     if bool_whisker:
         chart_cost = px.box(
             df_tmp,
-            x='Method', y='Cost($)', color='Transformation',
-            facet_col='Filename', facet_col_wrap=4,
+            x="Method",
+            y="Cost($)",
+            color="Transformation",
+            facet_col="Filename",
+            facet_col_wrap=4,
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-            height=_INT_CHART_ROW_SIZE * (
-                int((len(list_files_chosen) - 1) / 4) + 1),
+            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
             template=_STRING_PLOTLY_THEME,
-            category_orders={'Filename': list_files_chosen})
+            category_orders={"Filename": list_files_chosen},
+        )
 
     else:
         chart_cost = px.bar(
             df_tmp,
-            x='Method', y='Cost($)', color='Transformation',
-            facet_col='Filename', facet_col_wrap=4,
+            x="Method",
+            y="Cost($)",
+            color="Transformation",
+            facet_col="Filename",
+            facet_col_wrap=4,
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-            height=_INT_CHART_ROW_SIZE * (
-                int((len(list_files_chosen) - 1) / 4) + 1),
-            template=_STRING_PLOTLY_THEME, barmode='group',
-            category_orders={'Filename': list_files_chosen})
+            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            template=_STRING_PLOTLY_THEME,
+            barmode="group",
+            category_orders={"Filename": list_files_chosen},
+        )
 
-    chart_cost.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
+    chart_cost.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
 
     chart_cost.update_yaxes(showgrid=True)
 
     return chart_cost
 
 
-def visualize_time_benchmark(list_files_chosen, df_detail,
-                             float_error_multiplier, bool_whisker=True):
+def visualize_time_benchmark(
+    list_files_chosen, df_detail, float_error_multiplier, bool_whisker=True
+):
     """
     visualize_time_benchmark function is used for visualizing run times it took
     each method to encode/decode files
@@ -166,44 +203,60 @@ def visualize_time_benchmark(list_files_chosen, df_detail,
         chart_time (px.Chart): chart with times
     """
 
-    df_tmp = df_detail[
-        (df_detail['Filename'].isin(list_files_chosen)
-         & (df_detail['Error_Multiplier']
-            == float_error_multiplier))].sort_values('Method').rename(
-                columns={'Time': 'log(Time(s))'})
+    df_tmp = (
+        df_detail[
+            (
+                df_detail["Filename"].isin(list_files_chosen)
+                & (df_detail["Error_Multiplier"] == float_error_multiplier)
+            )
+        ]
+        .sort_values("Method")
+        .rename(columns={"Time": "log(Time(s))"})
+    )
 
     chart_time = None
 
     if bool_whisker:
         chart_time = px.box(
-            df_tmp, x='Method', y='log(Time(s))', color='Transformation',
-            log_y=True, facet_col='Filename',
+            df_tmp,
+            x="Method",
+            y="log(Time(s))",
+            color="Transformation",
+            log_y=True,
+            facet_col="Filename",
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
-            height=_INT_CHART_ROW_SIZE * (
-                int((len(list_files_chosen) - 1) / 4) + 1),
-            color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
+            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            facet_col_wrap=4,
             template=_STRING_PLOTLY_THEME,
-            category_orders={'Filename': list_files_chosen})
+            category_orders={"Filename": list_files_chosen},
+        )
     else:
         chart_time = px.bar(
-            df_tmp, x='Method', y='log(Time(s))', color='Transformation',
-            log_y=True, facet_col='Filename',
+            df_tmp,
+            x="Method",
+            y="log(Time(s))",
+            color="Transformation",
+            log_y=True,
+            facet_col="Filename",
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
-            height=_INT_CHART_ROW_SIZE * (
-                int((len(list_files_chosen) - 1) / 4) + 1),
-            color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
-            template=_STRING_PLOTLY_THEME, barmode='group',
-            category_orders={'Filename': list_files_chosen})
+            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            facet_col_wrap=4,
+            template=_STRING_PLOTLY_THEME,
+            barmode="group",
+            category_orders={"Filename": list_files_chosen},
+        )
 
-    chart_time.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
+    chart_time.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
     chart_time.update_yaxes(showgrid=True)
 
     return chart_time
 
 
-def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat,
-                                  float_error_multiplier):
+def visualize_base_error_per_file(
+    list_files_chosen, df_measure_sum_concat, float_error_multiplier
+):
     """
     visualize_base_errorper_file function is used for visualizing base
     error values for each method per file across all runs
@@ -217,22 +270,25 @@ def visualize_base_error_per_file(list_files_chosen, df_measure_sum_concat,
     Returns:
         chart_base_error (px.Chart): chart with base error values
     """
-    df_tmp = df_measure_sum_concat[(
-        df_measure_sum_concat['Filename'].isin(
-            list_files_chosen))].sort_values('Method')
+    df_tmp = df_measure_sum_concat[
+        (df_measure_sum_concat["Filename"].isin(list_files_chosen))
+    ].sort_values("Method")
 
     chart_base_error = px.line(
-        df_tmp, x='Base_error_ratio', y='Information_Density', color='Method',
-        facet_col='Filename',
+        df_tmp,
+        x="Base_error_ratio",
+        y="Information_Density",
+        color="Method",
+        facet_col="Filename",
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
-        height=_INT_CHART_ROW_SIZE * (
-            int((len(list_files_chosen) - 1) / 4) + 1),
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE, facet_col_wrap=4,
+        height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+        facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME,
-        category_orders={'Filename': list_files_chosen})
+        category_orders={"Filename": list_files_chosen},
+    )
 
-    chart_base_error.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
+    chart_base_error.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
 
     chart_base_error.update_yaxes(showgrid=True)
 
@@ -251,16 +307,20 @@ def visualize_base_error_general(df_measure_sum_concat):
         chart_base_error (px.Chart): chart with base error values
     """
     chart_base_error = px.line(
-        df_measure_sum_concat.sort_values('Method'), x='Mean_Base_Error_Ratio',
-        y='Information_Density', color='Method',
-        facet_col='Error_Multiplier', facet_col_wrap=3,
+        df_measure_sum_concat.sort_values("Method"),
+        x="Mean_Base_Error_Ratio",
+        y="Information_Density",
+        color="Method",
+        facet_col="Error_Multiplier",
+        facet_col_wrap=3,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
+        height=_INT_CHART_ROW_SIZE * 1.5,
+        template=_STRING_PLOTLY_THEME,
+    )
 
-    chart_base_error.update_layout(yaxis_title='Information Density (b/nt)')
-    chart_base_error.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
+    chart_base_error.update_layout(yaxis_title="Information Density (b/nt)")
+    chart_base_error.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
     # ! FIX: Find the appropriate aggregation
     chart_base_error.update_yaxes(showgrid=True)
 
@@ -279,38 +339,44 @@ def visualize_failure_rate_general(df_detail):
         chart_density (px.Chart): chart with information density
     """
     df_tmp = df_detail.copy()
-    df_tmp['Is_Failure'] = (df_tmp['Mean_Num_of_Errors'] == 0) \
-        & (df_tmp['Mean_Base_Error_Ratio'] == 0)
+    df_tmp["Is_Failure"] = (df_tmp["Mean_Num_of_Errors"] == 0) & (
+        df_tmp["Mean_Base_Error_Ratio"] == 0
+    )
 
-    df_failure_counts = df_tmp.groupby('Method')[
-        'Is_Failure'].sum().reset_index()
-    df_failure_counts.rename(columns={'Is_Failure': 'Number_of_Failures'},
-                             inplace=True)
+    df_failure_counts = df_tmp.groupby("Method")["Is_Failure"].sum().reset_index()
+    df_failure_counts.rename(columns={"Is_Failure": "Number_of_Failures"}, inplace=True)
 
-    df_total_counts = df_tmp.groupby('Method').size().reset_index(
-        name='Total_Attempts')
+    df_total_counts = df_tmp.groupby("Method").size().reset_index(name="Total_Attempts")
 
-    failure_rate_df = df_failure_counts.merge(df_total_counts, on='Method')
-    failure_rate_df['Failure Rate (%)'] = (
-        failure_rate_df['Number_of_Failures']
-        / failure_rate_df['Total_Attempts']) * 100
+    failure_rate_df = df_failure_counts.merge(df_total_counts, on="Method")
+    failure_rate_df["Failure Rate (%)"] = (
+        failure_rate_df["Number_of_Failures"] / failure_rate_df["Total_Attempts"]
+    ) * 100
 
-    df_tmp = df_tmp.merge(failure_rate_df[['Method', 'Failure Rate (%)']],
-                          on='Method', how='left')
+    df_tmp = df_tmp.merge(
+        failure_rate_df[["Method", "Failure Rate (%)"]], on="Method", how="left"
+    )
 
-    df_tmp = df_tmp.filter(['Method', 'Failure Rate (%)']).groupby(
-        ['Method']).agg({'Failure Rate (%)': 'first'}).reset_index()
+    df_tmp = (
+        df_tmp.filter(["Method", "Failure Rate (%)"])
+        .groupby(["Method"])
+        .agg({"Failure Rate (%)": "first"})
+        .reset_index()
+    )
 
     chart_failure_rate = px.bar(
-        df_tmp, x='Method', y='Failure Rate (%)', text='Failure Rate (%)',
-        height=_INT_CHART_ROW_SIZE * 1.5, template=_STRING_PLOTLY_THEME)
+        df_tmp,
+        x="Method",
+        y="Failure Rate (%)",
+        text="Failure Rate (%)",
+        height=_INT_CHART_ROW_SIZE * 1.5,
+        template=_STRING_PLOTLY_THEME,
+    )
 
-    chart_failure_rate.update_traces(
-        marker_color=_STRING_DENSITY_MARKER_COLOR)
-    chart_failure_rate.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True))
+    chart_failure_rate.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
+    chart_failure_rate.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
 
     chart_failure_rate.update_yaxes(range=[0, 100], showgrid=True)
-    chart_failure_rate.update_traces(texttemplate='%{y:.2f}%')
+    chart_failure_rate.update_traces(texttemplate="%{y:.2f}%")
 
     return chart_failure_rate
