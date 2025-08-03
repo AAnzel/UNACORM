@@ -156,7 +156,9 @@ def run_precalculation(int_num_of_iteration):
     for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
         for string_file in list_original_files:
             path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-            string_file_name, string_file_extension = os.path.splitext(string_file)
+            string_file_name, string_file_extension = os.path.splitext(
+                string_file
+            )
 
             if not os.path.isfile(path_one_file):
                 continue
@@ -167,8 +169,14 @@ def run_precalculation(int_num_of_iteration):
                 bool_file_is_processed = (
                     len(
                         df_existing_summary[
-                            (df_existing_summary["Filename"] == string_file_name)
-                            & (df_existing_summary["Method"] == string_encoding_method)
+                            (
+                                df_existing_summary["Filename"]
+                                == string_file_name
+                            )
+                            & (
+                                df_existing_summary["Method"]
+                                == string_encoding_method
+                            )
                             & (
                                 df_existing_summary["Error_Multiplier"]
                                 == float_error_multiplier
@@ -179,8 +187,8 @@ def run_precalculation(int_num_of_iteration):
                 )
 
                 if not bool_file_is_processed:
-                    (np_binary_encoding, int_file_size_bits) = np_data_to_binary_array(
-                        path_one_file
+                    (np_binary_encoding, int_file_size_bits) = (
+                        np_data_to_binary_array(path_one_file)
                     )
 
                     for int_i in range(int_num_of_iteration):

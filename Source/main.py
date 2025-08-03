@@ -34,7 +34,9 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
         key="Download_Summary_" + string_key,
     )
 
-    with st.expander("Expand Detailed Information", expanded=bool_expand_detail):
+    with st.expander(
+        "Expand Detailed Information", expanded=bool_expand_detail
+    ):
         st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
         st.dataframe(df_detail, use_container_width=True)
         st.download_button(
@@ -191,7 +193,9 @@ def create_upload_page():
             if len(np_decoded_array) == 0:
                 list_cannot_encode_decode.append(string_encoding_method)
 
-            bool_similar_files = np.array_equal(np_binary_encoding, np_decoded_array)
+            bool_similar_files = np.array_equal(
+                np_binary_encoding, np_decoded_array
+            )
             list_results.append(
                 list_encoded_info
                 + [
@@ -251,7 +255,9 @@ def create_upload_page():
             st.header("Benchmark")
             display_processed_data(df_new_summary, df_new_detail, True)
 
-        (chart_size, chart_time, chart_cost) = vis.visualize_uploaded(df_new_detail)
+        (chart_size, chart_time, chart_cost) = vis.visualize_uploaded(
+            df_new_detail
+        )
 
         st.header("Information Density", help=tc.STRING_DENSITY_HELP)
         chart = vis.visualize_density_benchmark(df_new_summary)
@@ -300,7 +306,9 @@ def create_benchmark_page():
     chart_base_error = vis.visualize_base_error_general(df_existing_summary)
     st.plotly_chart(chart_base_error, use_container_width=True)
 
-    st.header("Cost and Runtime per Error Multiplier", help=None)  # TODO: Add new help
+    st.header(
+        "Cost and Runtime per Error Multiplier", help=None
+    )  # TODO: Add new help
     st.markdown("---")
 
     st_col_1, _, st_col_2 = st.columns([4, 1, 8])
@@ -325,7 +333,8 @@ def create_benchmark_page():
 
     with st_col_2:
         list_files_chosen = st.multiselect(
-            "Select the files to review (This will affect Cost" + " and Time Charts)",
+            "Select the files to review (This will affect Cost"
+            + " and Time Charts)",
             default=list_files_to_visualize,
             options=list_files_to_visualize,
             placeholder="Choose files",
@@ -424,7 +433,9 @@ def main():
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    with open(os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"), "rb") as f:
+    with open(
+        os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"), "rb"
+    ) as f:
         image_b64 = base64.b64encode(f.read()).decode()
         st.html(
             f"<img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/>"

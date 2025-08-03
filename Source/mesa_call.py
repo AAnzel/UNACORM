@@ -70,12 +70,16 @@ def string_api_call(list_encoded_dna, int_storage_length):
     dict_payload["sequence"] = list_encoded_dna
 
     mesa_response = requests.post(
-        _STRING_MESA_URL, data=json.dumps(dict_payload), headers=_DICT_MESA_HEADER
+        _STRING_MESA_URL,
+        data=json.dumps(dict_payload),
+        headers=_DICT_MESA_HEADER,
     )
 
     dict_result = mesa_response.json()
     string_modified_sequence = ""
 
-    string_modified_sequence = dict_result[list_encoded_dna[0]]["modified_sequence"]
+    string_modified_sequence = dict_result[list_encoded_dna[0]][
+        "modified_sequence"
+    ]
 
     return string_modified_sequence

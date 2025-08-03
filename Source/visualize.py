@@ -103,7 +103,9 @@ def visualize_density_benchmark(df_measure_sum_concat):
         template=_STRING_PLOTLY_THEME,
     )
     chart_density.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
-    chart_density.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
+    chart_density.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True)
+    )
     chart_density.update_layout(yaxis_title="Information_Density (b/nt)")
     # TODO: Make it into a bar chart for uploaded data
     chart_density.update_yaxes(showgrid=True)
@@ -156,7 +158,8 @@ def visualize_cost_benchmark(
             facet_col_wrap=4,
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            height=_INT_CHART_ROW_SIZE
+            * (int((len(list_files_chosen) - 1) / 4) + 1),
             template=_STRING_PLOTLY_THEME,
             category_orders={"Filename": list_files_chosen},
         )
@@ -171,7 +174,8 @@ def visualize_cost_benchmark(
             facet_col_wrap=4,
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            height=_INT_CHART_ROW_SIZE
+            * (int((len(list_files_chosen) - 1) / 4) + 1),
             template=_STRING_PLOTLY_THEME,
             barmode="group",
             category_orders={"Filename": list_files_chosen},
@@ -225,7 +229,8 @@ def visualize_time_benchmark(
             log_y=True,
             facet_col="Filename",
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
-            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            height=_INT_CHART_ROW_SIZE
+            * (int((len(list_files_chosen) - 1) / 4) + 1),
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
             facet_col_wrap=4,
             template=_STRING_PLOTLY_THEME,
@@ -240,7 +245,8 @@ def visualize_time_benchmark(
             log_y=True,
             facet_col="Filename",
             facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
-            height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+            height=_INT_CHART_ROW_SIZE
+            * (int((len(list_files_chosen) - 1) / 4) + 1),
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
             facet_col_wrap=4,
             template=_STRING_PLOTLY_THEME,
@@ -281,14 +287,17 @@ def visualize_base_error_per_file(
         color="Method",
         facet_col="Filename",
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
-        height=_INT_CHART_ROW_SIZE * (int((len(list_files_chosen) - 1) / 4) + 1),
+        height=_INT_CHART_ROW_SIZE
+        * (int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         facet_col_wrap=4,
         template=_STRING_PLOTLY_THEME,
         category_orders={"Filename": list_files_chosen},
     )
 
-    chart_base_error.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
+    chart_base_error.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True)
+    )
 
     chart_base_error.update_yaxes(showgrid=True)
 
@@ -320,7 +329,9 @@ def visualize_base_error_general(df_measure_sum_concat):
     )
 
     chart_base_error.update_layout(yaxis_title="Information Density (b/nt)")
-    chart_base_error.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
+    chart_base_error.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True)
+    )
     # ! FIX: Find the appropriate aggregation
     chart_base_error.update_yaxes(showgrid=True)
 
@@ -343,14 +354,21 @@ def visualize_failure_rate_general(df_detail):
         df_tmp["Mean_Base_Error_Ratio"] == 0
     )
 
-    df_failure_counts = df_tmp.groupby("Method")["Is_Failure"].sum().reset_index()
-    df_failure_counts.rename(columns={"Is_Failure": "Number_of_Failures"}, inplace=True)
+    df_failure_counts = (
+        df_tmp.groupby("Method")["Is_Failure"].sum().reset_index()
+    )
+    df_failure_counts.rename(
+        columns={"Is_Failure": "Number_of_Failures"}, inplace=True
+    )
 
-    df_total_counts = df_tmp.groupby("Method").size().reset_index(name="Total_Attempts")
+    df_total_counts = (
+        df_tmp.groupby("Method").size().reset_index(name="Total_Attempts")
+    )
 
     failure_rate_df = df_failure_counts.merge(df_total_counts, on="Method")
     failure_rate_df["Failure Rate (%)"] = (
-        failure_rate_df["Number_of_Failures"] / failure_rate_df["Total_Attempts"]
+        failure_rate_df["Number_of_Failures"]
+        / failure_rate_df["Total_Attempts"]
     ) * 100
 
     df_tmp = df_tmp.merge(
@@ -374,7 +392,9 @@ def visualize_failure_rate_general(df_detail):
     )
 
     chart_failure_rate.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
-    chart_failure_rate.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
+    chart_failure_rate.for_each_xaxis(
+        lambda xaxis: xaxis.update(showticklabels=True)
+    )
 
     chart_failure_rate.update_yaxes(range=[0, 100], showgrid=True)
     chart_failure_rate.update_traces(texttemplate="%{y:.2f}%")

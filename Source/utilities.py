@@ -101,12 +101,19 @@ def remove_cached_data():
                 # Check if file is older than 1h, and if yes, delete it
                 if os.stat(path_file).st_mtime < time_limit:
                     try:
-                        if os.path.isfile(path_file) or os.path.islink(path_file):
+                        if os.path.isfile(path_file) or os.path.islink(
+                            path_file
+                        ):
                             os.unlink(path_file)
                         elif os.path.isdir(path_file):
                             shutil.rmtree(path_file)
                     except OSError as e:
-                        print("Failed to delete " + path_file + ". Reason: " + str(e))
+                        print(
+                            "Failed to delete "
+                            + path_file
+                            + ". Reason: "
+                            + str(e)
+                        )
                     #  print('Successfully removed old data from uploaded' +
                     #        ' directory')
                 else:
@@ -136,7 +143,8 @@ def float_calculate_encoding_cost(list_dna_sequences):
 
     float_cost_per_base = _FLOAT_SYNTHESIS_COST_PER_BASE
     int_total_base_pairs = sum([
-        len(string_dna_sequence.strip()) for string_dna_sequence in list_dna_sequences
+        len(string_dna_sequence.strip())
+        for string_dna_sequence in list_dna_sequences
     ])
     float_cost_total = int_total_base_pairs * float_cost_per_base
 
@@ -199,7 +207,9 @@ def float_calculate_decoding_cost(
     return float_cost_total
 
 
-def np_list_encode_decode(str_encoding_method, list_np_data, path_file, bool_encode):
+def np_list_encode_decode(
+    str_encoding_method, list_np_data, path_file, bool_encode
+):
     """
     np_list_encode_decode function encodes or decodes the data using all
     encoding methods
@@ -228,15 +238,23 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file, bool_enc
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.encode("", list_np_data)
         elif str_encoding_method == "OnlineCode":  # TODO: Tweak hyperparameter
-            np_list_generated_seq = encoding_online.encode(path_file, list_np_data)[0]
+            np_list_generated_seq = encoding_online.encode(
+                path_file, list_np_data
+            )[0]
         elif str_encoding_method == "LTCode":  # TODO: Tweak hyperparameters
-            np_list_generated_seq = encoding_lt.encode(path_file, list_np_data)[0]
+            np_list_generated_seq = encoding_lt.encode(path_file, list_np_data)[
+                0
+            ]
         elif str_encoding_method == "RaptorCode":
-            np_list_generated_seq = encoding_raptor.encode(path_file, list_np_data)[0]
+            np_list_generated_seq = encoding_raptor.encode(
+                path_file, list_np_data
+            )[0]
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.encode(path_file, "")
         else:
-            print("Encoding method " + str_encoding_method + " is not implemented")
+            print(
+                "Encoding method " + str_encoding_method + " is not implemented"
+            )
             pass
     else:
         if str_encoding_method == "The2DCode":
@@ -248,15 +266,21 @@ def np_list_encode_decode(str_encoding_method, list_np_data, path_file, bool_enc
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.decode("", list_np_data)
         elif str_encoding_method == "OnlineCode":  # TODO: Tweak hyperparameter
-            np_list_generated_seq = encoding_online.decode(path_file, list_np_data)
+            np_list_generated_seq = encoding_online.decode(
+                path_file, list_np_data
+            )
         elif str_encoding_method == "LTCode":  # TODO: Tweak hyperparameters
             np_list_generated_seq = encoding_lt.decode(path_file, list_np_data)
         elif str_encoding_method == "RaptorCode":
-            np_list_generated_seq = encoding_raptor.decode(path_file, list_np_data)
+            np_list_generated_seq = encoding_raptor.decode(
+                path_file, list_np_data
+            )
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.decode("", list_np_data)
         else:
-            print("Encoding method " + str_encoding_method + " is not implemented")
+            print(
+                "Encoding method " + str_encoding_method + " is not implemented"
+            )
             pass
 
     return np_list_generated_seq
@@ -354,13 +378,21 @@ def tuple_pipeline(
 
     if mp_encoding_process.exitcode != 0 or list_dna_sequences in [None, []]:
         print(
-            "Subprocess encoding failed with exit code: ", mp_encoding_process.exitcode
+            "Subprocess encoding failed with exit code: ",
+            mp_encoding_process.exitcode,
         )
-        return (list_encoded, list_decoded, list_dna_sequences, dict_error_results)
+        return (
+            list_encoded,
+            list_decoded,
+            list_dna_sequences,
+            dict_error_results,
+        )
 
     int_time_encoding = time.time() - int_start_time
 
-    list_dna_sequences = [string_dna.upper() for string_dna in list_dna_sequences]
+    list_dna_sequences = [
+        string_dna.upper() for string_dna in list_dna_sequences
+    ]
 
     int_cost_encoding = float_calculate_encoding_cost(list_dna_sequences)
     int_encoded_size = sum(
@@ -440,7 +472,8 @@ def tuple_pipeline(
         or len(np_decoded_dna_sequences) == 0
     ):
         print(
-            "Subprocess decoding failed with exit code: ", mp_decoding_process.exitcode
+            "Subprocess decoding failed with exit code: ",
+            mp_decoding_process.exitcode,
         )
         return (
             list_encoded,
@@ -465,7 +498,12 @@ def tuple_pipeline(
         int_original_size,
     ]
 
-    return (list_encoded, list_decoded, np_decoded_dna_sequences, dict_error_results)
+    return (
+        list_encoded,
+        list_decoded,
+        np_decoded_dna_sequences,
+        dict_error_results,
+    )
 
 
 @st.cache_data
@@ -491,7 +529,8 @@ def df_generate_summary(df_report):
         ["Filename", "Method", "Transformation", "Type", "Size", "OriFile_Size"]
     ].copy(deep=True)
     df_information_densities["Information_Density"] = (
-        df_information_densities["OriFile_Size"] / df_information_densities["Size"]
+        df_information_densities["OriFile_Size"]
+        / df_information_densities["Size"]
     )
     df_information_densities = df_information_densities.loc[
         df_summary["Transformation"] == "Encoding"

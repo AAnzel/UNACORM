@@ -52,7 +52,9 @@ def dict_initialize_probabilities(float_multiplier):
     return dict_error_probabilities
 
 
-def string_simulate_substitution(string_original, list_positions, string_base=None):
+def string_simulate_substitution(
+    string_original, list_positions, string_base=None
+):
     """
     string_simulate_substitution introduces substitutions in the parsed DNA
     sequences on the parsed positions.
@@ -70,7 +72,11 @@ def string_simulate_substitution(string_original, list_positions, string_base=No
         if not string_base:
             # We chose a base that is different than the existing one
             string_base = random.choice(
-                list({"A", "T", "G", "C"}.difference(string_original[int_position]))
+                list(
+                    {"A", "T", "G", "C"}.difference(
+                        string_original[int_position]
+                    )
+                )
             )
         string_modified = (
             string_modified[:int_position]
@@ -80,7 +86,9 @@ def string_simulate_substitution(string_original, list_positions, string_base=No
     return string_modified
 
 
-def string_simulate_insertion(string_original, list_positions, string_base=None):
+def string_simulate_insertion(
+    string_original, list_positions, string_base=None
+):
     """
     string_simulate_insertion introduces insertions in the parsed DNA sequences
     on the parsed positions.
@@ -159,9 +167,13 @@ def string_modify_sequence(
             string_modified, list_positions_sub
         )
     if list_positions_ins:
-        string_modified = string_simulate_insertion(string_modified, list_positions_ins)
+        string_modified = string_simulate_insertion(
+            string_modified, list_positions_ins
+        )
     if list_positions_del:
-        string_modified = string_simulate_deletion(string_modified, list_positions_del)
+        string_modified = string_simulate_deletion(
+            string_modified, list_positions_del
+        )
     return string_modified
 
 
@@ -184,7 +196,9 @@ def list_modify_sequences(
         list: A list of modified (degraded) DNA sequences.
     """
 
-    int_total_number_of_nucleotides = sum([len(string_seq) for string_seq in list_seqs])
+    int_total_number_of_nucleotides = sum([
+        len(string_seq) for string_seq in list_seqs
+    ])
 
     numpy_all_positions_subs = np.random.choice(
         int_total_number_of_nucleotides, int_number_of_subs, replace=False
@@ -221,7 +235,10 @@ def list_modify_sequences(
 
         list_modified_seqs.append(
             string_modify_sequence(
-                string_seq, list_positions_sub, list_positions_ins, list_positions_del
+                string_seq,
+                list_positions_sub,
+                list_positions_ins,
+                list_positions_del,
             )
         )
 
@@ -252,7 +269,8 @@ def tuple_simulate_errors(list_encoded_sequences, float_multiplier=0):
     dict_error_probabilities = dict_initialize_probabilities(float_multiplier)
     dict_results = {}
     dict_results["Total_number_of_nucleotides"] = sum(
-        len(string_sequence.strip()) for string_sequence in list_encoded_sequences
+        len(string_sequence.strip())
+        for string_sequence in list_encoded_sequences
     )
 
     dict_results["Number_of_substitutions"] = int(
