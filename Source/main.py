@@ -58,7 +58,7 @@ def create_contact_page():
     Returns:
         None
     """
-    st_col_1, st_col_2, st_col_3 = st.columns([1, 3, 1])
+    _, st_col_2, _ = st.columns([1, 3, 1])
     st_col_2.header("Contact Us")
     st_col_2.markdown(tc.STRING_CONTACT_PAGE)
 
@@ -72,7 +72,7 @@ def create_about_page():
     Returns:
         None
     """
-    st_col_1, st_col_2, st_col_3 = st.columns([1, 3, 1])
+    _, st_col_2, _ = st.columns([1, 3, 1])
     st_col_2.header("About")
     st_col_2.markdown(tc.STRING_ABOUT_PAGE)
 
@@ -288,7 +288,9 @@ def create_benchmark_page():
     df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
     df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
-    st.info(tc.STRING_INTRODUCTION)
+    _, st_col_2, _ = st.columns([1, 9, 1])
+    with st_col_2:
+        st.info(tc.STRING_INTRODUCTION)
 
     st.header("Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
     display_processed_data(df_existing_summary, df_existing_detail)
@@ -389,46 +391,45 @@ def main():
     )
 
     st.html("""
-                    <style>
+        <style>
 
-                        .stMainMenu {visibility:hidden;}
-                        .stAppDeployButton {visibility:hidden;}
-                        footer {visibility: hidden;}
+        .stMainMenu {visibility:hidden;}
+        .stAppDeployButton {visibility:hidden;}
+        footer {visibility: hidden;}
 
-                        .block-container {
-                            padding-top: 1.8rem;
-                        }
+        .block-container {
+            padding-top: 1.8rem;
+        }
 
-                        button[title="View fullscreen"]{
-                            visibility: hidden;}
+        button[title="View fullscreen"]{
+            visibility: hidden;}
 
-                        .stMain [data-testid="stHtml"] {
-                            height: 120px;
-                        }
+        .stMain [data-testid="stHtml"] {
+            height: 120px;
+        }
 
-                        .stTabs [data-baseweb="tab-list"] {
-                            gap: 80px;
-                            display: flex;
-                            justify-content: flex-end;
-                            width: 100%;
-                        }
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 80px;
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        }
 
-                        .stTabs [data-baseweb="tab-list"]
-                            button [data-testid="stMarkdownContainer"] p {
-                                font-size: 1.2rem;
-                                font-weight: bold;
-                            }
-                        .stTabs [data-baseweb="tab"] {
-                            height: 50px;
-                            white-space: pre-wrap;
-                            border-radius: 4px 4px 0px 0px;
-                            gap: 1px;
-                            padding-top: 5px;
-                            padding-bottom: 5px;
-                        }
-
-                    </style>
-                """)
+        .stTabs [data-baseweb="tab-list"]
+            button [data-testid="stMarkdownContainer"] p {
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+        .stTabs [data-baseweb="tab"] {
+            height: 50px;
+            white-space: pre-wrap;
+            border-radius: 4px 4px 0px 0px;
+            gap: 1px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        </style>
+        """)
 
     # Removing old uploaded data
     uti.remove_cached_data()
