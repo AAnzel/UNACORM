@@ -145,14 +145,27 @@ def run_precalculation(int_num_of_iteration):
 
     list_results = []
     list_original_files = os.listdir(PATH_ORIGINAL_DATA)
-    int_total_runs = (
-        len(list_original_files)
-        * len(LIST_ENCODING_METHODS)
-        * int_num_of_iteration
-        * len(LIST_FLOAT_ERROR_MULTIPLIERS)
-    )
+
+    int_total_missing = 0
+    for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
+        for string_file in list_original_files:
+            string_file_name, _ = os.path.splitext(string_file)
+            for string_encoding_method in LIST_ENCODING_METHODS:
+                int_existing_runs = df_existing_detail[
+                    (df_existing_detail["Filename"] == string_file_name)
+                    & (df_existing_detail["Method"] == string_encoding_method)
+                    & (
+                        df_existing_detail["Error_Multiplier"]
+                        == float_error_multiplier
+                    )
+                ].shape[0]
+                int_required = max(0, int_num_of_iteration - int_existing_runs)
+                int_total_missing += int_required
+
+    int_total_runs = int_total_missing
+    int_counter = 0
+
     # We go through error multipliers and list original files
-    int_counter = 1
     for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
         for string_file in list_original_files:
             path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
@@ -164,113 +177,94 @@ def run_precalculation(int_num_of_iteration):
                 continue
 
             for string_encoding_method in LIST_ENCODING_METHODS:
-                # We check if we already processed the file with a specific
-                # encoding method
-                bool_file_is_processed = (
-                    len(
-                        df_existing_summary[
-                            (
-                                df_existing_summary["Filename"]
-                                == string_file_name
-                            )
-                            & (
-                                df_existing_summary["Method"]
-                                == string_encoding_method
-                            )
-                            & (
-                                df_existing_summary["Error_Multiplier"]
-                                == float_error_multiplier
-                            )
-                        ]
+                int_existing_runs = df_existing_detail[
+                    (df_existing_detail["Filename"] == string_file_name)
+                    & (df_existing_detail["Method"] == string_encoding_method)
+                    & (
+                        df_existing_detail["Error_Multiplier"]
+                        == float_error_multiplier
                     )
-                    != 0
+                ].shape[0]
+
+                int_runs_to_do = int_num_of_iteration - int_existing_runs
+
+                if int_runs_to_do <= 0:
+                    continue  # All runs for this combination are done
+
+                (np_binary_encoding, int_file_size_bits) = (
+                    np_data_to_binary_array(path_one_file)
                 )
 
-                if not bool_file_is_processed:
-                    (np_binary_encoding, int_file_size_bits) = (
-                        np_data_to_binary_array(path_one_file)
+                for int_i in range(int_runs_to_do):
+                    int_counter += 1
+                    st_progress_bar.progress(
+                        int_counter / int_total_runs if int_total_runs else 1.0,
+                        text=(
+                            f"[{int_counter}/{int_total_runs}] {string_file}_{string_encoding_method}_MULT:{float_error_multiplier}"
+                        ),
                     )
 
-                    for int_i in range(int_num_of_iteration):
-                        st_progress_bar.progress(
-                            int_counter / int_total_runs,
-                            text=(
-                                "["
-                                + str(int_counter)
-                                + "/"
-                                + str(int_total_runs)
-                                + "] "
-                                + string_file
-                                + "_"
-                                + string_encoding_method
-                                + "_MULT: "
-                                + str(float_error_multiplier)
-                                + "_RUN: "
-                                + str(int_i)
-                            ),
-                        )
-                        int_counter += 1
-                        print(
-                            "\n["
-                            + str(int_counter)
-                            + "/"
-                            + str(int_total_runs)
-                            + "] "
-                            + string_file
-                            + "_"
-                            + string_encoding_method
-                            + "_MULT: "
-                            + str(float_error_multiplier)
-                            + "_RUN: "
-                            + str(int_i)
-                            + "\n"
-                        )
+                    print(
+                        "\n["
+                        + str(int_counter)
+                        + "/"
+                        + str(int_total_runs)
+                        + "] "
+                        + string_file
+                        + "_"
+                        + string_encoding_method
+                        + "_MULT: "
+                        + str(float_error_multiplier)
+                        + "_RUN: "
+                        + str(int_i)
+                        + "\n"
+                    )
 
-                        # Error simulation without MESA
-                        (
-                            list_encoded_info,
-                            list_decoded_info,
-                            np_decoded_array,
-                            dict_error_results,
-                        ) = tuple_pipeline(
-                            string_encoding_method,
-                            np_binary_encoding,
-                            path_one_file,
-                            string_file,
-                            int_file_size_bits,
-                            True,
-                            False,
-                            None,
+                    # Error simulation without MESA
+                    (
+                        list_encoded_info,
+                        list_decoded_info,
+                        np_decoded_array,
+                        dict_error_results,
+                    ) = tuple_pipeline(
+                        string_encoding_method,
+                        np_binary_encoding,
+                        path_one_file,
+                        string_file,
+                        int_file_size_bits,
+                        True,
+                        False,
+                        None,
+                        float_error_multiplier,
+                    )
+
+                    bool_similar_files = np.array_equal(
+                        np_binary_encoding, np_decoded_array
+                    )
+                    list_results.append(
+                        list_encoded_info
+                        + [
+                            bool_similar_files,
                             float_error_multiplier,
-                        )
-
-                        bool_similar_files = np.array_equal(
-                            np_binary_encoding, np_decoded_array
-                        )
-                        list_results.append(
-                            list_encoded_info
-                            + [
-                                bool_similar_files,
-                                float_error_multiplier,
-                                dict_error_results["Number_of_substitutions"],
-                                dict_error_results["Number_of_deletions"],
-                                dict_error_results["Number_of_insertions"],
-                                dict_error_results["Total_number_of_errors"],
-                                dict_error_results["Base_error_ratio"],
-                            ]
-                        )
-                        list_results.append(
-                            list_decoded_info
-                            + [
-                                bool_similar_files,
-                                float_error_multiplier,
-                                dict_error_results["Number_of_substitutions"],
-                                dict_error_results["Number_of_deletions"],
-                                dict_error_results["Number_of_insertions"],
-                                dict_error_results["Total_number_of_errors"],
-                                dict_error_results["Base_error_ratio"],
-                            ]
-                        )
+                            dict_error_results["Number_of_substitutions"],
+                            dict_error_results["Number_of_deletions"],
+                            dict_error_results["Number_of_insertions"],
+                            dict_error_results["Total_number_of_errors"],
+                            dict_error_results["Base_error_ratio"],
+                        ]
+                    )
+                    list_results.append(
+                        list_decoded_info
+                        + [
+                            bool_similar_files,
+                            float_error_multiplier,
+                            dict_error_results["Number_of_substitutions"],
+                            dict_error_results["Number_of_deletions"],
+                            dict_error_results["Number_of_insertions"],
+                            dict_error_results["Total_number_of_errors"],
+                            dict_error_results["Base_error_ratio"],
+                        ]
+                    )
 
             # We save the intermediary result
             save_intermediary(list_results)
