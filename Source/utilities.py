@@ -44,6 +44,7 @@ PATH_EXISTING_DETAIL = os.path.join(PATH_CACHE_DATA, "pre_detail.pkl")
 PATH_EXISTING_SUMMARY = os.path.join(PATH_CACHE_DATA, "pre_summary.pkl")
 PATH_INTERMEDIARY_DETAIL = os.path.join(PATH_CACHE_DATA, "int_detail.pkl")
 PATH_INTERMEDIARY_SUMMARY = os.path.join(PATH_CACHE_DATA, "int_summary.pkl")
+PATH_PARTIAL_RESULTS = os.path.join(PATH_CACHE_DATA, "partial_results")
 _PATH_ORIGINAL_TRANSLATED = os.path.join(
     PATH_ROOT_DATA, "Translated_Binary"
 )  # This is where we keep boolean
