@@ -438,7 +438,7 @@ def main():
     ) as f:
         image_b64 = base64.b64encode(f.read()).decode()
         st.html(
-            f"<img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/>"
+            f"<a href='/' target='_self'> <img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/></a>"
         )  # noqa
 
     st_tab_benchmark, st_tab_upload, st_tab_about, st_tab_contact = st.tabs([
