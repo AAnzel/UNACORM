@@ -45,11 +45,11 @@ def main():
         }
 
         header.stAppHeader {
-            background-color: #ffffff; /* or your preferred color */
+            background-color: #ffffff;
             min-height: 140px !important;           /* Increase header height */
-            padding: 0px 0px !important;         /* Add padding */
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Optional: subtle shadow */
-            position: relative !important;         /* Ensure proper positioning */
+            padding: 0px 0px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Subtle shadow */
+            position: relative !important;
             z-index: 1000 !important;              /* Keep above other content */
         }
 
@@ -82,14 +82,6 @@ def main():
     st.html(
         '<style> img[data-testid="stHeaderLogo"] {height: 7rem; margin-left: 65px;}</style>'
     )
-
-    # with open(
-    #     os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"), "rb"
-    # ) as f:
-    #     image_b64 = base64.b64encode(f.read()).decode()
-    #     st.html(
-    #         f"<a href='/' target='_self'> <img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/></a>"
-    #     )  # noqa
 
     st_home_page = st.Page(
         "1_home.py",
