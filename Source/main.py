@@ -37,6 +37,11 @@ def main():
         button[title="View fullscreen"]{
             visibility: hidden;}
 
+        .stMainBlockContainer {
+            padding-top: 50px;
+            padding-bottom: 250px;
+        }
+
         .stToolbarActions {
             max-width: 100px !important;  /* Restrict width */
             overflow: hidden;             /* Hide overflow */
@@ -83,11 +88,11 @@ def main():
         '<style> img[data-testid="stHeaderLogo"] {height: 7rem; margin-left: 65px;}</style>'
     )
 
-    st_home_page = st.Page(
-        "1_home.py",
-        title="Home",
-        icon=":material/home:",
-    )
+    # st_home_page = st.Page(
+    #     "1_home.py",
+    #     title="Home",
+    #     icon=":material/home:",
+    # )
     st_benchmark_page = st.Page(
         "2_benchmark.py",
         title="Benchmark",
@@ -111,7 +116,7 @@ def main():
 
     st_pages = st.navigation(
         [
-            st_home_page,
+            # st_home_page,
             st_benchmark_page,
             st_upload_page,
             st_about_page,

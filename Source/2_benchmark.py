@@ -13,6 +13,10 @@ __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
+_, st_col_2, _ = st.columns([1, 9, 1])
+with st_col_2:
+    st.info(tc.STRING_INTRODUCTION)
+
 df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
 df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
