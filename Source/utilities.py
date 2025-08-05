@@ -7,12 +7,11 @@ import sys
 import time
 
 import bitarray as ba
-
-# Importing error simulation scripts
 import mesa_call
 import numpy as np
 import simulate_errors
 import streamlit as st
+import text_content as tc
 
 # Importing Encodings
 import xor_code_python as encoding_xor
@@ -72,6 +71,35 @@ for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
         os.path.join(_PATH_ENCODING_METHODS, string_encoding_method)
     ):
         LIST_ENCODING_METHODS.append(string_encoding_method)
+
+
+def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
+    string_key = "new" if bool_expand_detail else "old"
+    st.dataframe(df_summary, use_container_width=True)
+    st.download_button(
+        label="Download Benchmark Data",
+        data=df_summary.to_csv(index=False).encode("utf-8"),
+        file_name="summary_data.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        key="Download_Summary_" + string_key,
+    )
+
+    with st.expander(
+        "Expand Detailed Information", expanded=bool_expand_detail
+    ):
+        st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
+        st.dataframe(df_detail, use_container_width=True)
+        st.download_button(
+            label="Download Detailed Benchmark Data",
+            data=df_detail.to_csv(index=False).encode("utf-8"),
+            file_name="detail_data.csv",
+            mime="text/csv",
+            icon=":material/download:",
+            key="Download_Detail_" + string_key,
+        )
+
+    return None
 
 
 def remove_cached_data():

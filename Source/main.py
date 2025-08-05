@@ -1,13 +1,7 @@
-import base64
 import os
-import time
 
-import numpy as np
-import pandas as pd
 import streamlit as st
-import text_content as tc
 import utilities as uti
-import visualize as vis
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
@@ -17,362 +11,6 @@ __version__ = "1.0.0"
 __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
-
-
-_PATH_UPLOADED_DATA = os.path.join(uti.PATH_ROOT_DATA, "Uploaded")
-
-
-def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
-    string_key = "new" if bool_expand_detail else "old"
-    st.dataframe(df_summary, use_container_width=True)
-    st.download_button(
-        label="Download Benchmark Data",
-        data=df_summary.to_csv(index=False).encode("utf-8"),
-        file_name="summary_data.csv",
-        mime="text/csv",
-        icon=":material/download:",
-        key="Download_Summary_" + string_key,
-    )
-
-    with st.expander(
-        "Expand Detailed Information", expanded=bool_expand_detail
-    ):
-        st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
-        st.dataframe(df_detail, use_container_width=True)
-        st.download_button(
-            label="Download Detailed Benchmark Data",
-            data=df_detail.to_csv(index=False).encode("utf-8"),
-            file_name="detail_data.csv",
-            mime="text/csv",
-            icon=":material/download:",
-            key="Download_Detail_" + string_key,
-        )
-
-    return None
-
-
-def create_contact_page():
-    """
-    create_contact_page function creates the Contact page
-
-    Returns:
-        None
-    """
-    _, st_col_2, _ = st.columns([1, 3, 1])
-    st_col_2.header("Contact Us")
-    st_col_2.markdown(tc.STRING_CONTACT_PAGE)
-
-    return None
-
-
-def create_about_page():
-    """
-    create_about function creates the About page
-
-    Returns:
-        None
-    """
-    _, st_col_2, _ = st.columns([1, 3, 1])
-    st_col_2.header("About")
-    st_col_2.markdown(tc.STRING_ABOUT_PAGE)
-
-    return None
-
-
-def create_upload_page():
-    """
-    create_upload_page function creates the Upload Page
-
-    Returns:
-        tuple: path of the uploaded file and its name are returned
-    """
-
-    st.header("File Upload")
-    st.markdown("")
-    list_file_type = ["txt", "jpg", "wav"]
-
-    imported_file = st.file_uploader(
-        label="Upload a file",
-        type=list_file_type,
-        accept_multiple_files=False,
-        key="Upload_file_",
-    )
-
-    string_input_file = ""
-    path_input_file = ""
-
-    if imported_file is not None:
-        float_time_uploaded = str(time.time()).replace(".", "_")
-        string_input_file = imported_file.name
-        string_new_name = float_time_uploaded + "_" + imported_file.name
-        path_input_file = os.path.join(_PATH_UPLOADED_DATA, string_new_name)
-        with open(path_input_file, mode="wb") as w:
-            w.write(imported_file.getvalue())
-
-        if os.path.exists(path_input_file):
-            st.success("The file is successfully uploaded")
-
-    st.write("Uploaded path data:\t", path_input_file)
-
-    if path_input_file != "":
-        np_binary_encoding, original_file_size = uti.np_data_to_binary_array(
-            path_input_file
-        )
-    else:
-        np_binary_encoding = None
-        original_file_size = None
-
-    st.markdown("---")
-
-    st.header("DNA Encoding")
-    list_chosen_dna_encoding = st.multiselect(
-        "Select preferred DNA Encoding Methods",
-        uti.LIST_ENCODING_METHODS,
-        placeholder="Choose DNA encoding methods",
-    )
-
-    st.warning("The length of processing time depends on chosen methods")
-
-    st_col_1, _, st_col_2 = st.columns([4, 1, 4])
-
-    with st_col_1:
-        int_chosen_storage_length = st.number_input(
-            "Choose length of storage (in months) or leave it empty to skip",
-            value=None,
-            min_value=1,
-            step=1,
-            disabled=True,
-        )
-
-    with st_col_2:
-        float_error_multiplier = st.number_input(
-            "Choose error multiplier value or leave it 0 to skip",
-            value=0.0,
-            min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
-            step=0.5,
-            help=tc.STRING_MUTAGENESIS_HELP,
-        )
-
-    if int_chosen_storage_length is None and float_error_multiplier == 0.0:
-        bool_simulate_errors = False
-    else:
-        bool_simulate_errors = True
-
-    df_new_detail = None
-    df_new_summary = None
-
-    list_results = []
-    list_cannot_encode_decode = []
-    if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
-        for string_encoding_method in list_chosen_dna_encoding:
-            # ! Runtime errors can occur if we simulate DNA degradation using
-            # ! MESA. These errors occur with some DNA Encoding methods, such
-            # ! as The2DCode that breaks if the error creates a homopolymer of
-            # ! length 3. This is why we have to catch errors
-            list_encoded_info = []
-
-            (
-                list_encoded_info,
-                list_decoded_info,
-                np_decoded_array,
-                dict_error_results,
-            ) = uti.tuple_pipeline(
-                string_encoding_method,
-                np_binary_encoding,
-                path_input_file,
-                string_input_file,
-                original_file_size,
-                bool_simulate_errors,
-                False,  # TODO: Add logic for this
-                int_chosen_storage_length,
-                float_error_multiplier,
-            )
-
-            # If error occured, we note it
-            if len(np_decoded_array) == 0:
-                list_cannot_encode_decode.append(string_encoding_method)
-
-            bool_similar_files = np.array_equal(
-                np_binary_encoding, np_decoded_array
-            )
-            list_results.append(
-                list_encoded_info
-                + [
-                    bool_similar_files,
-                    float_error_multiplier,
-                    dict_error_results["Number_of_substitutions"],
-                    dict_error_results["Number_of_deletions"],
-                    dict_error_results["Number_of_insertions"],
-                    dict_error_results["Total_number_of_errors"],
-                    dict_error_results["Base_error_ratio"],
-                ]
-            )
-            list_results.append(
-                list_decoded_info
-                + [
-                    bool_similar_files,
-                    float_error_multiplier,
-                    dict_error_results["Number_of_substitutions"],
-                    dict_error_results["Number_of_deletions"],
-                    dict_error_results["Number_of_insertions"],
-                    dict_error_results["Total_number_of_errors"],
-                    dict_error_results["Base_error_ratio"],
-                ]
-            )
-
-        if list_cannot_encode_decode:
-            st.error(
-                "Cannot encode/decode using the following methods:\t"
-                + str(list_cannot_encode_decode)
-            )
-
-        df_new_detail = pd.DataFrame(
-            list_results,
-            columns=pd.Series([
-                "Filename",
-                "Method",
-                "Transformation",
-                "Type",
-                "Size",
-                "Cost",
-                "Time",
-                "OriFile_Size",
-                "Similarity",
-                "Error_Multiplier",
-                "Number_of_substitutions",
-                "Number_of_deletions",
-                "Number_of_insertions",
-                "Total_number_of_errors",
-                "Base_error_ratio",
-            ]),
-        )
-
-        df_new_summary = uti.df_generate_summary(df_new_detail)
-
-        if df_new_detail is not None and df_new_summary is not None:
-            st.markdown("---")
-            st.header("Benchmark")
-            display_processed_data(df_new_summary, df_new_detail, True)
-
-        (chart_size, chart_time, chart_cost) = vis.visualize_uploaded(
-            df_new_detail
-        )
-
-        st.header("Information Density", help=tc.STRING_DENSITY_HELP)
-        chart = vis.visualize_density_benchmark(df_new_summary)
-        st.plotly_chart(chart, use_container_width=True)
-        st.header("Size", help=tc.STRING_SIZE_HELP)
-        st.plotly_chart(chart_size, use_container_width=True)
-        st.header("Time", help=tc.STRING_TIME_HELP)
-        st.plotly_chart(chart_time, use_container_width=True)
-        st.header("Cost", help=tc.STRING_COST_HELP)
-        st.plotly_chart(chart_cost, use_container_width=True)
-
-    elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
-        st.error("Choose a file and length of storage first.")  # TODO: Change
-    else:
-        pass
-
-    return None
-
-
-def create_benchmark_page():
-    """
-    create_main_page function creates the main dashboard page containing the
-    benchamark information
-
-    Returns:
-        None
-    """
-    df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
-    df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
-
-    _, st_col_2, _ = st.columns([1, 9, 1])
-    with st_col_2:
-        st.info(tc.STRING_INTRODUCTION)
-
-    st.header("Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
-    display_processed_data(df_existing_summary, df_existing_detail)
-    st.markdown("---")
-
-    st.header("Information Density", help=tc.STRING_DENSITY_HELP)
-    chart_density = vis.visualize_density_benchmark(df_existing_summary)
-    st.plotly_chart(chart_density, use_container_width=True)
-
-    st.header("Failure Rate", help=None)  # TODO: Add new help
-    chart_failure_rate = vis.visualize_failure_rate_general(df_existing_summary)
-    st.plotly_chart(chart_failure_rate, use_container_width=True)
-
-    st.header("Base Error", help=None)  # TODO: Add new help
-    chart_base_error = vis.visualize_base_error_general(df_existing_summary)
-    st.plotly_chart(chart_base_error, use_container_width=True)
-
-    st.header(
-        "Cost and Runtime per Error Multiplier", help=None
-    )  # TODO: Add new help
-    st.markdown("---")
-
-    st_col_1, _, st_col_2 = st.columns([4, 1, 8])
-
-    with st_col_1:
-        float_error_multiplier = st.slider(
-            "Choose error multiplier value or leave it 0 to skip",
-            value=0.0,
-            min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
-            step=0.5,
-            format="%1f",
-        )
-        with st.popover(
-            "What is error multiplier?",
-            icon=":material/help:",
-            use_container_width=True,
-        ):
-            st.markdown(tc.STRING_MUTAGENESIS_HELP)
-
-    list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
-
-    with st_col_2:
-        list_files_chosen = st.multiselect(
-            "Select the files to review (This will affect Cost"
-            + " and Time Charts)",
-            default=list_files_to_visualize,
-            options=list_files_to_visualize,
-            placeholder="Choose files",
-        )
-
-    st.html("<br>")
-    string_selected_visualization = st.radio(
-        "Visualize using", ["Whisker Chart", "Bar Chart"], horizontal=True
-    )
-
-    if string_selected_visualization == "Whisker Chart":
-        bool_whisker_chart = True
-    else:
-        bool_whisker_chart = False
-
-    chart_cost_all = vis.visualize_cost_benchmark(
-        list_files_chosen,
-        df_existing_detail,
-        float_error_multiplier,
-        bool_whisker_chart,
-    )
-    chart_time_all = vis.visualize_time_benchmark(
-        list_files_chosen,
-        df_existing_detail,
-        float_error_multiplier,
-        bool_whisker_chart,
-    )
-
-    st.subheader("Cost ", help=tc.STRING_COST_HELP)
-    st.markdown("Error Multiplier: " + str(float_error_multiplier))
-    st.plotly_chart(chart_cost_all, use_container_width=True)
-    st.subheader("Runtime", help=tc.STRING_TIME_HELP)
-    st.markdown("Error Multiplier: " + str(float_error_multiplier))
-    st.plotly_chart(chart_time_all, use_container_width=True)
-
-    return None
 
 
 def main():
@@ -396,67 +34,100 @@ def main():
         .stMainMenu {visibility:hidden;}
         .stAppDeployButton {visibility:hidden;}
         footer {visibility: hidden;}
-
-        .block-container {
-            padding-top: 1.8rem;
-        }
-
         button[title="View fullscreen"]{
             visibility: hidden;}
 
-        .stMain [data-testid="stHtml"] {
-            height: 120px;
+        .stToolbarActions {
+            max-width: 100px !important;  /* Restrict width */
+            overflow: hidden;             /* Hide overflow */
+            white-space: nowrap;          /* Prevent text wrapping */
+            text-overflow: ellipsis;      /* Show ellipsis for overflow */
         }
 
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 80px;
+        header.stAppHeader {
+            background-color: #ffffff; /* or your preferred color */
+            min-height: 140px !important;           /* Increase header height */
+            padding: 0px 0px !important;         /* Add padding */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Optional: subtle shadow */
+            position: relative !important;         /* Ensure proper positioning */
+            z-index: 1000 !important;              /* Keep above other content */
+        }
+
+        .rc-overflow {
             display: flex;
             justify-content: flex-end;
-            width: 100%;
+            margin-top: 65px;
+            margin-bottom: 20px;
         }
 
-        .stTabs [data-baseweb="tab-list"]
-            button [data-testid="stMarkdownContainer"] p {
-                font-size: 1.2rem;
-                font-weight: bold;
+        .rc-overflow-item {
+                padding: 10px 5px;/* Larger clickable area */
             }
-        .stTabs [data-baseweb="tab"] {
-            height: 50px;
-            white-space: pre-wrap;
-            border-radius: 4px 4px 0px 0px;
-            gap: 1px;
-            padding-top: 5px;
-            padding-bottom: 5px;
+
+        .rc-overflow-item a, .rc-overflow-item span {
+            font-size: 1.1em !important;
         }
+
         </style>
         """)
 
     # Removing old uploaded data
     uti.remove_cached_data()
 
-    with open(
-        os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"), "rb"
-    ) as f:
-        image_b64 = base64.b64encode(f.read()).decode()
-        st.html(
-            f"<a href='/' target='_self'> <img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/></a>"
-        )  # noqa
+    st.logo(
+        os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"),
+        link="https://github.com/AAnzel/DNA_Encodings/",
+    )
 
-    st_tab_benchmark, st_tab_upload, st_tab_about, st_tab_contact = st.tabs([
-        ":material/Monitoring: BENCHMARK",
-        ":material/Upload_File: FILE UPLOAD",
-        ":material/Info: ABOUT",
-        ":material/Mail: CONTACT",
-    ])
+    st.html(
+        '<style> img[data-testid="stHeaderLogo"] {height: 7rem; margin-left: 65px;}</style>'
+    )
 
-    with st_tab_benchmark:
-        create_benchmark_page()
-    with st_tab_upload:
-        create_upload_page()
-    with st_tab_about:
-        create_about_page()
-    with st_tab_contact:
-        create_contact_page()
+    # with open(
+    #     os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"), "rb"
+    # ) as f:
+    #     image_b64 = base64.b64encode(f.read()).decode()
+    #     st.html(
+    #         f"<a href='/' target='_self'> <img style='width: 25%;display: flex;margin:30px 0px 0px 0px' src='data:image/png;base64, {image_b64}'/></a>"
+    #     )  # noqa
+
+    st_home_page = st.Page(
+        "1_home.py",
+        title="Home",
+        icon=":material/home:",
+    )
+    st_benchmark_page = st.Page(
+        "2_benchmark.py",
+        title="Benchmark",
+        icon=":material/monitoring:",
+    )
+    st_upload_page = st.Page(
+        "3_upload.py",
+        title="Upload",
+        icon=":material/upload_file:",
+    )
+    st_about_page = st.Page(
+        "4_about.py",
+        title="About",
+        icon=":material/info:",
+    )
+    st_contact_page = st.Page(
+        "5_contact.py",
+        title="Contact",
+        icon=":material/mail:",
+    )
+
+    st_pages = st.navigation(
+        [
+            st_home_page,
+            st_benchmark_page,
+            st_upload_page,
+            st_about_page,
+            st_contact_page,
+        ],
+        position="top",
+    )
+    st_pages.run()
 
     return None
 
