@@ -42,7 +42,15 @@ if imported_file is not None:
     if os.path.exists(path_input_file):
         st.success("The file is successfully uploaded")
 
-st.write("Uploaded path data:\t", path_input_file)
+st_col_1, st_col_2 = st.columns([1.5, 1], gap="medium")
+
+with st_col_1:
+    st.write("Uploaded data path:\t", path_input_file)
+with st_col_2:
+    st.info(
+        "Your data is automatically deleted after changing the tab"
+        + " or closing the window."
+    )
 
 if path_input_file != "":
     np_binary_encoding, original_file_size = uti.np_data_to_binary_array(
@@ -63,26 +71,32 @@ list_chosen_dna_encoding = st.multiselect(
 
 st.warning("The length of processing time depends on chosen methods")
 
-st_col_1, _, st_col_2 = st.columns([4, 1, 4])
+st_cont_0 = st.container(border=True)
 
-with st_col_1:
-    int_chosen_storage_length = st.number_input(
-        "Choose length of storage (in months) or leave it empty to skip",
-        value=None,
-        min_value=1,
-        step=1,
-        disabled=True,
-    )
+with st_cont_0:
+    st.markdown("#### Error Simulation")
 
-with st_col_2:
-    float_error_multiplier = st.number_input(
-        "Choose error multiplier value or leave it 0 to skip",
-        value=0.0,
-        min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
-        step=0.5,
-        help=tc.STRING_MUTAGENESIS_HELP,
-    )
+    st_col_1, _, st_col_2 = st.columns([4, 1, 4])
+
+    with st_col_1:
+        int_chosen_storage_length = st.number_input(
+            "Choose length of storage (in months) or leave it empty to skip"
+            + " (uses [MESA](https://mesa.mosla.de/) API)",
+            value=None,
+            min_value=1,
+            step=1,
+            disabled=True,
+        )
+
+    with st_col_2:
+        float_error_multiplier = st.number_input(
+            "Choose error multiplier value or leave it 0 to skip",
+            value=0.0,
+            min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
+            step=0.5,
+            help=tc.STRING_MUTAGENESIS_HELP,
+        )
 
 if int_chosen_storage_length is None and float_error_multiplier == 0.0:
     bool_simulate_errors = False
@@ -181,7 +195,6 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
     df_new_summary = uti.df_generate_summary(df_new_detail)
 
     if df_new_detail is not None and df_new_summary is not None:
-        st.markdown("---")
         st.header("Benchmark")
         uti.display_processed_data(df_new_summary, df_new_detail, True)
 
