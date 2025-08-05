@@ -9,6 +9,15 @@ from utilities import (
     df_generate_summary,
 )
 
+__author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
+__copyright__ = ""
+__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Ezekannagha"]
+__license__ = "GNU General Public License v3.0"
+__version__ = "1.0.0"
+__maintainer__ = "Aleksandar Anžel"
+__email__ = "AnzelA@rki.de"
+__status__ = "Stable"
+
 # Adjust paths/patterns as needed
 PATH_PARTIAL_DETAIL_PATTERN = os.path.join(
     PATH_PARTIAL_RESULTS, "*.part_detail.pkl"

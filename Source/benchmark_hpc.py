@@ -13,6 +13,15 @@ from utilities import (
     tuple_pipeline,
 )
 
+__author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
+__copyright__ = ""
+__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Ezekannagha"]
+__license__ = "GNU General Public License v3.0"
+__version__ = "1.0.0"
+__maintainer__ = "Aleksandar Anžel"
+__email__ = "AnzelA@rki.de"
+__status__ = "Stable"
+
 _NUMBER_OF_EXPERIMENT_RUNS = 5
 _BOOL_NO_USER_INTERACTION = True
 
