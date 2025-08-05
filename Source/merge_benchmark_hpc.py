@@ -19,9 +19,7 @@ __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
 # Adjust paths/patterns as needed
-PATH_PARTIAL_DETAIL_PATTERN = os.path.join(
-    PATH_PARTIAL_RESULTS, "*.part_detail.pkl"
-)
+PATH_PARTIAL_DETAIL_PATTERN = os.path.join(PATH_PARTIAL_RESULTS, "*.pkl")
 
 
 def merge_details_and_generate_summary():
@@ -32,15 +30,15 @@ def merge_details_and_generate_summary():
         return
 
     # Load and concatenate partial detail dataframes
-    detail_dfs = [pd.read_pickle(f) for f in partial_detail_files]
-    merged_detail = pd.concat(detail_dfs, ignore_index=True)
+    list_detail_dfs = [pd.read_pickle(f) for f in partial_detail_files]
+    df_merged_detail = pd.concat(list_detail_dfs, ignore_index=True)
 
     # Save the merged detail dataframe
-    merged_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
+    df_merged_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
     print(f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}")
 
     # Generate a summary dataframe from the merged detail
-    merged_summary = df_generate_summary(merged_detail)
+    merged_summary = df_generate_summary(df_merged_detail)
 
     # Save the generated summary dataframe
     merged_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
