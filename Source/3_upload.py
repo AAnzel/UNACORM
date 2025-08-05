@@ -114,7 +114,7 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
             string_input_file,
             original_file_size,
             bool_simulate_errors,
-            False,  # TODO: Add logic for this
+            False,  # TODO: Add logic for this (bool_use_mesa)
             int_chosen_storage_length,
             float_error_multiplier,
         )
