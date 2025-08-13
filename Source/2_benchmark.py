@@ -19,7 +19,7 @@ df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
 st.header(":primary[︱]Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
 uti.display_processed_data(df_existing_summary, df_existing_detail)
-st.markdown("---")
+st.divider()
 
 st.header(":primary[︱]Information Density", help=tc.STRING_DENSITY_HELP)
 chart_density = vis.visualize_density_benchmark(df_existing_summary)
@@ -97,3 +97,6 @@ st.plotly_chart(chart_cost_all, use_container_width=True)
 st.subheader("Runtime", help=tc.STRING_TIME_HELP)
 st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
 st.plotly_chart(chart_time_all, use_container_width=True)
+
+
+uti.display_footer()

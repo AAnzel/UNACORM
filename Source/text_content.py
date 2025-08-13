@@ -191,9 +191,17 @@ STRING_ABOUT_PAGE = "\n".join((
 STRING_INTRODUCTION = "\n".join((
     "## :primary[UNACORM] :grey[︱] The Unified DNA Encodings Platform",
     " ",
-    "The Unified DNA Encoding Platfor is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage encoding methods. It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), incorporating key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and biochemical, constraint adherence. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical encodings via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",
+    "The Unified DNA Encoding Platform is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage encoding methods. It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), incorporating key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and biochemical, constraint adherence. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical encodings via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",
     " ",
     "Please cite this work as:",
     "Placeholder.",
     "Unified Evaluation Tool for DNA Data Storage Encodings. [Journal/Repository].",
+))
+
+STRING_FOOTER = "\n".join((
+    "Aleksandar Anžel, Chisom Ezekannagha, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Dominik Heider, and Georges Hattab (2025)",
+    "<br>",
+    "<i>A Unified Evaluation Tool for DNA Data Storage Encodings</i>",
+    "<br>",
+    "Journal Name. [DOI LINK].",
 ))

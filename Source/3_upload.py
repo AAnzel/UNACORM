@@ -214,3 +214,5 @@ elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
     st.error("Choose a file and length of storage first.")  # TODO: Change
 else:
     pass
+
+uti.display_footer()

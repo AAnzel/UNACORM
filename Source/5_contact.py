@@ -1,5 +1,6 @@
 import streamlit as st
 import text_content as tc
+import utilities as uti
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
@@ -13,3 +14,5 @@ __status__ = "Stable"
 _, st_col_2, _ = st.columns([1, 9, 1])
 st_col_2.header(":primary[︱]Contact Us")
 st_col_2.markdown(tc.STRING_CONTACT_PAGE)
+
+uti.display_footer()

@@ -73,6 +73,20 @@ for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
 # TODO: Implement creating a global list of files to be benchmarked
 
 
+def display_footer():
+    st.html("<br><br><br><br><br>")
+    _, st_col_2, _ = st.columns([1, 9, 1])
+    with st_col_2:
+        st.divider()
+        st.html(
+            '<small><div style="text-align: center">'
+            + tc.STRING_FOOTER
+            + "</div>"
+        )
+
+    return None
+
+
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     string_key = "new" if bool_expand_detail else "old"
     st.dataframe(df_summary, use_container_width=True)
