@@ -149,7 +149,14 @@ def run_precalculation(int_num_of_iteration):
     int_total_missing = 0
     for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
         for string_file in list_original_files:
-            string_file_name, _ = os.path.splitext(string_file)
+            path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
+            string_file_name, string_file_extension = os.path.splitext(
+                string_file
+            )
+
+            if not os.path.isfile(path_one_file):
+                continue
+
             for string_encoding_method in LIST_ENCODING_METHODS:
                 int_existing_runs = df_existing_detail[
                     (df_existing_detail["Filename"] == string_file_name)

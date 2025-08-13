@@ -88,7 +88,7 @@ We would like to thank the authors of the encoding methods (located at [Source/E
 
 | Location | Authors | Reimplemented by | Repository of the Reimplementation | Publication |
 |---|---|---|---|---|
-| [Simple Code](Source/Encodings/SimpleCode/) | George M. Church, Yuan Gao, and Sriram Kosuri | Khawla Elhadri | [https://github.com/ke-pm/DNA-Encoding](https://github.com/ke-pm/DNA-Encoding) | [10.1126/science.1226355](https://doi.org/10.1126/science.1226355) | 
+| [Simple Code](Source/Encodings/SimpleCode/) | George M. Church, Yuan Gao, and Sriram Kosuri | Khawla Elhadri | [https://github.com/ke-pm/DNA-Encoding](https://github.com/ke-pm/DNA-Encoding) | [10.1126/science.1226355](https://doi.org/10.1126/science.1226355) |
 | [2D Code](Source/Encodings/The2DCode) | Robert N. Grass, Reinhard Heckel, Michela Puddu, Daniela Paunescu, and Wendelin J. Stark | Samuel Becker, Felix Klein, and Raffael Schön | [https://github.com/raeudigerRaeffi/reedSolomonDNA](https://github.com/raeudigerRaeffi/reedSolomonDNA) | [10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378) |
 | [XOR-based Code](Source/Encodings/XORBasedCode) | James Bornholt, Randolph Lopez, Douglas M. Carmean, Luis Ceze, Georg Seelig, and Karin Strauss | Leon Wimbes, and Luca Staus | [https://github.com/StausWimbes/XOR_based_DNA_encoding](https://github.com/StausWimbes/XOR_based_DNA_encoding) | [10.1145/2872362.2872397](https://doi.org/10.1145/2872362.2872397) |
 | [Repetition Code](Source/Encodings/RepetitionCode) | Nick Goldman, Paul Bertone, Siyuan Chen, Christophe Dessimoz, Emily M. LeProust, Botond Sipos, and Ewan Birney | David Sonnabend | [https://github.com/davidabendsonn/DNAencoding-Goldman2013](https://github.com/davidabendsonn/DNAencoding-Goldman2013) | [10.1038/nature11875](https://doi.org/10.1038/nature11875) |
@@ -149,4 +149,3 @@ Licensed under the GNU General Public License, Version 3.0 ([LICENSE](./LICENSE)
 Any contribution intentionally submitted for inclusion in the work by you, shall be licensed under the GNU GPLv3.
 
 **To see how to contribute, please check [CONTRIBUTE.md](CONTRIBUTE.md).**
-

@@ -70,6 +70,8 @@ for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
     ):
         LIST_ENCODING_METHODS.append(string_encoding_method)
 
+# TODO: Implement creating a global list of files to be benchmarked
+
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     string_key = "new" if bool_expand_detail else "old"
@@ -84,7 +86,9 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     )
 
     with st.expander(
-        "Expand Detailed Information", expanded=bool_expand_detail
+        "Expand Detailed Information",
+        expanded=bool_expand_detail,
+        icon=":material/search_insights:",
     ):
         st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
         st.dataframe(df_detail, use_container_width=True)
