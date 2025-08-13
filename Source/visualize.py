@@ -27,7 +27,7 @@ _INT_CHART_TITLE_SIZE = 24
 
 
 # TODO: Decide if we want to visualize measures only for successful encode
-# TODO: and decode processes. If so, we should use the failure rate filter
+# TODO: and decode processes. If so, we should use the Success Rate filter
 def visualize_uploaded(df_report):
     """
     visualize_uploaded function is used for visualizing the time, cost,
@@ -364,41 +364,44 @@ def visualize_failure_rate_general(df_detail):
     )
 
     failure_rate_df = df_failure_counts.merge(df_total_counts, on="Method")
-    failure_rate_df["Failure Rate (%)"] = (
+    failure_rate_df["Success Rate (%)"] = (
         failure_rate_df["Number_of_Successes"]
         / failure_rate_df["Total_Attempts"]
     ) * 100
 
     df_tmp = df_tmp.merge(
-        failure_rate_df[["Method", "Failure Rate (%)"]], on="Method", how="left"
+        failure_rate_df[["Method", "Success Rate (%)"]], on="Method", how="left"
     )
 
     df_tmp = (
-        df_tmp.filter(["Method", "Failure Rate (%)"])
+        df_tmp.filter(["Method", "Success Rate (%)"])
         .groupby(["Method"])
-        .agg({"Failure Rate (%)": "first"})
+        .agg({"Success Rate (%)": "first"})
         .reset_index()
     )
 
-    chart_failure_rate = px.bar(
+    chart_success_rate = px.bar(
         df_tmp,
         x="Method",
-        y="Failure Rate (%)",
-        text="Failure Rate (%)",
+        y="Success Rate (%)",
+        text="Success Rate (%)",
         height=_INT_CHART_ROW_SIZE * 1.5,
         template=_STRING_PLOTLY_THEME,
     )
 
-    chart_failure_rate.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
-    chart_failure_rate.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True)
+    chart_success_rate.update_traces(
+        marker_color=_STRING_DENSITY_MARKER_COLOR,
+        marker_line_color=_STRING_DENSITY_MARKER_COLOR,
+        marker_line_width=4,
+        marker_cornerradius="5%",
+        texttemplate="%{y:.2f}%",
     )
+    chart_success_rate.update_xaxes(showticklabels=True)
 
-    chart_failure_rate.update_yaxes(
+    chart_success_rate.update_yaxes(
         range=[0, 100],
         showgrid=True,
         zeroline=True,
     )
-    chart_failure_rate.update_traces(texttemplate="%{y:.2f}%")
 
-    return chart_failure_rate
+    return chart_success_rate
