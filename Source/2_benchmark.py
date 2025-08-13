@@ -28,7 +28,7 @@ st.header("Information Density", help=tc.STRING_DENSITY_HELP)
 chart_density = vis.visualize_density_benchmark(df_existing_summary)
 st.plotly_chart(chart_density, use_container_width=True)
 
-st.header("Failure Rate", help=None)  # TODO: Add new help
+st.header("Success Rate", help=None)  # TODO: Add new help
 chart_failure_rate = vis.visualize_failure_rate_general(df_existing_summary)
 st.plotly_chart(chart_failure_rate, use_container_width=True)
 

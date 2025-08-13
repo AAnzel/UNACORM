@@ -315,12 +315,12 @@ def visualize_base_error_general(df_measure_sum_concat):
     Returns:
         chart_base_error (px.Chart): chart with base error values
     """
-    chart_base_error = px.line(
+    chart_base_error = px.scatter(
         df_measure_sum_concat.sort_values("Method"),
         x="Mean_Base_Error_Ratio",
         y="Information_Density",
         color="Method",
-        facet_col="Error_Multiplier",
+        facet_col="Filename",
         facet_col_wrap=3,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
@@ -350,15 +350,13 @@ def visualize_failure_rate_general(df_detail):
         chart_density (px.Chart): chart with information density
     """
     df_tmp = df_detail.copy()
-    df_tmp["Is_Failure"] = (df_tmp["Mean_Num_of_Errors"] == 0) & (
-        df_tmp["Mean_Base_Error_Ratio"] == 0
-    )
 
     df_failure_counts = (
-        df_tmp.groupby("Method")["Is_Failure"].sum().reset_index()
+        df_tmp.groupby("Method")["Similarity"].sum().reset_index()
     )
+
     df_failure_counts.rename(
-        columns={"Is_Failure": "Number_of_Failures"}, inplace=True
+        columns={"Similarity": "Number_of_Successes"}, inplace=True
     )
 
     df_total_counts = (
@@ -367,7 +365,7 @@ def visualize_failure_rate_general(df_detail):
 
     failure_rate_df = df_failure_counts.merge(df_total_counts, on="Method")
     failure_rate_df["Failure Rate (%)"] = (
-        failure_rate_df["Number_of_Failures"]
+        failure_rate_df["Number_of_Successes"]
         / failure_rate_df["Total_Attempts"]
     ) * 100
 
@@ -396,7 +394,11 @@ def visualize_failure_rate_general(df_detail):
         lambda xaxis: xaxis.update(showticklabels=True)
     )
 
-    chart_failure_rate.update_yaxes(range=[0, 100], showgrid=True)
+    chart_failure_rate.update_yaxes(
+        range=[0, 100],
+        showgrid=True,
+        zeroline=True,
+    )
     chart_failure_rate.update_traces(texttemplate="%{y:.2f}%")
 
     return chart_failure_rate
