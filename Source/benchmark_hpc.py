@@ -1,18 +1,18 @@
-import os
 import glob
+import os
 
 import numpy as np
 import pandas as pd
 from utilities import (
     LIST_ENCODING_METHODS,
     LIST_FLOAT_ERROR_MULTIPLIERS,
-    PATH_ORIGINAL_DATA,
-    PATH_PARTIAL_RESULTS,
     PATH_INTERMEDIARY_DETAIL,
     PATH_INTERMEDIARY_SUMMARY,
+    PATH_ORIGINAL_DATA,
+    PATH_PARTIAL_RESULTS,
+    df_generate_summary,
     np_data_to_binary_array,
     tuple_pipeline,
-    df_generate_summary
 )
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
@@ -27,6 +27,7 @@ __status__ = "Stable"
 
 PATH_PARTIAL_DETAIL_PATTERN = os.path.join(PATH_PARTIAL_RESULTS, "*.pkl")
 _NUMBER_OF_EXPERIMENT_RUNS = 5
+
 
 def save_intermediary(list_results, string_file_name):
     df_intermediary_detail = pd.DataFrame(
@@ -241,20 +242,25 @@ def merge_details_and_generate_summary():
 
     # Save the merged detail dataframe
     df_merged_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
-    print(f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}", flush=True)
+    print(
+        f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}", flush=True
+    )
 
     # Generate a summary dataframe from the merged detail
     merged_summary = df_generate_summary(df_merged_detail)
 
     # Save the generated summary dataframe
     merged_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
-    print(f"Summary pickle generated and saved to {PATH_INTERMEDIARY_SUMMARY}", flush=True)
+    print(
+        f"Summary pickle generated and saved to {PATH_INTERMEDIARY_SUMMARY}",
+        flush=True,
+    )
 
     return None
 
 
 def main():
-    run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
+    # run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
     merge_details_and_generate_summary()
 
     return None
