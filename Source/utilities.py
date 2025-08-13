@@ -35,9 +35,7 @@ __status__ = "Stable"
 
 # Defining paths for important files and directories
 PATH_ROOT_DATA = os.path.join("..", "Data")
-PATH_ORIGINAL_DATA = os.path.join(
-    PATH_ROOT_DATA, "Original", "Test"
-)  # TODO: Remove 'Test' # noqa
+PATH_ORIGINAL_DATA = os.path.join(PATH_ROOT_DATA, "Original")
 PATH_CACHE_DATA = os.path.join(PATH_ROOT_DATA, "cache_data")
 PATH_EXISTING_DETAIL = os.path.join(PATH_CACHE_DATA, "pre_detail.pkl")
 PATH_EXISTING_SUMMARY = os.path.join(PATH_CACHE_DATA, "pre_summary.pkl")
