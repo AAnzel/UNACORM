@@ -338,24 +338,24 @@ def visualize_base_error_general(df_measure_sum_concat):
     return chart_base_error
 
 
-def visualize_failure_rate_general(df_detail):
+def visualize_success_rate_general(df_detail):
     """
-    visualize_failure_rate_general function is used for visualizing the failure
+    visualize_success_rate_general function is used for visualizing the success
     rates for each method across all runs, files, and error multipliers
 
     Args:
         df_detail (pd.DataFrame): detail benchmarking dataset
 
     Returns:
-        chart_density (px.Chart): chart with information density
+        chart_success_rate (px.Chart): chart with success rates
     """
     df_tmp = df_detail.copy()
 
-    df_failure_counts = (
+    df_success_counts = (
         df_tmp.groupby("Method")["Similarity"].sum().reset_index()
     )
 
-    df_failure_counts.rename(
+    df_success_counts.rename(
         columns={"Similarity": "Number_of_Successes"}, inplace=True
     )
 
@@ -363,25 +363,14 @@ def visualize_failure_rate_general(df_detail):
         df_tmp.groupby("Method").size().reset_index(name="Total_Attempts")
     )
 
-    failure_rate_df = df_failure_counts.merge(df_total_counts, on="Method")
-    failure_rate_df["Success Rate (%)"] = (
-        failure_rate_df["Number_of_Successes"]
-        / failure_rate_df["Total_Attempts"]
+    df_success_rate = df_success_counts.merge(df_total_counts, on="Method")
+    df_success_rate["Success Rate (%)"] = (
+        df_success_rate["Number_of_Successes"]
+        / df_success_rate["Total_Attempts"]
     ) * 100
 
-    df_tmp = df_tmp.merge(
-        failure_rate_df[["Method", "Success Rate (%)"]], on="Method", how="left"
-    )
-
-    df_tmp = (
-        df_tmp.filter(["Method", "Success Rate (%)"])
-        .groupby(["Method"])
-        .agg({"Success Rate (%)": "first"})
-        .reset_index()
-    )
-
     chart_success_rate = px.bar(
-        df_tmp,
+        df_success_rate,
         x="Method",
         y="Success Rate (%)",
         text="Success Rate (%)",
