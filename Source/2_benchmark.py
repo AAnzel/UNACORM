@@ -39,46 +39,47 @@ st.plotly_chart(chart_base_error, use_container_width=True)
 st.header(
     ":primary[︱]Cost and Runtime per Error Multiplier", help=None
 )  # TODO: Add new help
-st.markdown("---")
-
-st_col_1, _, st_col_2 = st.columns([4, 1, 8])
-
-with st_col_1:
-    float_error_multiplier = st.slider(
-        "Choose error multiplier value or leave it 0 to skip",
-        value=0.0,
-        min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-        max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
-        step=0.5,
-        format="%1f",
-    )
-    with st.popover(
-        "What is error multiplier?",
-        icon=":material/help:",
-        use_container_width=True,
-    ):
-        st.markdown(tc.STRING_MUTAGENESIS_HELP)
-
-list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
-
-with st_col_2:
-    list_files_chosen = st.multiselect(
-        "Select the files to review (This will affect Cost"
-        + " and Time Charts)",
-        default=list_files_to_visualize,
-        options=list_files_to_visualize,
-        placeholder="Choose files",
-    )
-
 st.html("<br>")
-string_selected_visualization = st.radio(
-    "Visualize using", ["Whisker Chart", "Bar Chart"], horizontal=True
-)
 
-if string_selected_visualization == "Whisker Chart":
-    bool_whisker_chart = True
-else:
-    bool_whisker_chart = False
+with st.container(border=True):
+    st_col_1, _, st_col_2 = st.columns([4, 1, 8])
+
+    with st_col_1:
+        float_error_multiplier = st.slider(
+            "Choose error multiplier value or leave it 0 to skip",
+            value=0.0,
+            min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
+            step=0.5,
+            format="%1f",
+        )
+        with st.popover(
+            "What is error multiplier?",
+            icon=":material/help:",
+            use_container_width=True,
+        ):
+            st.markdown(tc.STRING_MUTAGENESIS_HELP)
+
+    list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
+
+    with st_col_2:
+        list_files_chosen = st.multiselect(
+            "Select the files to review (This will affect Cost"
+            + " and Time Charts)",
+            default=list_files_to_visualize,
+            options=list_files_to_visualize,
+            placeholder="Choose files",
+        )
+
+    st.html("<br>")
+    string_selected_visualization = st.radio(
+        "Visualize using", ["Whisker Chart", "Bar Chart"], horizontal=True
+    )
+
+    if string_selected_visualization == "Whisker Chart":
+        bool_whisker_chart = True
+    else:
+        bool_whisker_chart = False
 
 chart_cost_all = vis.visualize_cost_benchmark(
     list_files_chosen,
