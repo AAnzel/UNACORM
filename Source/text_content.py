@@ -189,7 +189,7 @@ STRING_ABOUT_PAGE = "\n".join((
 ))
 
 STRING_INTRODUCTION = "\n".join((
-    "## :primary[UNACORM]    The Unified DNA Encodings Platform",
+    "## :primary[UNACORM] :grey[︱] The Unified DNA Encodings Platform",
     " ",
     "The Unified DNA Encoding Platfor is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage encoding methods. It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), incorporating key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and biochemical, constraint adherence. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical encodings via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",
     " ",
