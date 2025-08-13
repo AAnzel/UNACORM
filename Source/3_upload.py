@@ -17,7 +17,7 @@ __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
-st.header("File Upload")
+st.header(":primary[︱]File Upload")
 st.markdown("")
 list_file_type = ["txt", "jpg", "wav"]
 
@@ -62,7 +62,7 @@ else:
 
 st.markdown("---")
 
-st.header("DNA Encoding")
+st.header(":primary[︱]DNA Encoding")
 list_chosen_dna_encoding = st.multiselect(
     "Select preferred DNA Encoding Methods",
     uti.LIST_ENCODING_METHODS,
@@ -195,19 +195,19 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
     df_new_summary = uti.df_generate_summary(df_new_detail)
 
     if df_new_detail is not None and df_new_summary is not None:
-        st.header("Benchmark")
+        st.header(":primary[︱]Benchmark")
         uti.display_processed_data(df_new_summary, df_new_detail, True)
 
     (chart_size, chart_time, chart_cost) = vis.visualize_uploaded(df_new_detail)
 
-    st.header("Information Density", help=tc.STRING_DENSITY_HELP)
+    st.header(":primary[︱]Information Density", help=tc.STRING_DENSITY_HELP)
     chart = vis.visualize_density_benchmark(df_new_summary)
     st.plotly_chart(chart, use_container_width=True)
-    st.header("Size", help=tc.STRING_SIZE_HELP)
+    st.header(":primary[︱]Size", help=tc.STRING_SIZE_HELP)
     st.plotly_chart(chart_size, use_container_width=True)
-    st.header("Time", help=tc.STRING_TIME_HELP)
+    st.header(":primary[︱]Time", help=tc.STRING_TIME_HELP)
     st.plotly_chart(chart_time, use_container_width=True)
-    st.header("Cost", help=tc.STRING_COST_HELP)
+    st.header(":primary[︱]Cost", help=tc.STRING_COST_HELP)
     st.plotly_chart(chart_cost, use_container_width=True)
 
 elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:

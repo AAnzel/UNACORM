@@ -20,24 +20,24 @@ with st_col_2:
 df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
 df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
-st.header("Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
+st.header(":primary[︱]Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
 uti.display_processed_data(df_existing_summary, df_existing_detail)
 st.markdown("---")
 
-st.header("Information Density", help=tc.STRING_DENSITY_HELP)
+st.header(":primary[︱]Information Density", help=tc.STRING_DENSITY_HELP)
 chart_density = vis.visualize_density_benchmark(df_existing_summary)
 st.plotly_chart(chart_density, use_container_width=True)
 
-st.header("Success Rate", help=None)  # TODO: Add new help
+st.header(":primary[︱]Success Rate", help=None)  # TODO: Add new help
 chart_failure_rate = vis.visualize_failure_rate_general(df_existing_summary)
 st.plotly_chart(chart_failure_rate, use_container_width=True)
 
-st.header("Base Error", help=None)  # TODO: Add new help
+st.header(":primary[︱]Base Error", help=None)  # TODO: Add new help
 chart_base_error = vis.visualize_base_error_general(df_existing_summary)
 st.plotly_chart(chart_base_error, use_container_width=True)
 
 st.header(
-    "Cost and Runtime per Error Multiplier", help=None
+    ":primary[︱]Cost and Runtime per Error Multiplier", help=None
 )  # TODO: Add new help
 st.markdown("---")
 

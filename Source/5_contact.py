@@ -11,5 +11,5 @@ __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
 _, st_col_2, _ = st.columns([1, 9, 1])
-st_col_2.header("Contact Us")
+st_col_2.header(":primary[︱]Contact Us")
 st_col_2.markdown(tc.STRING_CONTACT_PAGE)
