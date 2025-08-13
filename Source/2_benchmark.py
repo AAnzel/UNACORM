@@ -95,8 +95,8 @@ chart_time_all = vis.visualize_time_benchmark(
 )
 
 st.subheader("Cost ", help=tc.STRING_COST_HELP)
-st.markdown("Error Multiplier: " + str(float_error_multiplier))
+st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
 st.plotly_chart(chart_cost_all, use_container_width=True)
 st.subheader("Runtime", help=tc.STRING_TIME_HELP)
-st.markdown("Error Multiplier: " + str(float_error_multiplier))
+st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
 st.plotly_chart(chart_time_all, use_container_width=True)
