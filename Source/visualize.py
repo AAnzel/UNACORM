@@ -20,7 +20,7 @@ _STRING_DENSITY_MARKER_COLOR = (
 _DISCRETE_COLOR_PALLETE = (
     px.colors.qualitative.Dark2
     if _STRING_PLOTLY_THEME == "plotly_dark"
-    else px.colors.qualitative.D3
+    else px.colors.qualitative.Set2
 )
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
