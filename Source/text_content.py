@@ -194,8 +194,15 @@ STRING_INTRODUCTION = "\n".join((
     "The Unified DNA Encoding Platform is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage encoding methods. It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), incorporating key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and biochemical, constraint adherence. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical encodings via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",
     " ",
     "Please cite this work as:",
-    "Placeholder.",
-    "Unified Evaluation Tool for DNA Data Storage Encodings. [Journal/Repository].",
+    "```latex",
+    "@article{anzel2025unified,",
+    "author = {Aleksandar Anžel and Chisom Ezekannagha and Leon Wimbes and Luca Staus and Ihsan Tri Heldian and David Sonnabend and Khawla Elhadri and Samuel Becker and Felix Klein and Raffael Schön and Marius Welzel and Michael Schwarz and Dominik Heider and Georges Hattab},",
+    "title = {A Unified Evaluation Tool for DNA Data Storage Encodings},",
+    "journal = {Journal Name},",
+    "year = {2025},",
+    "doi = {[DOI LINK]},",
+    "},",
+    "```",
 ))
 
 STRING_FOOTER = "\n".join((
