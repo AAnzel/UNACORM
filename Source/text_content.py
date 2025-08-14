@@ -201,7 +201,7 @@ STRING_INTRODUCTION = "\n".join((
     "journal = {Journal Name},",
     "year = {2025},",
     "doi = {[DOI LINK]},",
-    "},",
+    "}",
     "```",
 ))
 

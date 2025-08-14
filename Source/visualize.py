@@ -43,41 +43,59 @@ def visualize_uploaded(df_report):
         chart_cost (px.Chart): chart with encoding/decoding costs
     """
 
-    chart_size = px.bar(
-        df_report,
-        x="Method",
-        y="Size",
-        color="Transformation",
-        barmode="group",
-        text_auto=True,
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        height=_INT_CHART_ROW_SIZE,
-        template=_STRING_PLOTLY_THEME,
-    ).update_layout(yaxis_title="Size(b)", yaxis_showgrid=True)
+    chart_size = (
+        px.bar(
+            df_report,
+            x="Method",
+            y="Size",
+            color="Transformation",
+            barmode="group",
+            text_auto=True,
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            height=_INT_CHART_ROW_SIZE,
+            template=_STRING_PLOTLY_THEME,
+        )
+        .update_layout(yaxis_title="Size(b)", yaxis_showgrid=True)
+        .update_traces(
+            marker_cornerradius="5%",
+        )
+    )
 
-    chart_time = px.bar(
-        df_report,
-        x="Method",
-        y="Time",
-        color="Transformation",
-        barmode="group",
-        height=_INT_CHART_ROW_SIZE,
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True,
-        template=_STRING_PLOTLY_THEME,
-    ).update_layout(yaxis_title="Time(s)", yaxis_showgrid=True)
+    chart_time = (
+        px.bar(
+            df_report,
+            x="Method",
+            y="Time",
+            color="Transformation",
+            barmode="group",
+            height=_INT_CHART_ROW_SIZE,
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            text_auto=True,
+            template=_STRING_PLOTLY_THEME,
+        )
+        .update_layout(yaxis_title="Time(s)", yaxis_showgrid=True)
+        .update_traces(
+            marker_cornerradius="5%",
+        )
+    )
 
-    chart_cost = px.bar(
-        df_report,
-        x="Method",
-        y="Cost",
-        color="Transformation",
-        barmode="group",
-        height=_INT_CHART_ROW_SIZE,
-        color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        text_auto=True,
-        template=_STRING_PLOTLY_THEME,
-    ).update_layout(yaxis_title="Cost($)", yaxis_showgrid=True)
+    chart_cost = (
+        px.bar(
+            df_report,
+            x="Method",
+            y="Cost",
+            color="Transformation",
+            barmode="group",
+            height=_INT_CHART_ROW_SIZE,
+            color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
+            text_auto=True,
+            template=_STRING_PLOTLY_THEME,
+        )
+        .update_layout(yaxis_title="Cost($)", yaxis_showgrid=True)
+        .update_traces(
+            marker_cornerradius="5%",
+        )
+    )
 
     return chart_size, chart_time, chart_cost
 
