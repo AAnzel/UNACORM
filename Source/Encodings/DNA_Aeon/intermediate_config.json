@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1755162809_1579773_to_do_list.txt_RU10.zip",
+        "input": "../Data/Uploaded/1755163356_065096_to_do_list.txt_RU10.zip",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",

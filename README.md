@@ -6,7 +6,7 @@ Badges Placeholder
 
 ## Manuscript
 
-This tool is created for the following paper:
+This tool was created for the following paper:
 
 ***"A Unified Evaluation Tool for DNA Storage Codes"*** by Chisom Ezekannagha^, Aleksandar Anžel^, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael
 Schwarz, Dominik Heider, and Georges Hattab
@@ -26,9 +26,9 @@ Abstract:
 > Abstract placeholder
 
 
-## Dependancies
+## Dependencies
 
-The code is written in Python 3.12.2 and tested on Linux with the libraries included in the following Anaconda environment: [environment.yml](environment.yml). Some DNA encoding methods have their own dependencies, located in the following files:
+The code is written in Python 3.12.2 and tested on Linux with the libraries included in the following Anaconda environment: [environment.yml](environment.yml). Some DNA encoding methods have additional dependencies listed in the following files::
 * [Source/Encodings/XORBasedCode/requirements.txt](Source/Encodings/XORBasedCode/requirements.txt)
 * [Source/Encodings/The2DCode/requirements.txt](Source/Encodings/The2DCode/requirements.txt)
 * [Source/Encodings/RaptorCode/requirements.txt](Source/Encodings/RaptorCode/requirements.txt)
@@ -40,15 +40,18 @@ The code is written in Python 3.12.2 and tested on Linux with the libraries incl
 |---|---|
 | [Data/](Data/) | contains all data used to evaluate encodings and store intermediary data representations |
 | [Data/Original/](Data/Original/) | contains the original data used to benchmark all encodings |
-| [Data/Encoded/](Data/Encoded/) | the directory is empty and used only when benchmarking encoding methods to save the encoded original data |
-| [Data/Decoded/](Data/Decoded/) | the directory is empty and used only when benchmarking encoding methods to save the decoded previously encoded data |
+| [Data/Encoded/](Data/Encoded/) | the directory is empty and used only during benchmarking encoding methods to save the encoded original data |
+| [Data/Decoded/](Data/Decoded/) | the directory is empty and used only during benchmarking encoding methods to save the decoded previously encoded data |
 | [Data/Uploaded/](Data/Uploaded/) | the directory is empty and used only for storing user-uploaded data |
 | [Data/cache_data/](Data/cache_data/) | contains cached data |
-| [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) | contains cached benchmark data of 10 runs for each DNA encoding and each original file |
-| [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_detail.pkl) | contains cached benchmark data that represents the summary of [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs |
+| [Data/cache_data/partial_results/](Data/cache_data/partial_results/) | contains partial per-file unmerged results created during benchmarking |
+| [Data/cache_data/int_detail.pkl](Data/cache_data/int_detail.pkl) | contains cached intermediary benchmark data of 5 runs for each DNA encoding and each original file. This file eventually becomes [pre_detail.pkl](Data/cache_data/pre_detail.pkl) after a manual check has been performed |
+| [Data/cache_data/int_summary.pkl](Data/cache_data/int_summary.pkl) | contains cached benchmark data that represents the summary of [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs. This file eventually becomes [pre_summary.pkl](Data/cache_data/pre_summary.pkl) after a manual check has been performed |
+| [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) | contains cached benchmark data of 5 runs for each DNA encoding and each original file |
+| [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) | contains cached benchmark data that represents the summary of [pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs |
 | [Data/cache_data/huff3.dict](Data/cache_data/huff3.dict) | contains cached codebook for the 2D code |
 
-The cached benchmark data can be re-calculated using [Source/precalculation.py](/Source/precalculation.py) script and the following command:
+The cached benchmark data can be re-calculated using the [Source/precalculation.py](/Source/precalculation.py) script and the following command:
 
 ```bash
 # The user should be placed inside the Source/ directory
@@ -76,13 +79,22 @@ The data located in [Data/Original/](Data/Original/) was used to test and benchm
 |---|---|
 | [Source/](Source/) | contains all scripts necessary to run the tool |
 | [Source/Encodings](Source/Encodings) | contains all DNA encodings, each in its own separate directory |
-| [Source/main.py](/Source/main.py) | contains the code that builds the main layout and connects all pages of the platform's dashboard |
-| [Source/utilities.py](/Source/utilities.py) | contains the code that implements main functionalities of the platform |
-| [Source/visualize.py](/Source/visualize.py) | contains the code that implements visualization functionalities of the platform |
-| [Source/text_content.py](/Source/text_content.py) | contains only various markdown strings that are used to build some pages or provide help tootlips |
-| [Source/precalculation.py](/Source/precalculation.py) | contains the code that precalculates the benchmark files [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) and [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) |
-| [Source/mesa_call.py](/Source/mesa_call.py) | contains the code that implements [MESA](https://mesa.mosla.de/) API calls using  [Source/mesa.json](/Source/mesa.json) configuration |
-| [Source/simulate_errors.py](/Source/simulate_errors.py) | contains the code that implements DNA error simulation which replaces MESA script if necessary |
+| [Source/utilities.py](Source/utilities.py) | contains the code that implements main functionalities of the platform |
+| [Source/visualize.py](Source/visualize.py) | contains the code that implements visualization functionalities of the platform |
+| [Source/text_content.py](Source/text_content.py) | contains only various markdown strings that are used to build some pages or provide help tootlips |
+| [Source/mesa_call.py](Source/mesa_call.py) | contains the code that implements [MESA](https://mesa.mosla.de/) API calls using  [Source/mesa.json](Source/mesa.json) configuration |
+| [Source/simulate_errors.py](Source/simulate_errors.py) | contains the code that implements DNA error simulation which replaces MESA script if necessary |
+| [Source/benchmark_ui.py](Source/benchmark_ui.py) | contains the code that runs the benchmark that can be monitored via UI and creates files [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) and [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) |
+| [Source/benchmark_hpc.py](Source/benchmark_hpc.py) | contains the HPC (high performance computing)-optimized code that runs the benchmark and creates files [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) and [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl). This script is meant to be run headless using the runner script [Source/hpc_slurm_benchmark.sh](Source/hpc_slurm_benchmark.sh) |
+| [Source/hpc_slurm_benchmark.sh](Source/hpc_slurm_benchmark.sh) | sets up the SLURM parameters and runs the [benchmark_hpc.py](Source/benchmark_hpc.py) script. Users should change the SLURM parameters within this script (**especially the e-mail**) |
+| | |
+| [Source/main.py](Source/main.py) | contains the code that builds the main application layout and connects all pages of the platform's dashboard |
+| [Source/1_home.py](Source/1_home.py) | contains the code that builds the home page |
+| [Source/2_benchmark.py](Source/2_benchmark.py) | contains the code that builds the benchmark page |
+| [Source/3_upload.py](Source/3_upload.py) | contains the code that builds the upload page |
+| [Source/4_about.py](Source/4_about.py) | contains the code that builds the about page |
+| [Source/5_contact.py](Source/5_contact.py) | contains the code that builds the contact page |
+
 
 We would like to thank the authors of the encoding methods (located at [Source/Encodings](Source/Encodings)) for helping us integrate them into our platform. We acknowledge their contributions in the table below.
 
