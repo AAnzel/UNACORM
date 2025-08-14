@@ -721,7 +721,7 @@ target_wrapper.*
 # QtCreator CMake
 CMakeLists.txt.user*
 
-# QtCreator 4.8< compilation database 
+# QtCreator 4.8< compilation database
 compile_commands.json
 
 # QtCreator local machine specific files for imported projects
@@ -1240,3 +1240,6 @@ Data/Translated_Binary/!.gitkeep
 Data/Encoded/!.gitkeep
 Data/Uploaded/!.gitkeep
 Source/Encodings/DNA_Aeon/!D
+Source/Encodings/DNA_Aeon/config.json
+Source/Encodings/DNA_Aeon/config.json
+Source/Encodings/DNA_Aeon/intermediate_config.json
