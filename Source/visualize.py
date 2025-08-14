@@ -121,6 +121,7 @@ def visualize_density_benchmark(df_measure_sum_concat):
         template=_STRING_PLOTLY_THEME,
     )
     chart_density.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
+
     chart_density.for_each_xaxis(
         lambda xaxis: xaxis.update(showticklabels=True)
     )
@@ -197,6 +198,8 @@ def visualize_cost_benchmark(
             template=_STRING_PLOTLY_THEME,
             barmode="group",
             category_orders={"Filename": list_files_chosen},
+        ).update_traces(
+            marker_cornerradius="5%",
         )
 
     chart_cost.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
@@ -270,6 +273,8 @@ def visualize_time_benchmark(
             template=_STRING_PLOTLY_THEME,
             barmode="group",
             category_orders={"Filename": list_files_chosen},
+        ).update_traces(
+            marker_cornerradius="5%",
         )
 
     chart_time.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
