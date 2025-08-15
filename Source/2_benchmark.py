@@ -70,9 +70,11 @@ with st.container(border=True):
         )
 
     st.html("<br>")
+
     string_selected_visualization = st.radio(
-        "Visualize using", ["Whisker Chart", "Bar Chart"], horizontal=True
+        "Visualize using", ["Bar Chart", "Whisker Chart"], horizontal=True
     )
+    st.warning("The y-axes use a logarithmic scale", width=260)
 
     if string_selected_visualization == "Whisker Chart":
         bool_whisker_chart = True

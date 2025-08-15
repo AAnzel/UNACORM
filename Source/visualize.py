@@ -122,9 +122,7 @@ def visualize_density_benchmark(df_measure_sum_concat):
     )
     chart_density.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
 
-    chart_density.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True)
-    )
+    chart_density.update_xaxes(showticklabels=True)
     chart_density.update_layout(yaxis_title="Information_Density (b/nt)")
     # TODO: Make it into a bar chart for uploaded data
     chart_density.update_yaxes(showgrid=True)
@@ -151,27 +149,27 @@ def visualize_cost_benchmark(
         chart_cost (px.Chart): chart with costs
     """
 
-    df_tmp = (
-        df_detail[
-            (
-                df_detail["Filename"].isin(list_files_chosen)
-                & (df_detail["Error_Multiplier"] == float_error_multiplier)
-            )
-        ]
-        .groupby(["Filename", "Method", "Transformation", "Size", "Type"])
-        .mean()
-        .sort_values("Method")
-        .reset_index()
-        .rename(columns={"Cost": "Cost($)"})
-    )
+    df_tmp = df_detail[
+        (
+            df_detail["Filename"].isin(list_files_chosen)
+            & (df_detail["Error_Multiplier"] == float_error_multiplier)
+        )
+    ]
 
     chart_cost = None
 
     if bool_whisker:
+        df_tmp = (
+            df_tmp[["Filename", "Method", "Transformation", "Cost"]]
+            .sort_values("Method")
+            .rename(columns={"Cost": "Cost($)"})
+        )
+
         chart_cost = px.box(
             df_tmp,
             x="Method",
             y="Cost($)",
+            log_y=True,
             color="Transformation",
             facet_col="Filename",
             facet_col_wrap=4,
@@ -184,10 +182,20 @@ def visualize_cost_benchmark(
         )
 
     else:
+        df_tmp = (
+            df_tmp[["Filename", "Method", "Transformation", "Cost"]]
+            .groupby(["Filename", "Method", "Transformation"])
+            .median()
+            .sort_values("Method")
+            .reset_index()
+            .rename(columns={"Cost": "Cost($)"})
+        )
+
         chart_cost = px.bar(
             df_tmp,
             x="Method",
             y="Cost($)",
+            log_y=True,
             color="Transformation",
             facet_col="Filename",
             facet_col_wrap=4,
@@ -202,8 +210,7 @@ def visualize_cost_benchmark(
             marker_cornerradius="5%",
         )
 
-    chart_cost.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
-
+    chart_cost.update_xaxes(showticklabels=True)
     chart_cost.update_yaxes(showgrid=True)
 
     return chart_cost
@@ -228,24 +235,26 @@ def visualize_time_benchmark(
         chart_time (px.Chart): chart with times
     """
 
-    df_tmp = (
-        df_detail[
-            (
-                df_detail["Filename"].isin(list_files_chosen)
-                & (df_detail["Error_Multiplier"] == float_error_multiplier)
-            )
-        ]
-        .sort_values("Method")
-        .rename(columns={"Time": "log(Time(s))"})
-    )
+    df_tmp = df_detail[
+        (
+            df_detail["Filename"].isin(list_files_chosen)
+            & (df_detail["Error_Multiplier"] == float_error_multiplier)
+        )
+    ]
 
     chart_time = None
 
     if bool_whisker:
+        df_tmp = (
+            df_tmp[["Filename", "Method", "Transformation", "Time"]]
+            .sort_values("Method")
+            .rename(columns={"Time": "Time(s)"})
+        )
+
         chart_time = px.box(
             df_tmp,
             x="Method",
-            y="log(Time(s))",
+            y="Time(s)",
             color="Transformation",
             log_y=True,
             facet_col="Filename",
@@ -258,10 +267,19 @@ def visualize_time_benchmark(
             category_orders={"Filename": list_files_chosen},
         )
     else:
+        df_tmp = (
+            df_tmp[["Filename", "Method", "Transformation", "Time"]]
+            .groupby(["Filename", "Method", "Transformation"])
+            .median()
+            .sort_values("Method")
+            .reset_index()
+            .rename(columns={"Time": "Time(s)"})
+        )
+
         chart_time = px.bar(
             df_tmp,
             x="Method",
-            y="log(Time(s))",
+            y="Time(s)",
             color="Transformation",
             log_y=True,
             facet_col="Filename",
@@ -277,8 +295,8 @@ def visualize_time_benchmark(
             marker_cornerradius="5%",
         )
 
-    chart_time.for_each_xaxis(lambda xaxis: xaxis.update(showticklabels=True))
-    chart_time.update_yaxes(showgrid=True)
+    chart_time.update_xaxes(showticklabels=True)
+    chart_time.update_yaxes(showgrid=True)  # , title="log(Time(s))")
 
     return chart_time
 
@@ -318,10 +336,7 @@ def visualize_base_error_per_file(
         category_orders={"Filename": list_files_chosen},
     )
 
-    chart_base_error.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True)
-    )
-
+    chart_base_error.update_xaxes(showticklabels=True)
     chart_base_error.update_yaxes(showgrid=True)
 
     return chart_base_error
@@ -352,9 +367,8 @@ def visualize_base_error_general(df_measure_sum_concat):
     )
 
     chart_base_error.update_layout(yaxis_title="Information Density (b/nt)")
-    chart_base_error.for_each_xaxis(
-        lambda xaxis: xaxis.update(showticklabels=True)
-    )
+    chart_base_error.update_xaxes(showticklabels=True)
+
     # ! FIX: Find the appropriate aggregation
     chart_base_error.update_yaxes(showgrid=True)
 
