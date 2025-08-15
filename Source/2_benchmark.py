@@ -25,7 +25,7 @@ st.header(":primary[︱]Information Density", help=tc.STRING_DENSITY_HELP)
 chart_density = vis.visualize_density_benchmark(df_existing_summary)
 st.plotly_chart(chart_density, use_container_width=True)
 
-st.header(":primary[︱]Success Rate", help=None)  # TODO: Add new help
+st.header(":primary[︱]Success Rate", help=tc.STRING_SUCCESS_RATE_HELP)
 chart_sucess_rate = vis.visualize_success_rate_general(df_existing_summary)
 st.plotly_chart(chart_sucess_rate, use_container_width=True)
 
@@ -34,8 +34,9 @@ chart_base_error = vis.visualize_base_error_general(df_existing_summary)
 st.plotly_chart(chart_base_error, use_container_width=True)
 
 st.header(
-    ":primary[︱]Cost and Runtime per Error Multiplier", help=None
-)  # TODO: Add new help
+    ":primary[︱]Cost and Runtime per Error Multiplier",
+    help=tc.STRING_COST_RUNTIME,
+)
 st.html("<br>")
 
 with st.container(border=True):
