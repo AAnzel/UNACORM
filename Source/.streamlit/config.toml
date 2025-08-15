@@ -4,6 +4,3 @@ primaryColor="#3399ff"
 
 [browser]
 gatherUsageStats=false
-
-[server]
-enableStaticServing = true
