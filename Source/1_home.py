@@ -10,8 +10,7 @@ df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 _, st_col_2, _ = st.columns([1, 9, 1])
 with st_col_2:
     st.info(tc.STRING_INTRODUCTION)
-    st.html("<br>")
-    st.html("<br>")
+    st.html("<br><br>")
 
 
 str_sum_time = str(
