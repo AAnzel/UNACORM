@@ -24,7 +24,7 @@ str_sum_size = str(
 )
 int_sum_methods = len(uti.LIST_ENCODING_METHODS)
 int_sum_files = len(list(pd.unique(df_existing_detail["Filename"])))
-series_success_rate = df_existing_detail["Similarity"].value_counts(
+series_success_rate = df_existing_detail["Similarity"].value_counts(  # pyright: ignore [reportAttributeAccessIssue]
     normalize=True
 )
 

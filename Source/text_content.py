@@ -7,8 +7,6 @@ __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
-# We put the comment below to disable all FLAKE8 "line too long" errors
-# flake8: noqa: E501
 
 STRING_CONTACT_PAGE = """
     We appreciate your interest in our project! Here are the best ways to get in touch or contribute.

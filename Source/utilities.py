@@ -277,7 +277,7 @@ def np_list_encode_decode(
         if str_encoding_method == "The2DCode":
             np_list_generated_seq = encoding_2d.encode("", list_np_data)
         elif str_encoding_method == "XORBasedCode":
-            np_list_generated_seq = encoding_xor.encode("", list_np_data)
+            np_list_generated_seq = encoding_xor.encode("", list_np_data)  # pyright: ignore [reportAttributeAccessIssue]
         elif str_encoding_method == "SimpleCode":
             np_list_generated_seq = encoding_simple.encode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
@@ -305,7 +305,7 @@ def np_list_encode_decode(
         if str_encoding_method == "The2DCode":
             np_list_generated_seq = encoding_2d.decode("", list_np_data)
         elif str_encoding_method == "XORBasedCode":
-            np_list_generated_seq = encoding_xor.decode("", list_np_data)
+            np_list_generated_seq = encoding_xor.decode("", list_np_data)  # pyright: ignore [reportAttributeAccessIssue]
         elif str_encoding_method == "SimpleCode":
             np_list_generated_seq = encoding_simple.decode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
@@ -327,6 +327,13 @@ def np_list_encode_decode(
                 "Encoding method " + str_encoding_method + " is not implemented"
             )
             pass
+
+    if bool_encode:
+        if not isinstance(np_list_generated_seq, list):
+            np_list_generated_seq = []
+    else:
+        if not isinstance(np_list_generated_seq, np.ndarray):
+            np_list_generated_seq = np.array([])
 
     return np_list_generated_seq
 
@@ -421,7 +428,11 @@ def tuple_pipeline(
     list_dna_sequences = print_output(mp_queue)
     mp_encoding_process.join()  # Wait for the process to finish
 
-    if mp_encoding_process.exitcode != 0 or list_dna_sequences in [None, []]:
+    # In case there is error with encoding and we get None
+    if not isinstance(list_dna_sequences, list):
+        list_dna_sequences = []
+
+    if mp_encoding_process.exitcode != 0 or len(list_dna_sequences) == 0:
         print(
             "Subprocess encoding failed with exit code: ",
             mp_encoding_process.exitcode,
@@ -511,11 +522,11 @@ def tuple_pipeline(
     np_decoded_dna_sequences = print_output(mp_queue)
     mp_decoding_process.join()  # Wait for the process to finish
 
-    if (
-        mp_decoding_process.exitcode != 0
-        or np_decoded_dna_sequences is None
-        or len(np_decoded_dna_sequences) == 0
-    ):
+    # In case there is error with decoding and we get None
+    if not isinstance(np_decoded_dna_sequences, np.ndarray):
+        np_decoded_dna_sequences = np.array([])
+
+    if mp_decoding_process.exitcode != 0 or len(np_decoded_dna_sequences) == 0:
         print(
             "Subprocess decoding failed with exit code: ",
             mp_decoding_process.exitcode,
