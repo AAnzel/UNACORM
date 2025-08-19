@@ -29,7 +29,7 @@ PATH_PARTIAL_DETAIL_PATTERN = os.path.join(PATH_PARTIAL_RESULTS, "*.pkl")
 _NUMBER_OF_EXPERIMENT_RUNS = 5
 
 def save_intermediary(list_results, string_file_name):
-    df_new_detail = pd.DataFrame(
+    df_intermediary_detail = pd.DataFrame(
         list_results,
         columns=pd.Series([
             "Filename",
@@ -50,16 +50,8 @@ def save_intermediary(list_results, string_file_name):
         ]),
     )
 
-    path_existing_detail = os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl")
-    bool_detail_exists = os.path.exists(path_existing_detail)
-    if bool_detail_exists:
-        df_existing_detail = pd.read_pickle(path_existing_detail)
-        pd.concat(
-            [df_existing_detail, df_new_detail], axis=0, ignore_index=True).to_pickle(
-                os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl"))
-    else:
-        df_new_detail.to_pickle(
-            os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl"))
+    df_intermediary_detail.to_pickle(
+        os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl"))
 
     return None
 
@@ -99,6 +91,7 @@ def run_precalculation(int_num_of_iteration):
         bool_detail_exists = os.path.exists(path_existing_detail)
         if bool_detail_exists:
             df_existing_detail = pd.read_pickle(path_existing_detail)
+            list_results.append(df_existing_detail.tolist())
         else:
             df_existing_detail = pd.DataFrame(
                 columns=pd.Series([

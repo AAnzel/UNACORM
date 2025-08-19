@@ -63,13 +63,6 @@ def save_intermediary(list_results):
         ]),
     )
 
-    bool_detail_exists = os.path.exists(PATH_INTERMEDIARY_DETAIL)
-    if bool_detail_exists:
-        df_existing_detail = pd.read_pickle(PATH_INTERMEDIARY_DETAIL)
-        df_intermediary_detail = pd.concat(
-            [df_existing_detail, df_intermediary_detail], axis=0,
-            ignore_index=True)
-    
     df_intermediary_summary = df_generate_summary(df_intermediary_detail)
     df_intermediary_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
     df_intermediary_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
