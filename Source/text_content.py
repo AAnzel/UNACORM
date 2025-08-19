@@ -8,36 +8,47 @@ __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
 
-STRING_CONTACT_PAGE = """
+STRING_CONTACT_PAGE_0 = """
     We appreciate your interest in our project! Here are the best ways to get in touch or contribute.
+    """
+STRING_CONTACT_PAGE_1 = """
     ### Project Repository
-    Our project is hosted on GitHub. You can find the main repository here:
-    GitHub Repository: [github.com/YourUsername/YourProject](https://github.com/YourUsername/YourProject)
+    Our project is hosted and maintained on GitHub."""
+
+STRING_CONTACT_PAGE_2 = """
     ### Reporting Issues
-    If you encounter a bug or have a feature request, please open an issue on our GitHub repository:
-    Open an Issue: [github.com/YourUsername/YourProject/issues/new](https://github.com/YourUsername/YourProject/issues/new)
+    If you encounter a bug or have a feature request, please open an issue on our GitHub repository.
     Before creating a new issue, please check if a similar one already exists.
+    """
+
+STRING_CONTACT_PAGE_3 = """
     ### Contributing
     We welcome contributions! If you would like to contribute to the project:
     1. Fork the repository.
     2. Create a new branch for your feature or bug fix.
     3. Make your changes.
     4. Submit a pull request.
-    Create a Pull Request: [github.com/YourUsername/YourProject/compare](https://github.com/YourUsername/YourProject/compare)
-    Please review our contribution guidelines before submitting a pull request.
+    Please review our [contribution guidelines](https://github.com/AAnzel/DNA_Encodings/blob/master/CONTRIBUTE.md) before submitting a pull request.
+    """
+
+STRING_CONTACT_PAGE_4 = """
     ### Discussions
-    For general questions, ideas, or community discussions, please use our GitHub Discussions forum:
-    GitHub Discussions: [github.com/YourUsername/YourProject/discussions](https://github.com/YourUsername/YourProject/discussions)
+    For general questions, ideas, or community discussions, please use our GitHub Discussions forum.
+
+    """
+
+STRING_CONTACT_PAGE_5 = """
     ### Project Updates
-    Stay updated with our latest releases and announcements:
-    Releases: [github.com/YourUsername/YourProject/releases](https://github.com/YourUsername/YourProject/releases)
+    Stay updated with our latest releases and announcements.
+    """
+
+STRING_CONTACT_PAGE_6 = """
     ### Additional Contact Information
     For matters not suitable for GitHub, you can reach us at:
-    Email: [info@yourproject.com](mailto:info@yourproject.com)
+    Email: [AnzelA@rki.de](mailto:AnzelA@rki.de) or [EzekannaghaC@rki.de](mailto:EzekannaghaC@rki.de)
     ### Follow Us
     Stay connected with our project:
-    - GitHub: [@YourUsername](https://github.com/YourUsername)
-    - Twitter: [@YourProject](https://twitter.com/YourProject)
+    - GitHub: [@AAnzel](https://github.com/AAnzel) or [@Sombiri](https://github.com/Sombiri)
     ---
     Thank you for your interest in our project! We look forward to your contributions and feedback.
 """
