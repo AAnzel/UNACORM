@@ -11,15 +11,23 @@ __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
-_, st_col_1, st_col_2, _ = st.columns([1, 6, 3, 1])
+_, st_col_1, _ = st.columns([1, 9, 1])
 st_col_1.header(":primary[︱]Contact Us")
 st_col_1.markdown(tc.STRING_CONTACT_PAGE_0)
+st.html("<br><br>")
 
-_, st_col_1, st_col_2, _ = st.columns(
-    [1, 6, 3, 1], gap="large", vertical_alignment="center"
+_, st_col_1, st_col_2, st_col_3, _ = st.columns(
+    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
 )
 st_col_1.markdown(tc.STRING_CONTACT_PAGE_1)
-st_col_2.link_button(
+st_col_2.markdown(tc.STRING_CONTACT_PAGE_2)
+st_col_3.markdown(tc.STRING_CONTACT_PAGE_3)
+
+_, st_col_1, st_col_2, st_col_3, _ = st.columns(
+    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
+)
+
+st_col_1.link_button(
     "GitHub Repository",
     url="https://github.com/AAnzel/DNA_Encodings/tree/master",
     icon=":material/home_storage:",
@@ -27,10 +35,6 @@ st_col_2.link_button(
     type="primary",
 )
 
-_, st_col_1, st_col_2, _ = st.columns(
-    [1, 6, 3, 1], gap="large", vertical_alignment="center"
-)
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_2)
 st_col_2.link_button(
     "Open Issue",
     url="https://github.com/AAnzel/DNA_Encodings/issues/new",
@@ -39,11 +43,7 @@ st_col_2.link_button(
     type="primary",
 )
 
-_, st_col_1, st_col_2, _ = st.columns(
-    [1, 6, 3, 1], gap="large", vertical_alignment="center"
-)
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_3)
-st_col_2.link_button(
+st_col_3.link_button(
     "Create a Pull Request",
     url="https://github.com/AAnzel/DNA_Encodings/compare",
     icon=":material/add:",
@@ -51,11 +51,20 @@ st_col_2.link_button(
     type="primary",
 )
 
-_, st_col_1, st_col_2, _ = st.columns(
-    [1, 6, 3, 1], gap="large", vertical_alignment="center"
+st.html("<br><br>")
+
+_, st_col_1, st_col_2, st_col_3, _ = st.columns(
+    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
 )
 st_col_1.markdown(tc.STRING_CONTACT_PAGE_4)
-st_col_2.link_button(
+st_col_2.markdown(tc.STRING_CONTACT_PAGE_5)
+st_col_3.markdown(tc.STRING_CONTACT_PAGE_6)
+
+_, st_col_1, st_col_2, st_col_3, _ = st.columns(
+    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
+)
+
+st_col_1.link_button(
     "Discuss",
     url="https://github.com/AAnzel/DNA_Encodings/discussions/new/choose",
     icon=":material/comment:",
@@ -63,10 +72,6 @@ st_col_2.link_button(
     type="primary",
 )
 
-_, st_col_1, st_col_2, _ = st.columns(
-    [1, 6, 3, 1], gap="large", vertical_alignment="center"
-)
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_5)
 st_col_2.link_button(
     "Releases",
     url="https://github.com/AAnzel/DNA_Encodings/releases",
@@ -75,10 +80,12 @@ st_col_2.link_button(
     type="primary",
 )
 
-_, st_col_1, st_col_2, _ = st.columns(
-    [1, 6, 3, 1], gap="large", vertical_alignment="center"
+st_col_3.link_button(
+    "AnzelA@rki.de",
+    url="mailto:AnzelA@rki.de",
+    icon=":material/mail:",
+    use_container_width=True,
+    type="primary",
 )
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_6)
-
 
 uti.display_footer()

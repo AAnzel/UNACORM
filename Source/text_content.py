@@ -23,12 +23,7 @@ STRING_CONTACT_PAGE_2 = """
 
 STRING_CONTACT_PAGE_3 = """
     ### Contributing
-    We welcome contributions! If you would like to contribute to the project:
-    1. Fork the repository.
-    2. Create a new branch for your feature or bug fix.
-    3. Make your changes.
-    4. Submit a pull request.
-    Please review our [contribution guidelines](https://github.com/AAnzel/DNA_Encodings/blob/master/CONTRIBUTE.md) before submitting a pull request.
+    We welcome contributions! If you would like to contribute to the project please review our [contribution guidelines](https://github.com/AAnzel/DNA_Encodings/blob/master/CONTRIBUTE.md) before submitting a pull request.
     """
 
 STRING_CONTACT_PAGE_4 = """
@@ -44,14 +39,9 @@ STRING_CONTACT_PAGE_5 = """
 
 STRING_CONTACT_PAGE_6 = """
     ### Additional Contact Information
-    For matters not suitable for GitHub, you can reach us at:
-    Email: [AnzelA@rki.de](mailto:AnzelA@rki.de) or [EzekannaghaC@rki.de](mailto:EzekannaghaC@rki.de)
-    ### Follow Us
-    Stay connected with our project:
-    - GitHub: [@AAnzel](https://github.com/AAnzel) or [@Sombiri](https://github.com/Sombiri)
-    ---
-    Thank you for your interest in our project! We look forward to your contributions and feedback.
-"""
+    For matters not suitable for GitHub, you can reach us via e-mail.
+    """
+
 STRING_MAIN_BENCHMARK_HELP = (
     "**The benchmark data set** includes summarized results for all encoding "
     "methods and benchmark files. This data set does not distinguish "
