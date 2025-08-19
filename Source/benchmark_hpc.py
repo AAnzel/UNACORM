@@ -1,18 +1,18 @@
-import os
 import glob
+import os
 
 import numpy as np
 import pandas as pd
 from utilities import (
     LIST_ENCODING_METHODS,
     LIST_FLOAT_ERROR_MULTIPLIERS,
-    PATH_ORIGINAL_DATA,
-    PATH_PARTIAL_RESULTS,
     PATH_INTERMEDIARY_DETAIL,
     PATH_INTERMEDIARY_SUMMARY,
+    PATH_ORIGINAL_DATA,
+    PATH_PARTIAL_RESULTS,
+    df_generate_summary,
     np_data_to_binary_array,
     tuple_pipeline,
-    df_generate_summary
 )
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
@@ -27,6 +27,7 @@ __status__ = "Stable"
 
 PATH_PARTIAL_DETAIL_PATTERN = os.path.join(PATH_PARTIAL_RESULTS, "*.pkl")
 _NUMBER_OF_EXPERIMENT_RUNS = 5
+
 
 def save_intermediary(list_results, string_file_name):
     df_intermediary_detail = pd.DataFrame(
@@ -51,7 +52,8 @@ def save_intermediary(list_results, string_file_name):
     )
 
     df_intermediary_detail.to_pickle(
-        os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl"))
+        os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl")
+    )
 
     return None
 
@@ -74,24 +76,66 @@ def run_precalculation(int_num_of_iteration):
     Returns:
         None
     """
-    
-    list_results = []
+
     list_original_files = os.listdir(PATH_ORIGINAL_DATA)
 
     int_total_missing = 0
     for string_file in list_original_files:
         path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-        
+
         if not os.path.isfile(path_one_file):
             continue
-        
+
         string_file_name, _ = os.path.splitext(string_file)
 
-        path_existing_detail = os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl")
+        path_existing_detail = os.path.join(
+            PATH_PARTIAL_RESULTS, string_file_name + ".pkl"
+        )
         bool_detail_exists = os.path.exists(path_existing_detail)
         if bool_detail_exists:
             df_existing_detail = pd.read_pickle(path_existing_detail)
-            list_results.append(df_existing_detail.tolist())
+
+            for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
+                for string_encoding_method in LIST_ENCODING_METHODS:
+                    int_existing_runs = df_existing_detail[
+                        (df_existing_detail["Filename"] == string_file_name)
+                        & (
+                            df_existing_detail["Method"]
+                            == string_encoding_method
+                        )
+                        & (
+                            df_existing_detail["Error_Multiplier"]
+                            == float_error_multiplier
+                        )
+                    ].shape[0]
+                    int_required = max(
+                        0, int_num_of_iteration - int_existing_runs
+                    )
+                    int_total_missing += int_required
+        else:
+            int_total_missing += len(LIST_FLOAT_ERROR_MULTIPLIERS) * len(
+                LIST_ENCODING_METHODS * int_num_of_iteration
+            )
+
+    int_total_runs = int_total_missing
+    int_counter = 0
+
+    for string_file in list_original_files:
+        list_partial_results = []
+        path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
+
+        if not os.path.isfile(path_one_file):
+            continue
+
+        string_file_name, _ = os.path.splitext(string_file)
+
+        path_existing_detail = os.path.join(
+            PATH_PARTIAL_RESULTS, string_file_name + ".pkl"
+        )
+        bool_detail_exists = os.path.exists(path_existing_detail)
+        if bool_detail_exists:
+            df_existing_detail = pd.read_pickle(path_existing_detail)
+            list_partial_results.append(df_existing_detail.values.tolist())
         else:
             df_existing_detail = pd.DataFrame(
                 columns=pd.Series([
@@ -112,31 +156,6 @@ def run_precalculation(int_num_of_iteration):
                     "Base_error_ratio",
                 ])
             )
-
-        for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
-            for string_encoding_method in LIST_ENCODING_METHODS:
-                int_existing_runs = df_existing_detail[
-                    (df_existing_detail["Filename"] == string_file_name)
-                    & (df_existing_detail["Method"] == string_encoding_method)
-                    & (
-                        df_existing_detail["Error_Multiplier"]
-                        == float_error_multiplier
-                    )
-                ].shape[0]
-                int_required = max(0, int_num_of_iteration - int_existing_runs)
-                int_total_missing += int_required
-
-    int_total_runs = int_total_missing
-    int_counter = 0
-
-    for string_file in list_original_files:
-        path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-        string_file_name, string_file_extension = os.path.splitext(
-            string_file
-        )
-
-        if not os.path.isfile(path_one_file):
-            continue
 
         for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
             for string_encoding_method in LIST_ENCODING_METHODS:
@@ -198,7 +217,7 @@ def run_precalculation(int_num_of_iteration):
                     bool_similar_files = np.array_equal(
                         np_binary_encoding, np_decoded_array
                     )
-                    list_results.append(
+                    list_partial_results.append(
                         list_encoded_info
                         + [
                             bool_similar_files,
@@ -210,7 +229,7 @@ def run_precalculation(int_num_of_iteration):
                             dict_error_results["Base_error_ratio"],
                         ]
                     )
-                    list_results.append(
+                    list_partial_results.append(
                         list_decoded_info
                         + [
                             bool_similar_files,
@@ -225,10 +244,15 @@ def run_precalculation(int_num_of_iteration):
 
                     if int_counter % 2 == 0:
                         # Save intermediary results frequently to minimize data loss
-                        save_intermediary(list_results, string_file_name)
+                        save_intermediary(
+                            list_partial_results, string_file_name
+                        )
 
             # We save the intermediary result
-            save_intermediary(list_results, string_file_name)
+            save_intermediary(list_partial_results, string_file_name)
+
+        # We save the intermediary result
+        save_intermediary(list_partial_results, string_file_name)
 
     return None
 
@@ -246,14 +270,19 @@ def merge_details_and_generate_summary():
 
     # Save the merged detail dataframe
     df_merged_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
-    print(f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}", flush=True)
+    print(
+        f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}", flush=True
+    )
 
     # Generate a summary dataframe from the merged detail
     merged_summary = df_generate_summary(df_merged_detail)
 
     # Save the generated summary dataframe
     merged_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
-    print(f"Summary pickle generated and saved to {PATH_INTERMEDIARY_SUMMARY}", flush=True)
+    print(
+        f"Summary pickle generated and saved to {PATH_INTERMEDIARY_SUMMARY}",
+        flush=True,
+    )
 
     return None
 
