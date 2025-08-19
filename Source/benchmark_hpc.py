@@ -1,18 +1,18 @@
-import glob
 import os
+import glob
 
 import numpy as np
 import pandas as pd
 from utilities import (
     LIST_ENCODING_METHODS,
     LIST_FLOAT_ERROR_MULTIPLIERS,
-    PATH_INTERMEDIARY_DETAIL,
-    PATH_INTERMEDIARY_SUMMARY,
     PATH_ORIGINAL_DATA,
     PATH_PARTIAL_RESULTS,
-    df_generate_summary,
+    PATH_INTERMEDIARY_DETAIL,
+    PATH_INTERMEDIARY_SUMMARY,
     np_data_to_binary_array,
     tuple_pipeline,
+    df_generate_summary
 )
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
@@ -28,9 +28,8 @@ __status__ = "Stable"
 PATH_PARTIAL_DETAIL_PATTERN = os.path.join(PATH_PARTIAL_RESULTS, "*.pkl")
 _NUMBER_OF_EXPERIMENT_RUNS = 5
 
-
 def save_intermediary(list_results, string_file_name):
-    df_intermediary_detail = pd.DataFrame(
+    df_new_detail = pd.DataFrame(
         list_results,
         columns=pd.Series([
             "Filename",
@@ -50,9 +49,17 @@ def save_intermediary(list_results, string_file_name):
             "Base_error_ratio",
         ]),
     )
-    df_intermediary_detail.to_pickle(
-        os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl")
-    )
+
+    path_existing_detail = os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl")
+    bool_detail_exists = os.path.exists(path_existing_detail)
+    if bool_detail_exists:
+        df_existing_detail = pd.read_pickle(path_existing_detail)
+        pd.concat(
+            [df_existing_detail, df_new_detail], axis=0, ignore_index=True).to_pickle(
+                os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl"))
+    else:
+        df_new_detail.to_pickle(
+            os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl"))
 
     return None
 
@@ -75,46 +82,45 @@ def run_precalculation(int_num_of_iteration):
     Returns:
         None
     """
-
-    path_existing_detail = PATH_INTERMEDIARY_DETAIL
-    bool_detail_exists = os.path.exists(PATH_INTERMEDIARY_DETAIL)
-
-    if bool_detail_exists:
-        df_existing_detail = pd.read_pickle(path_existing_detail)
-    else:
-        df_existing_detail = pd.DataFrame(
-            columns=pd.Series([
-                "Filename",
-                "Method",
-                "Transformation",
-                "Type",
-                "Size",
-                "Cost",
-                "Time",
-                "OriFile_Size",
-                "Similarity",
-                "Error_Multiplier",
-                "Number_of_substitutions",
-                "Number_of_deletions",
-                "Number_of_insertions",
-                "Total_number_of_errors",
-                "Base_error_ratio",
-            ])
-        )
-
+    
     list_results = []
     list_original_files = os.listdir(PATH_ORIGINAL_DATA)
 
     int_total_missing = 0
-    for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
-        for string_file in list_original_files:
-            path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-            string_file_name, string_file_extension = os.path.splitext(
-                string_file
+    for string_file in list_original_files:
+        path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
+        
+        if not os.path.isfile(path_one_file):
+            continue
+        
+        string_file_name, _ = os.path.splitext(string_file)
+
+        path_existing_detail = os.path.join(PATH_PARTIAL_RESULTS, string_file_name + ".pkl")
+        bool_detail_exists = os.path.exists(path_existing_detail)
+        if bool_detail_exists:
+            df_existing_detail = pd.read_pickle(path_existing_detail)
+        else:
+            df_existing_detail = pd.DataFrame(
+                columns=pd.Series([
+                    "Filename",
+                    "Method",
+                    "Transformation",
+                    "Type",
+                    "Size",
+                    "Cost",
+                    "Time",
+                    "OriFile_Size",
+                    "Similarity",
+                    "Error_Multiplier",
+                    "Number_of_substitutions",
+                    "Number_of_deletions",
+                    "Number_of_insertions",
+                    "Total_number_of_errors",
+                    "Base_error_ratio",
+                ])
             )
 
-            if not os.path.isfile(path_one_file):
-                continue
+        for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
             for string_encoding_method in LIST_ENCODING_METHODS:
                 int_existing_runs = df_existing_detail[
                     (df_existing_detail["Filename"] == string_file_name)
@@ -130,17 +136,16 @@ def run_precalculation(int_num_of_iteration):
     int_total_runs = int_total_missing
     int_counter = 0
 
-    # We go through error multipliers and list original files
-    for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
-        for string_file in list_original_files:
-            path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-            string_file_name, string_file_extension = os.path.splitext(
-                string_file
-            )
+    for string_file in list_original_files:
+        path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
+        string_file_name, string_file_extension = os.path.splitext(
+            string_file
+        )
 
-            if not os.path.isfile(path_one_file):
-                continue
+        if not os.path.isfile(path_one_file):
+            continue
 
+        for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
             for string_encoding_method in LIST_ENCODING_METHODS:
                 int_existing_runs = df_existing_detail[
                     (df_existing_detail["Filename"] == string_file_name)
@@ -248,25 +253,20 @@ def merge_details_and_generate_summary():
 
     # Save the merged detail dataframe
     df_merged_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
-    print(
-        f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}", flush=True
-    )
+    print(f"Merged detail pickle saved to {PATH_INTERMEDIARY_DETAIL}", flush=True)
 
     # Generate a summary dataframe from the merged detail
     merged_summary = df_generate_summary(df_merged_detail)
 
     # Save the generated summary dataframe
     merged_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
-    print(
-        f"Summary pickle generated and saved to {PATH_INTERMEDIARY_SUMMARY}",
-        flush=True,
-    )
+    print(f"Summary pickle generated and saved to {PATH_INTERMEDIARY_SUMMARY}", flush=True)
 
     return None
 
 
 def main():
-    # run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
+    run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
     merge_details_and_generate_summary()
 
     return None

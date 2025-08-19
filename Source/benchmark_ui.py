@@ -63,8 +63,14 @@ def save_intermediary(list_results):
         ]),
     )
 
+    bool_detail_exists = os.path.exists(PATH_INTERMEDIARY_DETAIL)
+    if bool_detail_exists:
+        df_existing_detail = pd.read_pickle(PATH_INTERMEDIARY_DETAIL)
+        df_intermediary_detail = pd.concat(
+            [df_existing_detail, df_intermediary_detail], axis=0,
+            ignore_index=True)
+    
     df_intermediary_summary = df_generate_summary(df_intermediary_detail)
-
     df_intermediary_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
     df_intermediary_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
 
@@ -149,14 +155,7 @@ def run_precalculation(int_num_of_iteration):
     int_total_missing = 0
     for float_error_multiplier in LIST_FLOAT_ERROR_MULTIPLIERS:
         for string_file in list_original_files:
-            path_one_file = os.path.join(PATH_ORIGINAL_DATA, string_file)
-            string_file_name, string_file_extension = os.path.splitext(
-                string_file
-            )
-
-            if not os.path.isfile(path_one_file):
-                continue
-
+            string_file_name, _ = os.path.splitext(string_file)
             for string_encoding_method in LIST_ENCODING_METHODS:
                 int_existing_runs = df_existing_detail[
                     (df_existing_detail["Filename"] == string_file_name)
@@ -273,8 +272,8 @@ def run_precalculation(int_num_of_iteration):
                         ]
                     )
 
-            # We save the intermediary result
-            save_intermediary(list_results)
+                    # We save the intermediary result
+                    save_intermediary(list_results)
 
     df_new_detail = pd.DataFrame(
         list_results,
