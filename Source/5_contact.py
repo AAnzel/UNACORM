@@ -24,7 +24,7 @@ st_col_2.markdown(tc.STRING_CONTACT_PAGE_2)
 st_col_3.markdown(tc.STRING_CONTACT_PAGE_3)
 
 _, st_col_1, st_col_2, st_col_3, _ = st.columns(
-    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
+    [1, 3, 3, 3, 1], gap="large", vertical_alignment="bottom"
 )
 
 st_col_1.link_button(
@@ -61,7 +61,7 @@ st_col_2.markdown(tc.STRING_CONTACT_PAGE_5)
 st_col_3.markdown(tc.STRING_CONTACT_PAGE_6)
 
 _, st_col_1, st_col_2, st_col_3, _ = st.columns(
-    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
+    [1, 3, 3, 3, 1], gap="large", vertical_alignment="bottom"
 )
 
 st_col_1.link_button(
