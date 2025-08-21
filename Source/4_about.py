@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 import text_content as tc
 import utilities as uti
@@ -14,5 +16,13 @@ __status__ = "Stable"
 _, st_col_2, _ = st.columns([1, 9, 1])
 st_col_2.header(":primary[︱]About")
 st_col_2.markdown(tc.STRING_ABOUT_PAGE)
+
+st_col_2.image(
+    os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_summary.svg")
+)
+
+st_col_2.image(
+    os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_histogram.svg")
+)
 
 uti.display_footer()
