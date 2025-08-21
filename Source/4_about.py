@@ -15,14 +15,20 @@ __status__ = "Stable"
 
 _, st_col_2, _ = st.columns([1, 9, 1])
 st_col_2.header(":primary[︱]About")
-st_col_2.markdown(tc.STRING_ABOUT_PAGE)
-
+st_col_2.markdown(tc.STRING_ABOUT_PAGE_1)
+st_col_2.markdown(tc.STRING_ABOUT_PAGE_2)
+st_col_2.markdown(tc.STRING_ABOUT_PAGE_3)
 st_col_2.image(
-    os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_summary.svg")
+    os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_summary.svg"),
+    width=1000,
 )
 
+st_col_2.markdown(tc.STRING_ABOUT_PAGE_4)
 st_col_2.image(
-    os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_histogram.svg")
+    os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_histogram.svg"),
+    width=1000,
 )
+
+st_col_2.markdown(tc.STRING_ABOUT_PAGE_5)
 
 uti.display_footer()

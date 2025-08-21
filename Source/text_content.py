@@ -99,7 +99,7 @@ STRING_COST_RUNTIME = (
     "how much it would cost and how long it would take to encode and decode "
     "benchmark files across all encoding methods and for a selected error multiplier."
 )
-STRING_ABOUT_PAGE = "\n".join((
+STRING_ABOUT_PAGE_1 = "\n".join((
     "Welcome to the Unified DNA Data Storage Encoding Web App, an open-source platform for standardized, multi-metric evaluation of DNA encoding and decoding methods. Our tool consolidates state-of-the-art codecs into a single dashboard, enabling fair, reproducible comparisons across diverse data sets and criteria.",
     "### Benchmark Parameters",
     "1. Throughput",
@@ -117,6 +117,9 @@ STRING_ABOUT_PAGE = "\n".join((
     "5. Biochemical Constraint Adherence",
     "   - GC Content: Percentage of G + C bases (target: 40–60%).",
     "   - Homopolymer Limits: Maximum allowed run length (≤4 bases).",
+))
+
+STRING_ABOUT_PAGE_2 = "\n".join((
     "### How It Works",
     "1. Select a Baseline or Upload Your File",
     "Choose from our curated data set (text, image, audio, video, PDF) or upload any file to convert into a NumPy boolean array.",
@@ -130,7 +133,16 @@ STRING_ABOUT_PAGE = "\n".join((
     "   - Interactive Charts: Whisker or bar plots for density, runtime, and cost.",
     "5. Export",
     "   Download CSV tables and SVG/PNG charts for reporting and further analysis.",
-    "---",
+))
+
+STRING_ABOUT_PAGE_3 = "\n".join((
+    "### Benchmark Data Set Analysis",
+    "#### Summary Information",
+))
+
+STRING_ABOUT_PAGE_4 = "#### Byte Density Histograms"
+
+STRING_ABOUT_PAGE_5 = "\n".join((
     "### Supported Encoding Methods",
     " * Simple Code by Church et al.",
     "[DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)",
