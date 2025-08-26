@@ -117,7 +117,7 @@ def visualize_density_benchmark(df_measure_sum_concat):
         df_measure_sum_concat.sort_values("Method"),
         y="Information_Density",
         x="Method",
-        height=_INT_CHART_ROW_SIZE * 1.5,
+        height=_INT_CHART_ROW_SIZE,
         template=_STRING_PLOTLY_THEME,
     )
     chart_density.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
@@ -411,7 +411,7 @@ def visualize_success_rate_general(df_detail):
         x="Method",
         y="Success Rate (%)",
         text="Success Rate (%)",
-        height=_INT_CHART_ROW_SIZE * 1.5,
+        height=_INT_CHART_ROW_SIZE,
         template=_STRING_PLOTLY_THEME,
     )
 
