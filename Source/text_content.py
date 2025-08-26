@@ -160,8 +160,6 @@ STRING_ABOUT_PAGE_5 = "\n".join((
     "[DOI: 10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950)",
     "* Online Code by Maymounkov et al.",
     "[LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)",
-    " ",
-    "By harmonizing benchmarking criteria with SNIA’s consensus metrics, this tool empowers researchers and system architects to identify the most suitable DNA storage strategies for their applications.",
 ))
 STRING_INTRODUCTION = "\n".join((
     "## :primary[UNACORM] :grey[︱] The Unified DNA Encodings Platform",
