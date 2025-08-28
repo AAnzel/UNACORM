@@ -110,6 +110,7 @@ STRING_ABOUT_PAGE_0 = (
 
 STRING_ABOUT_PAGE_1 = "\n".join((
     "### Benchmark Parameters",
+    "Consistent with the encoding [guidelines of the DNA Data Storage Alliance](https://www.snia.org/sites/default/files/DNA/SNIA-DNA-Data-Storage-Codecs-v1.0.pdf) and supported by recent comparative studies, our evaluation of each encoding is conducted across the following quantitative metrics.",
     "1. Throughput",
     "   - Encoding Speed: Time (s) to convert a binary file into DNA oligos.",
     "   - Decoding Speed: Time (s) to reconstruct binary data from DNA sequences.",
@@ -122,10 +123,11 @@ STRING_ABOUT_PAGE_1 = "\n".join((
     "4. Specification Transparency",
     "   - Method's Format Compliance: Adherence to DNA Data Storage Allieance's [Format Specification v1.0](https://www.snia.org/sites/default/files/DNA/SNIA-DNA-Data-Storage-Codecs-v1.0.pdf), ensuring future-proof interoperability.",
     "   - Public Documentation: Availability of “encode(…)” / “decode(…)” wrappers, input/output formats, and parameter settings.",
-    "5. Biochemical Constraint Adherence",
-    "   - GC Content: Percentage of G + C bases (target: 40–60%).",
-    "   - Homopolymer Limits: Maximum allowed run length (≤4 bases).",
 ))
+#    "5. Biochemical Constraint Adherence",
+#    "   - GC Content: Percentage of G + C bases (target: 40–60%).",
+#    "   - Homopolymer Limits: Maximum allowed run length (≤4 bases).",
+
 
 STRING_ABOUT_PAGE_2 = "\n".join((
     "### How It Works",
@@ -145,6 +147,8 @@ STRING_ABOUT_PAGE_2 = "\n".join((
 
 STRING_ABOUT_PAGE_3 = "\n".join((
     "### Benchmark Data Set Analysis",
+    "To comprehensively assess the effectiveness of DNA data storage encoding methods, our platform employed a varied collection of benchmark files. The collection included two text files, three images, two audio files, one video, and one document, intentionally chosen to cover a wide range of file types and content typically found in digital storage.",
+    "The two images below illustrate the sizes, entropies, and byte distributions of the benchmark files.",
     "#### Summary Information",
 ))
 
@@ -152,23 +156,19 @@ STRING_ABOUT_PAGE_4 = "#### Byte Density Histograms"
 
 STRING_ABOUT_PAGE_5 = "\n".join((
     "### Supported Encoding Methods",
-    " * Simple Code by Church et al.",
-    "[DOI: 10.1126/science.1226355](https://www.science.org/doi/10.1126/science.1226355)",
-    "* Repetition Code by Goldman et al.",
-    "[DOI: 10.1038/nature11875](https://www.nature.com/articles/nature11875)",
-    "* The 2D Code by Grass et al.",
-    "[DOI: 10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378)",
-    "* XOR-Based Code by Bornholt et al.",
-    "[DOI: 10.1145/2872362.2872397](https://dl.acm.org/doi/pdf/10.1145/2872362.2872397)",
-    "* DNA-Aeon Code by Welzel et al.",
-    "[DOI: 10.1038/s41467-023-36297-3](https://doi.org/10.1038/s41467-023-36297-3)",
-    "* Raptor Code by Shokrollahi et al.",
-    "[DOI: 10.1109/TIT.2006.874390](https://doi.org/10.1109/TIT.2006.874390)",
-    "* LT Code by Luby et al.",
-    "[DOI: 10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950)",
-    "* Online Code by Maymounkov et al.",
-    "[LINK: TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)",
+    "Our platform currently implements eight DNA encoding methods, as shown in the table below. Future work will focus on incorporating additional relevant methods that were beyond the scope of the initial analysis.",
+    "| DNA Encoding |  Publication | Authors | Reimplemented by | Repository of the Reimplementation |",
+    "|---|---|---|---|---|",
+    "| Simple Code | [10.1126/science.1226355](https://doi.org/10.1126/science.1226355) | George M. Church, Yuan Gao, and Sriram Kosuri | Khawla Elhadri | [https://github.com/ke-pm/DNA-Encoding](https://github.com/ke-pm/DNA-Encoding) |",
+    "| 2D Code | [10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378) | Robert N. Grass, Reinhard Heckel, Michela Puddu, Daniela Paunescu, and Wendelin J. Stark | Samuel Becker, Felix Klein, and Raffael Schön | [https://github.com/raeudigerRaeffi/reedSolomonDNA](https://github.com/raeudigerRaeffi/reedSolomonDNA) |",
+    "| XOR-based Code | [10.1145/2872362.2872397](https://doi.org/10.1145/2872362.2872397) | James Bornholt, Randolph Lopez, Douglas M. Carmean, Luis Ceze, Georg Seelig, and Karin Strauss | Leon Wimbes, and Luca Staus | [https://github.com/StausWimbes/XOR_based_DNA_encoding](https://github.com/StausWimbes/XOR_based_DNA_encoding) |",
+    "| Repetition Code | [10.1038/nature11875](https://doi.org/10.1038/nature11875) | Nick Goldman, Paul Bertone, Siyuan Chen, Christophe Dessimoz, Emily M. LeProust, Botond Sipos, and Ewan Birney | David Sonnabend | [https://github.com/davidabendsonn/DNAencoding-Goldman2013](https://github.com/davidabendsonn/DNAencoding-Goldman2013) |",
+    "| DNA-Aeon | [10.1038/s41467-023-36297-3](https://doi.org/10.1038/s41467-023-36297-3) | Marius Welzel, Peter Michael Schwarz, Hannah F. Löchel, Tolganay Kabdullayeva, Sandra Clemens, Anke Becker, Bernd Freisleben, and Dominik Heider | Marius Welzel | [https://github.com/MW55/DNA-Aeon/tree/main](https://github.com/MW55/DNA-Aeon/tree/main)|",
+    "| RaptorCode | [10.1109/TIT.2006.874390](https://doi.org/10.1109/TIT.2006.874390) | Amin Shokrollahi | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) |",
+    "| LTCode | [10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950) | Michael Luby | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) |",
+    "| OnlineCode | [TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf) | Petar Maymounkov | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) |",
 ))
+
 STRING_INTRODUCTION = "\n".join((
     "## :primary[UNACORM] :grey[︱] The Unified DNA Encodings Platform",
     "The Unified DNA Encoding Platform is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage encoding methods. It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), and incorporates key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and adherence to biochemical constraints. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical encodings via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",

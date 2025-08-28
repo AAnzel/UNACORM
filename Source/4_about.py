@@ -35,7 +35,6 @@ st_col_2.markdown(
 )
 
 st_col_2.markdown(tc.STRING_ABOUT_PAGE_1)
-st_col_2.markdown(tc.STRING_ABOUT_PAGE_2)
 st_col_2.markdown(tc.STRING_ABOUT_PAGE_3)
 st_col_2.image(
     os.path.join(uti.PATH_CACHE_DATA, "images", "data_set_summary.svg"),
