@@ -99,8 +99,16 @@ STRING_COST_RUNTIME = (
     "how much it would cost and how long it would take to encode and decode "
     "benchmark files across all encoding methods and for a selected error multiplier."
 )
+STRING_ABOUT_PAGE_0 = (
+    "The Unified DNA Encoding Platform is an open-source "
+    "web application for standardized, multi-metric evaluation of DNA "
+    "encoding and decoding methods. Our tool consolidates state-of-the-art "
+    "methods into a single dashboard, enabling fair, reproducible comparisons "
+    "across diverse data sets and criteria. The image below gives an overview "
+    "of the DNA encoding and decoding processes for storing digital data."
+)
+
 STRING_ABOUT_PAGE_1 = "\n".join((
-    "Welcome to the Unified DNA Data Storage Encoding Web App, an open-source platform for standardized, multi-metric evaluation of DNA encoding and decoding methods. Our tool consolidates state-of-the-art codecs into a single dashboard, enabling fair, reproducible comparisons across diverse data sets and criteria.",
     "### Benchmark Parameters",
     "1. Throughput",
     "   - Encoding Speed: Time (s) to convert a binary file into DNA oligos.",
@@ -109,10 +117,10 @@ STRING_ABOUT_PAGE_1 = "\n".join((
     "   - Runtime Complexity: Measured on identical hardware, to expose sub-quadratic versus super-quadratic performance.",
     "   - Energy Efficiency: Throughput per watt, guiding sustainable deployments.",
     "3. Error-Correction Efficacy",
-    "   - Substitution, Insertion, & Deletion Recovery: Fraction of errors corrected by each codec’s built-in clustering and multistrand alignment.",
+    "   - Substitution, Insertion, & Deletion Recovery: Fraction of errors corrected by each method's built-in clustering and multistrand alignment.",
     "   - Data Integrity: Boolean pass/fail comparison against the original binary payload.",
     "4. Specification Transparency",
-    "   - Codec Format Compliance: Adherence to SNIA’s Codec Format Specification v1.0, ensuring future-proof interoperability.",
+    "   - Method's Format Compliance: Adherence to DNA Data Storage Allieance's [Format Specification v1.0](https://www.snia.org/sites/default/files/DNA/SNIA-DNA-Data-Storage-Codecs-v1.0.pdf), ensuring future-proof interoperability.",
     "   - Public Documentation: Availability of “encode(…)” / “decode(…)” wrappers, input/output formats, and parameter settings.",
     "5. Biochemical Constraint Adherence",
     "   - GC Content: Percentage of G + C bases (target: 40–60%).",
@@ -124,12 +132,12 @@ STRING_ABOUT_PAGE_2 = "\n".join((
     "1. Select a Baseline or Upload Your File",
     "Choose from our curated data set (text, image, audio, video, PDF) or upload any file to convert into a NumPy boolean array.",
     "2. Pick Encoding Methods",
-    "Run one or more integrated codecs (e.g., HEDGES, DNA Fountain, Raptor, DNA Aeon, Yin-Yang).",
+    "Run one or more integrated methods (e.g., HEDGES, DNA Fountain, Raptor, DNA Aeon, Yin-Yang).",
     "3. Simulate Storage (Optional)",
     "Specify storage duration to invoke MESA-based degradation simulation.",
     "4. Review Results",
     "   - Summary Table: Aggregated metrics across runs.",
-    "   - Detailed Table: Per-file, per-codec breakdown.",
+    "   - Detailed Table: Per-file, per-method breakdown.",
     "   - Interactive Charts: Whisker or bar plots for density, runtime, and cost.",
     "5. Export",
     "   Download CSV tables and SVG/PNG charts for reporting and further analysis.",
