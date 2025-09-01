@@ -135,7 +135,7 @@ def run_precalculation(int_num_of_iteration):
         bool_detail_exists = os.path.exists(path_existing_detail)
         if bool_detail_exists:
             df_existing_detail = pd.read_pickle(path_existing_detail)
-            list_partial_results.append(df_existing_detail.values.tolist())
+            list_partial_results.append(df_existing_detail.values.tolist()[0])
         else:
             df_existing_detail = pd.DataFrame(
                 columns=pd.Series([
