@@ -421,6 +421,7 @@ def visualize_success_rate_general(df_detail):
         marker_line_width=4,
         marker_cornerradius="5%",
         texttemplate="%{y:.2f}%",
+        textposition="outside",
     )
     chart_success_rate.update_xaxes(showticklabels=True)
 
