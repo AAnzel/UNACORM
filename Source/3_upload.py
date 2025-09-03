@@ -19,7 +19,7 @@ __status__ = "Stable"
 
 st.header(":primary[︱]File Upload")
 st.markdown("")
-list_file_type = ["txt", "jpg", "wav"]
+list_file_type = None  # ["txt", "jpg", "wav"]
 
 imported_file = st.file_uploader(
     label="Upload a file",
@@ -39,17 +39,24 @@ if imported_file is not None:
     with open(path_input_file, mode="wb") as w:
         w.write(imported_file.getvalue())
 
-    if os.path.exists(path_input_file):
-        st.success("The file is successfully uploaded")
+    if not os.path.exists(path_input_file):
+        st.error("Error while uploading the file")
 
 st_col_1, st_col_2 = st.columns([1.5, 1], gap="medium")
 
 with st_col_1:
-    st.write("Uploaded data path:\t", path_input_file)
+    if path_input_file != "":
+        st.success(
+            "Uploaded file path:    `" + path_input_file + "`",
+            icon=":material/check:",
+        )
+    else:
+        st.empty()
 with st_col_2:
     st.info(
         "Your data is automatically deleted after changing the tab"
-        + " or closing the window."
+        + " or closing the window.",
+        icon=":material/info_i:",
     )
 
 if path_input_file != "":
