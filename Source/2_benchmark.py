@@ -73,14 +73,22 @@ with st.container(border=True):
     st_col_1, _, st_col_2 = st.columns([4, 1, 8])
 
     with st_col_1:
-        string_selected_visualization = st.radio(
-            "Visualize using", ["Bar Chart", "Whisker Chart"], horizontal=True
+        string_selected_visualization = st.pills(
+            "Visualize using",
+            [
+                ":material/bar_chart: Bar Chart",
+                ":material/candlestick_chart: Whisker Chart",
+            ],
+            default=":material/bar_chart: Bar Chart",
         )
 
     with st_col_2:
         st.warning("The y-axes use a logarithmic scale", width=260)
 
-    if string_selected_visualization == "Whisker Chart":
+    if (
+        string_selected_visualization
+        == ":material/candlestick_chart: Whisker Chart"
+    ):
         bool_whisker_chart = True
     else:
         bool_whisker_chart = False
