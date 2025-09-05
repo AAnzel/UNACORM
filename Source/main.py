@@ -80,7 +80,7 @@ def main():
     uti.remove_cached_data()
 
     st.logo(
-        os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.png"),
+        os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.svg"),
         link="https://github.com/AAnzel/DNA_Encodings/",
     )
 
