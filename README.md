@@ -6,8 +6,7 @@ Badges Placeholder
 
 This tool was created for the following paper:
 
-***"The Unified Evaluation Tool for DNA Data Storage Codecs"*** by Chisom Ezekannagha^, Aleksandar Anžel^, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael
-Schwarz, Dominik Heider, and Georges Hattab
+***"The Unified Evaluation Tool for DNA Data Storage Codecs"*** by Aleksandar Anžel^, Chisom Ezekannagha^, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Dominik Heider, and Georges Hattab
 
 ^ --- These authors contributed equally to this work
 
