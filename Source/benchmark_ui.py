@@ -73,7 +73,7 @@ def save_intermediary(list_results):
 def run_precalculation(int_num_of_iteration):
     """
     run_precalculation function is used to run the precalculation dashboard
-    num_of_iteration times in order to benchmark all encoding methods
+    num_of_iteration times in order to benchmark all coding schemes
     across all original files.
 
     The function only precalculates the original files that were not already

@@ -568,10 +568,9 @@ def df_generate_summary(df_report):
     df_generate_summary function generates a summary report of multiple
     benchmark runs
 
-    This function aggregates mulitple benchmarks of all encoding methods and
+    This function aggregates mulitple benchmarks of all coding schemes and
     all original files. The resulting file does not contain per run information
-    but an aggregated information of all runs per encoding method and original
-    file
+    but an aggregated information of all runs per codec and original file
 
     Args:
         df_report (pd.DataFrame): DataFrame containing the detailed benchmark

@@ -43,9 +43,9 @@ STRING_CONTACT_PAGE_6 = """
     """
 
 STRING_MAIN_BENCHMARK_HELP = (
-    "**The benchmark data set** includes summarized results for all encoding "
-    "methods and benchmark files. This data set does not distinguish "
-    "between the different runs of each encoding method for every benchmark file."
+    "**The benchmark data set** includes summarized results for all coding "
+    "schemes and benchmark files. This data set does not distinguish "
+    "between the different runs of each coding schemes for every benchmark file."
 )
 STRING_DETAILED_HELP = (
     "**The detailed data set** contains information on both encoding and decoding "
@@ -54,9 +54,9 @@ STRING_DETAILED_HELP = (
 STRING_DENSITY_HELP = (
     "**Information density** measures the difference in size between an encoded "
     "file and its original counterpart. For example, if the original file "
-    "consists of 300 bits and encoding it using a specific method produces a "
+    "consists of 300 bits and encoding it using a specific scheme produces a "
     "DNA strand of 100 bases (nucleotides), the information density would be "
-    "3. A higher value indicates that the encoding method can store more data "
+    "3. A higher value indicates that the codec can store more data "
     "efficiently, resulting in greater cost-effectiveness."
 )
 STRING_COST_HELP = (
@@ -68,7 +68,7 @@ STRING_COST_HELP = (
 STRING_TIME_HELP = (
     "**The time** required for the encoding and decoding processes is measured for "
     "each method and each file. These values should be used only as a reference, "
-    "since the implementations of encodings may vary depending on the programming language used."
+    "since the implementations of coding schemes may vary depending on the programming language used."
 )
 STRING_SIZE_HELP = (
     "**The size** of the resulting files from encoding and decoding processes."
@@ -90,19 +90,19 @@ STRING_MUTAGENESIS_HELP = (
 STRING_SUCCESS_RATE_HELP = (
     "**Success rate** is calculated by assessing the similarity between the "
     "original file and the file that has undergone encoding and decoding "
-    "processes. It measures how well the encoding method recovers the original "
+    "processes. It measures how well the coding scheme recovers the original "
     "information. It is calculated for all benchmark runs and all files."
 )
 STRING_BASE_ERROR_HELP = ""  # TODO: Finish this
 STRING_COST_RUNTIME = (
     "**Cost and runtime per error multiplier show** "
     "how much it would cost and how long it would take to encode and decode "
-    "benchmark files across all encoding methods and for a selected error multiplier."
+    "benchmark files across all coding schemes and for a selected error multiplier."
 )
 STRING_ABOUT_PAGE_0 = (
-    "The Unified DNA Encoding Platform is an open-source "
+    "The Unified DNA Codecs Platform is an open-source "
     "web application for standardized, multi-metric evaluation of DNA "
-    "encoding and decoding methods. Our tool consolidates state-of-the-art "
+    "encoding and decoding schemes. Our tool consolidates state-of-the-art "
     "methods into a single dashboard, enabling fair, reproducible comparisons "
     "across diverse data sets and criteria. The image below gives an overview "
     "of the DNA encoding and decoding processes for storing digital data."
@@ -110,7 +110,7 @@ STRING_ABOUT_PAGE_0 = (
 
 STRING_ABOUT_PAGE_1 = "\n".join((
     "### Benchmark Parameters",
-    "Consistent with the encoding [guidelines of the DNA Data Storage Alliance](https://www.snia.org/sites/default/files/DNA/SNIA-DNA-Data-Storage-Codecs-v1.0.pdf) and supported by recent comparative studies, our evaluation of each encoding is conducted across the following quantitative metrics.",
+    "Consistent with the codec [guidelines of the DNA Data Storage Alliance](https://www.snia.org/sites/default/files/DNA/SNIA-DNA-Data-Storage-Codecs-v1.0.pdf) and supported by recent comparative studies, our evaluation of each codec is conducted across the following quantitative metrics.",
     "1. Throughput",
     "   - Encoding Speed: Time (s) to convert a binary file into DNA oligos.",
     "   - Decoding Speed: Time (s) to reconstruct binary data from DNA sequences.",
@@ -133,7 +133,7 @@ STRING_ABOUT_PAGE_2 = "\n".join((
     "### How It Works",
     "1. Select a Baseline or Upload Your File",
     "Choose from our curated data set (text, image, audio, video, PDF) or upload any file to convert into a NumPy boolean array.",
-    "2. Pick Encoding Methods",
+    "2. Pick Coding Schemes (Codecs)",
     "Run one or more integrated methods (e.g., HEDGES, DNA Fountain, Raptor, DNA Aeon, Yin-Yang).",
     "3. Simulate Storage (Optional)",
     "Specify storage duration to invoke MESA-based degradation simulation.",
@@ -147,7 +147,7 @@ STRING_ABOUT_PAGE_2 = "\n".join((
 
 STRING_ABOUT_PAGE_3 = "\n".join((
     "### Benchmark Data Set Analysis",
-    "To comprehensively assess the effectiveness of DNA data storage encoding methods, our platform employed a varied collection of benchmark files. The collection included two text files, three images, two audio files, one video, and one document, intentionally chosen to cover a wide range of file types and content typically found in digital storage.",
+    "To comprehensively assess the effectiveness of DNA data storage coding schemes, our platform employed a varied collection of benchmark files. The collection included two text files, three images, two audio files, one video, and one document, intentionally chosen to cover a wide range of file types and content typically found in digital storage.",
     "The two images below illustrate the sizes, entropies, and byte distributions of the benchmark files.",
     "#### Summary Information",
 ))
@@ -155,9 +155,9 @@ STRING_ABOUT_PAGE_3 = "\n".join((
 STRING_ABOUT_PAGE_4 = "#### Byte Density Histograms"
 
 STRING_ABOUT_PAGE_5 = "\n".join((
-    "### Supported Encoding Methods",
-    "Our platform currently implements eight DNA encoding methods, as shown in the table below. Future work will focus on incorporating additional relevant methods that were beyond the scope of the initial analysis.",
-    "| DNA Encoding |  Publication | Authors | Reimplemented by | Repository of the Reimplementation |",
+    "### Supported Coding Schemes (Codecs)",
+    "Our platform currently implements eight DNA coding schemes, as shown in the table below. Future work will focus on incorporating additional relevant methods that were beyond the scope of the initial analysis.",
+    "| DNA Codec |  Publication | Authors | Reimplemented by | Repository of the Reimplementation |",
     "|---|---|---|---|---|",
     "| Simple Code | [10.1126/science.1226355](https://doi.org/10.1126/science.1226355) | George M. Church, Yuan Gao, and Sriram Kosuri | Khawla Elhadri | [https://github.com/ke-pm/DNA-Encoding](https://github.com/ke-pm/DNA-Encoding) |",
     "| 2D Code | [10.1002/anie.201411378](https://doi.org/10.1002/anie.201411378) | Robert N. Grass, Reinhard Heckel, Michela Puddu, Daniela Paunescu, and Wendelin J. Stark | Samuel Becker, Felix Klein, and Raffael Schön | [https://github.com/raeudigerRaeffi/reedSolomonDNA](https://github.com/raeudigerRaeffi/reedSolomonDNA) |",
@@ -170,13 +170,13 @@ STRING_ABOUT_PAGE_5 = "\n".join((
 ))
 
 STRING_INTRODUCTION = "\n".join((
-    "## :primary[UNACORM] :grey[︱] The Unified DNA Encodings Platform",
-    "The Unified DNA Encoding Platform is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage encoding methods. It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), and incorporates key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and adherence to biochemical constraints. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical encodings via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",
+    "## :primary[UNACORM] :grey[︱] The Unified DNA Codecs Platform",
+    "The Unified DNA Codecs Platform is an open-source, modular platform designed to systematically evaluate and compare diverse DNA data storage coding schemes (codecs). It harmonizes benchmarking criteria with internationally recognized standards, such as those outlined by the [DNA Data Storage Alliance](https://dnastoragealliance.org/), and incorporates key metrics including encoding and decoding throughput, computational efficiency, error-correction effectiveness, specification transparency, and adherence to biochemical constraints. The tool supports batch processing of multiple file formats across various sizes, integrates state-of-the-art and classical codecs via standardized wrappers, and provides comprehensive interactive visualizations and exportable results to facilitate informed selection and optimization of DNA storage strategies.",
     "Please cite this work as:",
     "```tex",
     "@article{anzel2025unified,",
     "author = {Aleksandar Anžel and Chisom Ezekannagha and Leon Wimbes and Luca Staus and Ihsan Tri Heldian and David Sonnabend and Khawla Elhadri and Samuel Becker and Felix Klein and Raffael Schön and Marius Welzel and Michael Schwarz and Dominik Heider and Georges Hattab},",
-    "title = {A Unified Evaluation Tool for DNA Data Storage Encodings},",
+    "title = {The Unified Evaluation Tool for DNA Data Storage Codecs},",
     "journal = {Journal Name},",
     "year = {2025},",
     "doi = {[DOI LINK]},",
@@ -186,7 +186,7 @@ STRING_INTRODUCTION = "\n".join((
 STRING_FOOTER = "\n".join((
     "Aleksandar Anžel, Chisom Ezekannagha, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Dominik Heider, and Georges Hattab (2025)",
     "<br>",
-    "<i>A Unified Evaluation Tool for DNA Data Storage Encodings</i>",
+    "<i>The Unified Evaluation Tool for DNA Data Storage Codecs</i>",
     "<br>",
     "Journal Name. [DOI LINK].",
 ))

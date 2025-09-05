@@ -71,9 +71,9 @@ st.markdown("---")
 
 st.header(":primary[︱]DNA Encoding")
 list_chosen_dna_encoding = st.multiselect(
-    "Select preferred DNA Encoding Methods",
+    "Select preferred DNA Coding Schemes",
     uti.LIST_ENCODING_METHODS,
-    placeholder="Choose DNA encoding methods",
+    placeholder="Choose DNA Coding Schemes",
 )
 
 st.warning("The length of processing time depends on chosen methods")

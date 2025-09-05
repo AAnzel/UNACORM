@@ -135,7 +135,7 @@ def visualize_cost_benchmark(
 ):
     """
     visualize_cost_benchmark function is used for visualizing the
-    encoding/decoding costs for each encoding method
+    encoding/decoding costs for each codec
 
     Args:
         list_files_chosen (list): names of files that are to be visualized

@@ -34,7 +34,7 @@ _, st_col_1, st_col_2, st_col_3, _ = st.columns([1, 3, 3, 3, 1])
 _, st_col_4, st_col_5, st_col_6, _ = st.columns([1, 3, 3, 3, 1])
 
 st_col_1.metric(
-    ":primary[:material/genetics:]$~~~~$Encoding Methods",
+    ":primary[:material/genetics:]$~~~~$Coding Schemes (Codecs)",
     int_sum_methods,
     border=True,
 )
