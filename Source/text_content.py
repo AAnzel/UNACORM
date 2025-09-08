@@ -109,7 +109,7 @@ STRING_ABOUT_PAGE_0 = (
 )
 
 STRING_ABOUT_PAGE_1 = "\n".join((
-    "### Benchmark Parameters",
+    "### Evaluation Parameters",
     "Consistent with the codec [guidelines of the DNA Data Storage Alliance](https://www.snia.org/sites/default/files/DNA/SNIA-DNA-Data-Storage-Codecs-v1.0.pdf) and supported by recent comparative studies, our evaluation of each codec is conducted across the following quantitative metrics.",
     "1. Throughput",
     "   - Encoding Speed: Time (s) to convert a binary file into DNA oligos.",
@@ -167,6 +167,18 @@ STRING_ABOUT_PAGE_5 = "\n".join((
     "| RaptorCode | [10.1109/TIT.2006.874390](https://doi.org/10.1109/TIT.2006.874390) | Amin Shokrollahi | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) |",
     "| LTCode | [10.1109/SFCS.2002.1181950](https://doi.org/10.1109/SFCS.2002.1181950) | Michael Luby | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) |",
     "| OnlineCode | [TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf) | Petar Maymounkov | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) |",
+))
+
+STRING_ABOUT_PAGE_6 = "\n".join((
+    "#### Codecs' Parameters",
+    "* Simple code: [Placeholder for parameters such as redundancy ratio, mapping constraints, etc.]",
+    "* 2D code: [Placeholder for parameters such as matrix dimensions, redundancy distribution, etc.]",
+    "* XOR-based code: [Placeholder for parameters such as window size, overlap degree, etc.]",
+    "* Repetition code: [Placeholder for parameters such as repetition factor, block size, etc.]",
+    "* DNA-Aeon code: [Placeholder for parameters such as constraint sets, coding constraints (e.g., GC balance), optimization modes, etc.]",
+    "* Raptor code: [Placeholder for parameters such as degree distribution, pre-coding parameters, overhead fraction, etc.]",
+    "* LT code: [Placeholder for parameters such as degree distribution, block size, overhead ratio, etc.]",
+    "* Online code: [Placeholder for parameters such as symbol size, encoding window, overhead, etc.]",
 ))
 
 STRING_INTRODUCTION = "\n".join((

@@ -48,5 +48,6 @@ st_col_2.image(
 )
 
 st_col_2.markdown(tc.STRING_ABOUT_PAGE_5)
+st_col_2.markdown(tc.STRING_ABOUT_PAGE_6)
 
 uti.display_footer()
