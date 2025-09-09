@@ -392,7 +392,7 @@ def tuple_pipeline(
         string_input_file_basename,
         string_encoding_method,
         "Encoding",
-        string_file_extension,
+        "." + string_file_extension,
         None,
         None,
         None,
