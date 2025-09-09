@@ -12,33 +12,33 @@ STRING_CONTACT_PAGE_0 = """
     We appreciate your interest in our project! Here are the best ways to get in touch or contribute.
     """
 STRING_CONTACT_PAGE_1 = """
-    #### Project Repository
+    #### Go To Project Repository
     Our project is hosted and maintained on GitHub."""
 
 STRING_CONTACT_PAGE_2 = """
-    #### Reporting Issues
+    #### Report Issues
     If you encounter a bug or have a feature request, please open an issue on our GitHub repository.
     Before creating a new issue, please check if a similar one already exists.
     """
 
 STRING_CONTACT_PAGE_3 = """
-    #### Contributing
+    #### Contribute
     We welcome contributions! If you would like to contribute to the project please review our [contribution guidelines](https://github.com/AAnzel/DNA_Encodings/blob/master/CONTRIBUTE.md) before submitting a pull request.
     """
 
 STRING_CONTACT_PAGE_4 = """
-    #### Discussions
+    #### Discuss
     For general questions, ideas, or community discussions, please use our GitHub Discussions forum.
 
     """
 
 STRING_CONTACT_PAGE_5 = """
-    #### Project Updates
+    #### Stay Up To Date
     Stay updated with our latest releases and announcements.
     """
 
 STRING_CONTACT_PAGE_6 = """
-    #### Additional Information
+    #### More Info
     For matters not suitable for GitHub, you can reach us via e-mail.
     """
 
