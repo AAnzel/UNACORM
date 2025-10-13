@@ -113,10 +113,10 @@ The easiest way to install the tool is to use our latest Docker image by buildin
 ```bash
 # How to build the docker container and run it locally
 
-git clone https://github.com/AAnzel/DNA_Encodings.git
-cd DNA_Encodings/
-docker build -t dna-encodings-local:stable .
-docker run --publish 8501:8501 --detach --name dna-encodings-local dna-encodings-local:stable
+git clone https://github.com/AAnzel/UNACORM.git
+cd UNACORM/
+docker build -t unacorm-local:stable .
+docker run --publish 8501:8501 --detach --name unacorm-local unacorm-local:stable
 ```
 
 You can start using the tool by opening a web browser and typing in [http://localhost:8501/](http://localhost:8501/) as the address. If you run the docker container, you have to use the IP address or hostname instead of localhost.
@@ -125,8 +125,8 @@ You can start using the tool by opening a web browser and typing in [http://loca
 The platform can also be installed without the docker container. This process requires users to install Anaconda or Miniconda package managers. Users can install Conda using the instructions on the following link [https://docs.anaconda.com/miniconda/#quick-command-line-install](https://docs.anaconda.com/miniconda/#quick-command-line-install). If Conda is installed, the following sequence of instructions (for Linux-based systems) installs all dependencies and runs the dashboard:
 
 ```bash
-git clone https://github.com/AAnzel/DNA_Encodings.git
-cd DNA_Encodings/
+git clone https://github.com/AAnzel/UNACORM.git
+cd UNACORM/
 conda env create -f environment.yml
 conda activate dna_project_env
 pip install -r Source/Encodings/XORBasedCode/requirements.txt

@@ -81,7 +81,7 @@ def main():
 
     st.logo(
         os.path.join(uti.PATH_CACHE_DATA, "images", "Logo.svg"),
-        link="https://github.com/AAnzel/DNA_Encodings/",
+        link="https://github.com/AAnzel/UNACORM/",
     )
 
     st.html(

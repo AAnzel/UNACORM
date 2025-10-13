@@ -29,7 +29,7 @@ _, st_col_1, st_col_2, st_col_3, _ = st.columns(
 
 st_col_1.link_button(
     "GitHub Repository",
-    url="https://github.com/AAnzel/DNA_Encodings/tree/master",
+    url="https://github.com/AAnzel/UNACORM/tree/master",
     icon=":material/home_storage:",
     use_container_width=True,
     type="primary",
@@ -37,7 +37,7 @@ st_col_1.link_button(
 
 st_col_2.link_button(
     "Open Issue",
-    url="https://github.com/AAnzel/DNA_Encodings/issues/new",
+    url="https://github.com/AAnzel/UNACORM/issues/new",
     icon=":material/bug_report:",
     use_container_width=True,
     type="primary",
@@ -45,7 +45,7 @@ st_col_2.link_button(
 
 st_col_3.link_button(
     "Create a Pull Request",
-    url="https://github.com/AAnzel/DNA_Encodings/compare",
+    url="https://github.com/AAnzel/UNACORM/compare",
     icon=":material/add:",
     use_container_width=True,
     type="primary",
@@ -66,7 +66,7 @@ _, st_col_1, st_col_2, st_col_3, _ = st.columns(
 
 st_col_1.link_button(
     "Discuss",
-    url="https://github.com/AAnzel/DNA_Encodings/discussions/new/choose",
+    url="https://github.com/AAnzel/UNACORM/discussions/new/choose",
     icon=":material/comment:",
     use_container_width=True,
     type="primary",
@@ -74,7 +74,7 @@ st_col_1.link_button(
 
 st_col_2.link_button(
     "Releases",
-    url="https://github.com/AAnzel/DNA_Encodings/releases",
+    url="https://github.com/AAnzel/UNACORM/releases",
     icon=":material/deployed_code:",
     use_container_width=True,
     type="primary",

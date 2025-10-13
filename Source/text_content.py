@@ -23,7 +23,7 @@ STRING_CONTACT_PAGE_2 = """
 
 STRING_CONTACT_PAGE_3 = """
     #### Contribute
-    We welcome contributions! If you would like to contribute to the project please review our [contribution guidelines](https://github.com/AAnzel/DNA_Encodings/blob/master/CONTRIBUTE.md) before submitting a pull request.
+    We welcome contributions! If you would like to contribute to the project please review our [contribution guidelines](https://github.com/AAnzel/UNACORM/blob/master/CONTRIBUTE.md) before submitting a pull request.
     """
 
 STRING_CONTACT_PAGE_4 = """
