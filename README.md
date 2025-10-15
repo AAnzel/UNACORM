@@ -48,12 +48,15 @@ The code is written in Python 3.12.2 and tested on Linux with the libraries incl
 | [Data/cache_data/pre_summary.pkl](Data/cache_data/pre_summary.pkl) | contains cached benchmark data that represents the summary of [pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs |
 | [Data/cache_data/huff3.dict](Data/cache_data/huff3.dict) | contains cached codebook for the 2D code |
 
-The cached benchmark data can be re-calculated using the [Source/precalculation.py](/Source/precalculation.py) script and the following command:
+The cached benchmark data can be re-calculated using the [Source/benchmark_ui.py](/Source/benchmark_ui.py) script and the following command:
 
 ```bash
 # The user should be placed inside the Source/ directory
-streamlit run precalculation.py
+streamlit run benchmark_ui.py
 ```
+
+If used in an HPC headless environment, the following script should be used instead [Source/benchmark_hpc.py](/Source/benchmark_hpc.py) alongside a bash wrapper [Source/hpc_slurm_benchmark.py](/Source/hpc_slurm_benchmark.py). Users should change the SLURM parameters within this script (**especially the e-mail**).
+
 
 The data located in [Data/Original/](Data/Original/) was used to test and benchmark all DNA coding schemes. The directory contains the following files:
 
