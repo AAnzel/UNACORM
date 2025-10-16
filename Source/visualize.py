@@ -375,8 +375,6 @@ def visualize_base_error_general(df_detail):
         .reset_index()
     )
 
-    print(df_success_rate.head(50))
-
     chart_base_error = px.line(
         df_success_rate.sort_values("Method"),
         x="Base_error_ratio",
