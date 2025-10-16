@@ -42,7 +42,9 @@ if imported_file is not None:
     if not os.path.exists(path_input_file):
         st.error("Error while uploading the file")
 
-st_col_1, st_col_2 = st.columns([1.5, 1], gap="medium")
+st_col_1, st_col_2 = st.columns(
+    [1.5, 1], gap="medium", vertical_alignment="bottom"
+)
 
 with st_col_1:
     if path_input_file != "":
@@ -83,7 +85,7 @@ st_cont_0 = st.container(border=True)
 with st_cont_0:
     st.markdown("#### Error Simulation")
 
-    st_col_1, _, st_col_2 = st.columns([4, 1, 4])
+    st_col_1, _, st_col_2 = st.columns([4, 1, 4], vertical_alignment="bottom")
 
     with st_col_1:
         int_chosen_storage_length = st.number_input(
