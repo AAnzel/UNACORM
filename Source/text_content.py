@@ -171,14 +171,18 @@ STRING_ABOUT_PAGE_5 = "\n".join((
 
 STRING_ABOUT_PAGE_6 = "\n".join((
     "#### Codecs' Parameters",
-    "* Simple code: [Placeholder for parameters such as redundancy ratio, mapping constraints, etc.]",
-    "* 2D code: [Placeholder for parameters such as matrix dimensions, redundancy distribution, etc.]",
-    "* XOR-based code: [Placeholder for parameters such as window size, overlap degree, etc.]",
-    "* Repetition code: [Placeholder for parameters such as repetition factor, block size, etc.]",
-    "* DNA-Aeon code: [Placeholder for parameters such as constraint sets, coding constraints (e.g., GC balance), optimization modes, etc.]",
-    "* Raptor code: [Placeholder for parameters such as degree distribution, pre-coding parameters, overhead fraction, etc.]",
-    "* LT code: [Placeholder for parameters such as degree distribution, block size, overhead ratio, etc.]",
-    "* Online code: [Placeholder for parameters such as symbol size, encoding window, overhead, etc.]",
+    "- **Repetition code**: No parameters.",
+    "- **Simple code**: Default parameters — a segment length of 12 bytes, with the maximum number of 'oligos' set to (2^{19} = 524,288).",
+    "- **2D code**: Default parameters —",
+    "  **(a)** In the inner encoder, the Galois field size (p) is 47, the message length is 39, the payload length is 33, the symbol size is 1, and the p-factor is 2.",
+    "  **(b)** In the outer encoder, the Galois field size (p) is 47, the message length is 713, the payload length is 594, the symbol size is 30, and the p-factor is 7.",
+    "- **XOR-based code**: Default parameters — 12 nucleotides per primer, a maximum of 6 nucleotides per byte, the minimum strand length follows the equation (27 + (10 x MAX_NUCLEOTIDES_PER_BYTE)), the maximum payload index gap and the minimum number of larger payloads are 10, and the minimum XOR size and step are 2 and 1, respectively.",
+    "- **Raptor code**: Overhead value is 0.2, headers are included, the upper bound threshold for dropping packets is 1, chunk size is 100, seed value is 2, and 2 repair symbols are used.",
+    "- **Online code**: Same parameters as Raptor code, with additional parameters: epsilon at 0.19 and quality value at 7.",
+    "- **LT code**: Same as Raptor code, but with the upper bound threshold for dropping packets changed to 0.9, and an implicit mode set to enabled.",
+    "- **DNA-Aeon code**: Default parameters — chunk size is 100, the error detection algorithm is 'crc' with a header length of 8, and the package redundancy value is set to 0.4.",
+    "",
+    ":primary-background[Additional, less relevant parameters are available in the GitHub repository.]",
 ))
 
 STRING_INTRODUCTION = "\n".join((
