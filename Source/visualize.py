@@ -367,28 +367,9 @@ def visualize_base_error_general(df_detail):
         columns={"Similarity": "Success Rate (%)"}
     )
 
-    # df_success_rate["Base_error_ratio_rounded"] = df_success_rate[
-    #     "Base_error_ratio"
-    # ].round(5)
-
-    # df_success_rate = (
-    #     df_success_rate.groupby(["Method", "Filename", "Success Rate (%)"])[
-    #         "Base_error_ratio_rounded"
-    #     ]
-    #     .first()
-    #     .reset_index()
-    # )
-
-    # df_success_rate = df_success_rate.rename(
-    #     columns={"Base_error_ratio_rounded": "Base error ratio"}
-    # )
-
-    # # Adding jitter for better visual readability
-    # np_jitter = np.random.uniform(0, 0.005, len(LIST_ENCODING_METHODS))
-    # dict_jitter_map = dict(zip(LIST_ENCODING_METHODS, np_jitter))
-    # df_success_rate["Base error ratio"] = df_success_rate[
-    #     "Base error ratio"
-    # ] + df_success_rate["Method"].map(dict_jitter_map)
+    # TODO: The last ratio, in which the code had a 100% success rate
+    # (out of 5 repetitions) and up until the first time, the code had a zero
+    # percent success rate
 
     chart_base_error = px.line(
         df_success_rate.sort_values("Method"),
