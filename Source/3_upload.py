@@ -103,7 +103,7 @@ with st_cont_0:
             value=0.0,
             min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
             max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
-            step=0.5,
+            step=0.01,
             help=tc.STRING_MUTAGENESIS_HELP,
         )
 

@@ -43,13 +43,10 @@ with st.container(border=True):
     st_col_1, _, st_col_2 = st.columns([4, 1, 8])
 
     with st_col_1:
-        float_error_multiplier = st.slider(
+        float_error_multiplier = st.select_slider(
             "Choose error multiplier value or leave it 0 to skip",
-            value=0.0,
-            min_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-            max_value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[-1],
-            step=0.5,
-            format="%1f",
+            value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+            options=uti.LIST_FLOAT_ERROR_MULTIPLIERS,
         )
         with st.popover(
             "What is error multiplier?",
