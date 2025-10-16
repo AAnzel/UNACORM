@@ -342,34 +342,56 @@ def visualize_base_error_per_file(
     return chart_base_error
 
 
-def visualize_base_error_general(df_measure_sum_concat):
+def visualize_base_error_general(df_detail):
     """
     visualize_base_error_general function is used for visualizing base error
     values for each method across all runs and files
 
     Args:
-        df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+        df_detail (pd.DataFrame): detail benchmark DataFrame
 
     Returns:
         chart_base_error (px.Chart): chart with base error values
     """
-    chart_base_error = px.scatter(
-        df_measure_sum_concat.sort_values("Method"),
-        x="Mean_Base_Error_Ratio",
-        y="Information_Density",
+    df_tmp = df_detail.copy()
+
+    df_success_rate = (
+        df_tmp.groupby(["Method", "Filename", "Base_error_ratio"])["Similarity"]
+        .mean()
+        .reset_index()
+    )
+
+    df_success_rate["Similarity"] = df_success_rate["Similarity"] * 100
+
+    df_success_rate = df_success_rate.rename(
+        columns={"Similarity": "Success Rate (%)"}
+    )
+
+    df_success_rate = (
+        df_success_rate.groupby(["Method", "Filename", "Success Rate (%)"])[
+            "Base_error_ratio"
+        ]
+        .mean()
+        .reset_index()
+    )
+
+    print(df_success_rate.head(50))
+
+    chart_base_error = px.line(
+        df_success_rate.sort_values("Method"),
+        x="Base_error_ratio",
+        y="Success Rate (%)",
         color="Method",
+        markers=True,
         facet_col="Filename",
         facet_col_wrap=3,
         facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        height=_INT_CHART_ROW_SIZE * 1.5,
+        height=_INT_CHART_ROW_SIZE * 2,
         template=_STRING_PLOTLY_THEME,
     )
 
-    chart_base_error.update_layout(yaxis_title="Information Density (b/nt)")
     chart_base_error.update_xaxes(showticklabels=True)
-
-    # ! FIX: Find the appropriate aggregation
     chart_base_error.update_yaxes(showgrid=True)
 
     return chart_base_error
@@ -388,23 +410,15 @@ def visualize_success_rate_general(df_detail):
     """
     df_tmp = df_detail.copy()
 
-    df_success_counts = (
-        df_tmp.groupby("Method")["Similarity"].sum().reset_index()
+    df_success_rate = (
+        df_tmp.groupby("Method")["Similarity"].mean().reset_index()
     )
 
-    df_success_counts.rename(
-        columns={"Similarity": "Number_of_Successes"}, inplace=True
-    )
+    df_success_rate["Similarity"] = df_success_rate["Similarity"] * 100
 
-    df_total_counts = (
-        df_tmp.groupby("Method").size().reset_index(name="Total_Attempts")
+    df_success_rate = df_success_rate.rename(
+        columns={"Similarity": "Success Rate (%)"}
     )
-
-    df_success_rate = df_success_counts.merge(df_total_counts, on="Method")
-    df_success_rate["Success Rate (%)"] = (
-        df_success_rate["Number_of_Successes"]
-        / df_success_rate["Total_Attempts"]
-    ) * 100
 
     chart_success_rate = px.bar(
         df_success_rate,

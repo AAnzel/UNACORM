@@ -31,7 +31,7 @@ chart_sucess_rate = vis.visualize_success_rate_general(df_existing_summary)
 st.plotly_chart(chart_sucess_rate, use_container_width=True)
 
 st.header(":primary[︱]Base Error", help=None)  # TODO: Add new help
-chart_base_error = vis.visualize_base_error_general(df_existing_summary)
+chart_base_error = vis.visualize_base_error_general(df_existing_detail)
 st.plotly_chart(chart_base_error, use_container_width=True)
 
 st.header(
