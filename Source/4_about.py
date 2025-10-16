@@ -16,6 +16,7 @@ __status__ = "Stable"
 
 _, st_col_2, _ = st.columns([1, 9, 1])
 st_col_2.header(":primary[︱]About")
+st_col_2.markdown("")
 st_col_2.markdown(tc.STRING_ABOUT_PAGE_0)
 
 with open(

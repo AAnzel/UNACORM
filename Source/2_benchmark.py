@@ -18,6 +18,7 @@ df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
 df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
 st.header(":primary[︱]Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
+st.markdown("")
 uti.display_processed_data(df_existing_summary, df_existing_detail)
 st.divider()
 
@@ -37,7 +38,7 @@ st.header(
     ":primary[︱]Cost and Runtime per Error Multiplier",
     help=tc.STRING_COST_RUNTIME,
 )
-st.html("<br>")
+st.markdown("")
 
 with st.container(border=True):
     st_col_1, _, st_col_2 = st.columns([4, 1, 8])
@@ -66,7 +67,7 @@ with st.container(border=True):
             placeholder="Choose files",
         )
 
-    st.html("<br>")
+    st.markdown("")
     st_col_1, _, st_col_2 = st.columns([4, 1, 8])
 
     with st_col_1:
