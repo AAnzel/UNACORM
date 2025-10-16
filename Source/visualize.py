@@ -356,10 +356,8 @@ def visualize_base_error_general(df_detail):
     df_tmp = df_detail.copy()
 
     df_success_rate = (
-        df_tmp.groupby(["Method", "Filename", "Error_Multiplier"])[
-            ["Similarity", "Base_error_ratio"]
-        ]
-        .mean()
+        df_tmp.groupby(["Method", "Filename", "Error_Multiplier"])
+        .agg({"Similarity": "mean", "Base_error_ratio": "max"})
         .reset_index()
     )
 
@@ -394,7 +392,7 @@ def visualize_base_error_general(df_detail):
 
     chart_base_error = px.line(
         df_success_rate.sort_values("Method"),
-        x="Error_Multiplier",
+        x="Base_error_ratio",
         y="Success Rate (%)",
         color="Method",
         markers=True,
