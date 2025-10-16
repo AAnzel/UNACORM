@@ -426,7 +426,7 @@ def visualize_success_rate_general(df_detail):
     chart_success_rate.update_xaxes(showticklabels=True)
 
     chart_success_rate.update_yaxes(
-        range=[0, 100],
+        range=[0, 110],
         showgrid=True,
         zeroline=True,
     )
