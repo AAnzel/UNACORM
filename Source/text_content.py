@@ -93,7 +93,16 @@ STRING_SUCCESS_RATE_HELP = (
     "processes. It measures how well the coding scheme recovers the original "
     "information. It is calculated for all benchmark runs and all files."
 )
-STRING_BASE_ERROR_HELP = ""  # TODO: Finish this
+STRING_BASE_ERROR_HELP = (
+    "**Base Error** is calculated by plotting a percentage of successful "
+    "decoding attempts for a given base error ratio using the proportions of "
+    "substitutions, deletions and insertions described in (high mutagenesis by "
+    "Press et al.[1]), with a multiplier between 0.0 and 2.5.\n\n"
+    "[1] W.H. Press, J.A. Hawkins, S.K. Jones, J.M. Schaub, I.J. Finkelstein, "
+    "HEDGES error-correcting code for DNA storage corrects indels and allows "
+    "sequence constraints, Proc. Natl. Acad. Sci. USA 117 (31) 18489-18496, "
+    "https://doi.org/10.1073/pnas.2004821117 (2020).\n"
+)
 STRING_COST_RUNTIME = (
     "**Cost and runtime per error multiplier show** "
     "how much it would cost and how long it would take to encode and decode "
