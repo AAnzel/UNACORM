@@ -1,4 +1,4 @@
-Badges Placeholder
+![Alt text](Data/cache_data/images/Logo.svg)
 
 # UNACORM --- The Unified DNA Codecs Platform
 
