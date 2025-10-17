@@ -1,3 +1,4 @@
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
@@ -367,12 +368,55 @@ def visualize_base_error_general(df_detail):
         columns={"Similarity": "Success Rate (%)"}
     )
 
-    # TODO: The last ratio, in which the code had a 100% success rate
+    # Now we calculate the last ratio, in which the code had a 100% success rate
     # (out of 5 repetitions) and up until the first time, the code had a zero
     # percent success rate
 
+    df_success_rate = df_success_rate.sort_values([
+        "Method",
+        "Filename",
+        "Base_error_ratio",
+    ]).reset_index(drop=True)
+
+    # Compute previous success rate for each (Method, Filename) group
+    df_success_rate["Prev_Success"] = df_success_rate.groupby([
+        "Method",
+        "Filename",
+    ])["Success Rate (%)"].shift(1)
+
+    # Find drops from 100% to <100%
+    df_drops = df_success_rate[
+        (df_success_rate["Prev_Success"] == 100)
+        & (df_success_rate["Success Rate (%)"] < 100)
+    ]
+
+    # Rows for (Method, Filename) where drop never happens (always 100%), keep max Base_error_ratio
+    df_max_rows = df_success_rate.loc[
+        df_success_rate.groupby(["Method", "Filename"])[
+            "Base_error_ratio"
+        ].idxmax()
+    ]
+
+    # Combine, prefer drop rows if available
+    df_final = (
+        pd.concat([
+            df_drops,
+            df_max_rows[
+                ~df_max_rows.set_index(["Method", "Filename"]).index.isin(
+                    df_drops.set_index(["Method", "Filename"]).index
+                )
+            ],
+        ])
+        .sort_values(["Method", "Filename"])
+        .reset_index(drop=True)
+    )
+
+    df_final = df_final[
+        ["Method", "Filename", "Success Rate (%)", "Base_error_ratio"]
+    ]
+
     chart_base_error = px.line(
-        df_success_rate.sort_values("Method"),
+        df_final,
         x="Base_error_ratio",
         y="Success Rate (%)",
         color="Method",
@@ -385,8 +429,15 @@ def visualize_base_error_general(df_detail):
         template=_STRING_PLOTLY_THEME,
     )
 
-    chart_base_error.update_xaxes(showticklabels=True)
-    chart_base_error.update_yaxes(showgrid=True)
+    chart_base_error.update_xaxes(
+        showticklabels=True,
+        range=[-0.05, 1],
+    )
+    chart_base_error.update_yaxes(
+        showgrid=True,
+        range=[-5, 105],
+        zeroline=True,
+    )
     chart_base_error.update_traces(line=dict(dash="dash"))
 
     return chart_base_error
