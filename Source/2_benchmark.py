@@ -27,7 +27,7 @@ chart_density = vis.visualize_density_benchmark(df_existing_summary)
 st.plotly_chart(chart_density, use_container_width=True)
 
 st.header(":primary[︱]Success Rate", help=tc.STRING_SUCCESS_RATE_HELP)
-chart_sucess_rate = vis.visualize_success_rate_general(df_existing_summary)
+chart_sucess_rate = vis.visualize_success_rate_general(df_existing_detail)
 st.plotly_chart(chart_sucess_rate, use_container_width=True)
 
 st.header(":primary[︱]Base Error", help=tc.STRING_BASE_ERROR_HELP)
