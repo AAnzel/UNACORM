@@ -38,7 +38,7 @@ STRING_CONTACT_PAGE_5 = """
     """
 
 STRING_CONTACT_PAGE_6 = """
-    #### More Info
+    #### Get More Info
     For matters not suitable for GitHub, you can reach us via e-mail.
     """
 

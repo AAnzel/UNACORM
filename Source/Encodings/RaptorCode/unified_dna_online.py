@@ -1,13 +1,18 @@
-import functools
 import io
+import os
 
 import numpy as np
 
-from norec4dna import Encoder, IdealSolitonDistribution, get_error_correction_encode, \
-    OnlineDistribution, OnlineEncoder, OnlineDecoder
+from norec4dna import (
+    Encoder,
+    OnlineDecoder,
+    OnlineDistribution,
+    OnlineEncoder,
+    get_error_correction_encode,
+)
 from norec4dna.HeaderChunk import HeaderChunk
-from norec4dna.Packet import Packet
 from norec4dna.helper.quaternary2Bin import tranlate_quat_to_byte
+from norec4dna.Packet import Packet
 from norec4dna.rules.FastDNARules import FastDNARules
 
 OVERHEAD = 0.2
@@ -28,13 +33,15 @@ NUMBER_OF_CHUNKS = None
 CHECKSUM_LEN_STR = "H"
 
 # For Online encoding, one should set the epsilon and quality parameters and derive the number of chunks from the file size..
-EPS = 0.19  # Original value 0.19
+EPS = 0.19
 QUALITY = 7
 SEED = 2
 
 ERROR_CORRECTION = "nocode"
 REPAIR_SYMBOLS = 2
-error_correction_func = get_error_correction_encode(ERROR_CORRECTION, REPAIR_SYMBOLS)
+error_correction_func = get_error_correction_encode(
+    ERROR_CORRECTION, REPAIR_SYMBOLS
+)
 
 DIST = OnlineDistribution  # in general this should be left unchanged
 
@@ -42,7 +49,9 @@ DNA_RULES = FastDNARules()
 
 READ_ALL = True
 NULL_IS_TERMINATOR = False  # should only be set
-DECODER_NUM_CHUNK_LEN_FORMAT = ""  # should only be set if the number of chunks is stored in each packet
+DECODER_NUM_CHUNK_LEN_FORMAT = (
+    ""  # should only be set if the number of chunks is stored in each packet
+)
 SEED_LEN_FORMAT = "I"
 
 
@@ -51,17 +60,28 @@ def encode(string_file_name, numpy_boolean_array):
     # we operate on files, not raw bits, thus we only use the file name and load the data from disk,
     # if required we could change this...
     if NUMBER_OF_CHUNKS is None:
-        NUMBER_OF_CHUNKS = Encoder.get_number_of_chunks_for_file_with_chunk_size(string_file_name,
-                                                                                 chunk_size=CHUNK_SIZE,
-                                                                                 insert_header=INSERT_HEADER)
-    encoder = OnlineEncoder(string_file_name, NUMBER_OF_CHUNKS, DIST(eps=EPS), insert_header=INSERT_HEADER,
-                            epsilon=EPS, quality=QUALITY,
-                            rules=DNA_RULES, error_correction=error_correction_func,
-                            number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
-                            check_block_number_len_format=SEED_LEN_FORMAT,
-                            save_number_of_chunks_in_packet=NUMBER_OF_CHUNKS_IN_PACKET,
-                            drop_upper_bound=DROP_UPPER_BOUND,
-                            checksum_len_str=CHECKSUM_LEN_STR)
+        NUMBER_OF_CHUNKS = (
+            Encoder.get_number_of_chunks_for_file_with_chunk_size(
+                string_file_name,
+                chunk_size=CHUNK_SIZE,
+                insert_header=INSERT_HEADER,
+            )
+        )
+    encoder = OnlineEncoder(
+        string_file_name,
+        NUMBER_OF_CHUNKS,
+        DIST(eps=EPS),
+        insert_header=INSERT_HEADER,
+        epsilon=EPS,
+        quality=QUALITY,
+        rules=DNA_RULES,
+        error_correction=error_correction_func,
+        number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
+        check_block_number_len_format=SEED_LEN_FORMAT,
+        save_number_of_chunks_in_packet=NUMBER_OF_CHUNKS_IN_PACKET,
+        drop_upper_bound=DROP_UPPER_BOUND,
+        checksum_len_str=CHECKSUM_LEN_STR,
+    )
     encoder.set_overhead_limit(OVERHEAD)
     encoder.encode_to_packets()
     return [x.get_dna_struct(True) for x in encoder.encodedPackets], encoder
@@ -69,15 +89,21 @@ def encode(string_file_name, numpy_boolean_array):
 
 def decode(string_file_name, list_of_dna_strings):
     # make sure that the dist is freshly initialized...
-    decoder = OnlineDecoder(string_file_name, error_correction=error_correction_func, use_headerchunk=INSERT_HEADER,
-                            static_number_of_chunks=NUMBER_OF_CHUNKS)
+    decoder = OnlineDecoder(
+        string_file_name,
+        error_correction=error_correction_func,
+        use_headerchunk=INSERT_HEADER,
+        static_number_of_chunks=NUMBER_OF_CHUNKS,
+    )
     decoder.read_all_before_decode = READ_ALL
 
     for dna_str in list_of_dna_strings:
-        new_pack = decoder.parse_raw_packet(io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
-                                            crc_len_format=CHECKSUM_LEN_STR,
-                                            number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
-                                            check_block_number_len_format=SEED_LEN_FORMAT)
+        new_pack = decoder.parse_raw_packet(
+            io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
+            crc_len_format=CHECKSUM_LEN_STR,
+            number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
+            check_block_number_len_format=SEED_LEN_FORMAT,
+        )
         if new_pack is not None and new_pack != "CORRUPT":
             decoder.input_new_packet(new_pack)
 
@@ -92,15 +118,25 @@ def decode(string_file_name, list_of_dna_strings):
             if INSERT_HEADER and decoder.headerChunk is None:
                 header_row = decoder.GEPP.result_mapping[0]
                 decoder.headerChunk = HeaderChunk(
-                    Packet(decoder.GEPP.b[header_row], {0}, decoder.number_of_chunks, read_only=True),
-                    checksum_len_format=CHECKSUM_LEN_STR)
+                    Packet(
+                        decoder.GEPP.b[header_row],
+                        {0},
+                        decoder.number_of_chunks,
+                        read_only=True,
+                    ),
+                    checksum_len_format=CHECKSUM_LEN_STR,
+                )
             if 0 != x or not INSERT_HEADER:
                 if decoder.number_of_chunks - 1 == x and INSERT_HEADER:
-                    output = decoder.GEPP.b[x][0][0: decoder.headerChunk.get_last_chunk_length()]
+                    output = decoder.GEPP.b[x][0][
+                        0 : decoder.headerChunk.get_last_chunk_length()
+                    ]
                     f.write(output)
                 else:
                     if NULL_IS_TERMINATOR:
-                        splitter: str = decoder.GEPP.b[x].tostring().decode().split("\x00")
+                        splitter: str = (
+                            decoder.GEPP.b[x].tostring().decode().split("\x00")
+                        )
                         output = splitter[0].encode()
                         f.write(output)
                         if len(splitter) > 1:
@@ -109,14 +145,20 @@ def decode(string_file_name, list_of_dna_strings):
                         output = decoder.GEPP.b[x]
                         f.write(output)
         # convert the byte array __ByteIO to a numpy bool array
-        numpy_boolean_array = np.unpackbits(np.frombuffer(f.getvalue(), dtype=np.uint8))
+        numpy_boolean_array = np.unpackbits(
+            np.frombuffer(f.getvalue(), dtype=np.uint8)
+        )
         return numpy_boolean_array
 
 
 if __name__ == "__main__":
-    res, encoder = encode("Dorn", None)
+    string_file_name = os.path.join(
+        "..", "..", "..", "Data", "Original", "Test", "Dorn.txt"
+    )
+
+    res, encoder = encode(string_file_name, None)
     org = None
-    with open("Dorn", "r") as f:
+    with open(string_file_name, "r") as f:
         org = np.unpackbits(np.frombuffer(f.read().encode(), dtype=np.uint8))
     decoded = decode(None, res)
     assert np.all(np.equal(org, decoded))

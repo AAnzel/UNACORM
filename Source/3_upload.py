@@ -144,7 +144,7 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
         )
 
         # If error occured, we note it
-        if len(np_decoded_array) == 0:
+        if list_decoded_info[4] is None and list_decoded_info[5] is None:
             list_cannot_encode_decode.append(string_encoding_method)
 
         bool_similar_files = np.array_equal(
@@ -177,8 +177,8 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
 
     if list_cannot_encode_decode:
         st.error(
-            "Cannot encode/decode using the following methods:\t"
-            + str(list_cannot_encode_decode)
+            "Cannot encode/decode using the following methods: "
+            + ", ".join(list_cannot_encode_decode)
         )
 
     df_new_detail = pd.DataFrame(

@@ -20,13 +20,13 @@ NOREC4DNA implements LT, Online, and Raptor (RU10) Fountain Codes.
 ## Install
 
 ### Using docker
-
+:warning: Docker builds are currently not recommended (deprecated)
 + Building the docker container from source:
     - ````git clone git@github.com:umr-ds/NOREC4DNA.git````
     - ```docker build . --tag norec4dna```
 + pulling the container from Dockerhub:
     - TBA once NOREC4DNA is available on Dockerhub
-    
+
 ### From source
 
 + Clone the repository:
@@ -35,7 +35,8 @@ NOREC4DNA implements LT, Online, and Raptor (RU10) Fountain Codes.
 
 + OPTIONAL create a virtual environment (recommended):
     - ````python3 -m venv <name_of_virtualenv>````
-    - activate/source the newly created venv
+    - activate/source the newly created venv:
+        ````source <name_of_virtualenv>/bin/activate```` (for UNIX)
 
 
 + Installing the dependencies:
@@ -45,8 +46,9 @@ NOREC4DNA implements LT, Online, and Raptor (RU10) Fountain Codes.
 
 
 + Install NOREC4DNA:
-    - ```python3 setup.py install```
-  
+    - ```python -m build .```
+    - ```pip install -e .```
+
 **If you plan to build NOREC4DNA from source under Windows we recommend using Anaconda!**
 
 ---
@@ -164,7 +166,7 @@ Defines the error detection / correction algorithm to use per packet. (Default: 
 `--split_input`
 
 Sets the number of pre-splits to perform Default: 1 (= do not split the input file into multiple NOREC rounds)
-WARNING: If set, this value _should_ be known during decoding (thus using a bruteforce approach this value might be reconstructed) 
+WARNING: If set, this value _should_ be known during decoding (thus using a bruteforce approach this value might be reconstructed)
 
 `--store_as_fasta`
 
@@ -174,7 +176,7 @@ If set, stores the result in a .fasta file instead of one file per sequence
 
 If set, besides the created chunks an additional header chunk will be added. This chunk stores the filename and the correct padding for the last chunk.
 (Recommended!) WARNING: If not set, the reconstructed file will most likely be longer due to the \00-padding at the end.
- 
+
 
 ### ConfigWorker.py
 Allows easy en- and decoding used .ini files.
@@ -205,4 +207,4 @@ there are various more or less useful scripts inside `helpful_scripts/`
 `python ConfigWorker.py <name of the .ini-file>`
 
 The decoded file will be saved as DEC_RU10_Dorn if no header-chunk was added during encoding, otherwise the file will be saved under the correct filename.
-###### if the header-chunk was NOT used, the created file will have padding \00-bytes at the end. 
+###### if the header-chunk was NOT used, the created file will have padding \00-bytes at the end.

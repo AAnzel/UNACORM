@@ -89,7 +89,7 @@ def display_footer():
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     string_key = "new" if bool_expand_detail else "old"
-    st.dataframe(df_summary, use_container_width=True)
+    st.dataframe(df_summary, width="stretch")
     st.download_button(
         label="Download Benchmark Data",
         data=df_summary.to_csv(index=False).encode("utf-8"),
@@ -105,7 +105,7 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
         icon=":material/search_insights:",
     ):
         st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
-        st.dataframe(df_detail, use_container_width=True)
+        st.dataframe(df_detail, width="stretch")
         st.download_button(
             label="Download Detailed Benchmark Data",
             data=df_detail.to_csv(index=False).encode("utf-8"),
@@ -282,17 +282,17 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_simple.encode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.encode("", list_np_data)
-        elif str_encoding_method == "OnlineCode":  # TODO: Tweak hyperparameter
+        elif str_encoding_method == "OnlineCode":
             np_list_generated_seq = encoding_online.encode(
-                path_file, list_np_data
+                os.path.join("..", "..", path_file), list_np_data
             )[0]
-        elif str_encoding_method == "LTCode":  # TODO: Tweak hyperparameters
-            np_list_generated_seq = encoding_lt.encode(path_file, list_np_data)[
-                0
-            ]
+        elif str_encoding_method == "LTCode":
+            np_list_generated_seq = encoding_lt.encode(
+                os.path.join("..", "..", path_file), list_np_data
+            )[0]
         elif str_encoding_method == "RaptorCode":
             np_list_generated_seq = encoding_raptor.encode(
-                path_file, list_np_data
+                os.path.join("..", "..", path_file), list_np_data
             )[0]
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.encode(path_file, "")
@@ -310,15 +310,17 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_simple.decode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.decode("", list_np_data)
-        elif str_encoding_method == "OnlineCode":  # TODO: Tweak hyperparameter
+        elif str_encoding_method == "OnlineCode":
             np_list_generated_seq = encoding_online.decode(
-                path_file, list_np_data
+                os.path.join("..", "..", path_file), list_np_data
             )
-        elif str_encoding_method == "LTCode":  # TODO: Tweak hyperparameters
-            np_list_generated_seq = encoding_lt.decode(path_file, list_np_data)
+        elif str_encoding_method == "LTCode":
+            np_list_generated_seq = encoding_lt.decode(
+                os.path.join("..", "..", path_file), list_np_data
+            )
         elif str_encoding_method == "RaptorCode":
             np_list_generated_seq = encoding_raptor.decode(
-                path_file, list_np_data
+                os.path.join("..", "..", path_file), list_np_data
             )
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.decode("", list_np_data)
@@ -408,7 +410,6 @@ def tuple_pipeline(
         "Total_number_of_errors": 0,
         "Base_error_ratio": 0,
     }
-
     # We time the encoding process
     int_start_time = time.time()
 
@@ -752,7 +753,7 @@ def print_output(mp_queue):
         function_target stdout, stderr, and return value
 
     Returns:
-        list or np.array: returns a list of np.array, as defined in
+        list or np.array: returns a list or np.array, as defined in
         np_list_encode_decode function
     """
     while True:
