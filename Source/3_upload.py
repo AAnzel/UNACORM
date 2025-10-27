@@ -71,7 +71,7 @@ else:
 
 st.markdown("---")
 
-st.header(":primary[︱]DNA Encoding")
+st.header(":primary[︱]DNA Encoding, Storage, and Decoding")
 st.markdown("")
 list_chosen_dna_encoding = st.multiselect(
     "Select preferred DNA Coding Schemes",
