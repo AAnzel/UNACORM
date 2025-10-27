@@ -89,7 +89,7 @@ def display_footer():
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     string_key = "new" if bool_expand_detail else "old"
-    st.dataframe(df_summary, width="stretch")
+    st.dataframe(df_summary, use_container_width=True)
     st.download_button(
         label="Download Benchmark Data",
         data=df_summary.to_csv(index=False).encode("utf-8"),
@@ -105,7 +105,7 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
         icon=":material/search_insights:",
     ):
         st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
-        st.dataframe(df_detail, width="stretch")
+        st.dataframe(df_detail, use_container_width=True)
         st.download_button(
             label="Download Detailed Benchmark Data",
             data=df_detail.to_csv(index=False).encode("utf-8"),

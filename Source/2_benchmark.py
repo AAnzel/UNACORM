@@ -52,7 +52,7 @@ with st.container(border=True):
         with st.popover(
             "What is error multiplier?",
             icon=":material/help:",
-            width="stretch",
+            use_container_width=True,
         ):
             st.markdown(tc.STRING_MUTAGENESIS_HELP)
 
