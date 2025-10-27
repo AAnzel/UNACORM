@@ -1,4 +1,5 @@
 import io
+import os
 import struct
 
 import numpy as np
@@ -185,7 +186,9 @@ def decode(string_file_name, list_of_dna_strings):
 
 
 if __name__ == "__main__":
-    string_file_name = "Dorn"
+    string_file_name = os.path.join(
+        "..", "..", "..", "Data", "Original", "Test", "Dorn.txt"
+    )
 
     res, encoder = encode(string_file_name, None)
     org = None

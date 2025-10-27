@@ -132,13 +132,11 @@ git clone https://github.com/AAnzel/UNACORM.git
 cd UNACORM/
 conda env create -f environment.yml
 conda activate dna_project_env
-pip install -r Source/Encodings/XORBasedCode/requirements.txt
-pip install -r Source/Encodings/The2DCode/requirements.txt
-pip install -r Source/Encodings/RaptorCode/requirements.txt
 cd Source/Encodings/XORBasedCode
 python setup.py install
 cd ../RaptorCode
-python setup.py install
+python -m build .
+pip install -e .
 cd ../DNA_Aeon
 python setup.py
 cd ../../

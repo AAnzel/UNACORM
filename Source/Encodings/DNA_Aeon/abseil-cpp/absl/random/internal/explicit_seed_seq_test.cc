@@ -29,14 +29,18 @@ using ::absl::random_internal::ExplicitSeedSeq;
 template <typename Sseq>
 bool ConformsToInterface() {
   // Check that the SeedSequence can be default-constructed.
-  { Sseq default_constructed_seq; }
+  {
+    Sseq default_constructed_seq;
+  }
   // Check that the SeedSequence can be constructed with two iterators.
   {
     uint32_t init_array[] = {1, 3, 5, 7, 9};
     Sseq iterator_constructed_seq(init_array, &init_array[5]);
   }
   // Check that the SeedSequence can be std::initializer_list-constructed.
-  { Sseq list_constructed_seq = {1, 3, 5, 7, 9, 11, 13}; }
+  {
+    Sseq list_constructed_seq = {1, 3, 5, 7, 9, 11, 13};
+  }
   // Check that param() and size() return state provided to constructor.
   {
     uint32_t init_array[] = {1, 2, 3, 4, 5};
@@ -140,10 +144,8 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
     ExplicitSeedSeq seq_copy(seq_from_entropy);
     EXPECT_EQ(seq_copy.size(), seq_from_entropy.size());
 
-    std::vector<uint32_t> seeds_1;
-    seeds_1.resize(1000, 0);
-    std::vector<uint32_t> seeds_2;
-    seeds_2.resize(1000, 1);
+    std::vector<uint32_t> seeds_1(1000, 0);
+    std::vector<uint32_t> seeds_2(1000, 1);
 
     seq_from_entropy.generate(seeds_1.begin(), seeds_1.end());
     seq_copy.generate(seeds_2.begin(), seeds_2.end());
@@ -157,10 +159,8 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
     }
     ExplicitSeedSeq another_seq(std::begin(entropy), std::end(entropy));
 
-    std::vector<uint32_t> seeds_1;
-    seeds_1.resize(1000, 0);
-    std::vector<uint32_t> seeds_2;
-    seeds_2.resize(1000, 0);
+    std::vector<uint32_t> seeds_1(1000, 0);
+    std::vector<uint32_t> seeds_2(1000, 0);
 
     seq_from_entropy.generate(seeds_1.begin(), seeds_1.end());
     another_seq.generate(seeds_2.begin(), seeds_2.end());
@@ -169,7 +169,15 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
     EXPECT_THAT(seeds_1, Not(Pointwise(Eq(), seeds_2)));
 
     // Apply the assignment-operator.
+    // GCC 12 has a false-positive -Wstringop-overflow warning here.
+#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
     another_seq = seq_from_entropy;
+#if ABSL_INTERNAL_HAVE_MIN_GNUC_VERSION(12, 0)
+#pragma GCC diagnostic pop
+#endif
 
     // Re-generate seeds.
     seq_from_entropy.generate(seeds_1.begin(), seeds_1.end());
@@ -181,15 +189,13 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
   // Move constructor.
   {
     // Get seeds from seed-sequence constructed from entropy.
-    std::vector<uint32_t> seeds_1;
-    seeds_1.resize(1000, 0);
+    std::vector<uint32_t> seeds_1(1000, 0);
     seq_from_entropy.generate(seeds_1.begin(), seeds_1.end());
 
     // Apply move-constructor move the sequence to another instance.
     absl::random_internal::ExplicitSeedSeq moved_seq(
         std::move(seq_from_entropy));
-    std::vector<uint32_t> seeds_2;
-    seeds_2.resize(1000, 1);
+    std::vector<uint32_t> seeds_2(1000, 1);
     moved_seq.generate(seeds_2.begin(), seeds_2.end());
     // Verify that seeds produced by moved-instance are the same as original.
     EXPECT_THAT(seeds_1, Pointwise(Eq(), seeds_2));

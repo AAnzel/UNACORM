@@ -282,6 +282,13 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_simple.encode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.encode("", list_np_data)
+
+        # TODO: None below work due to the following RaptorCode error:
+        # /RaptorCode/norec4dna/helper/helper.py", line 225, in calc_crc
+        #     while chunk := file_io.read(chunksize):
+        #                    ^^^^^^^^^^^^
+        # AttributeError: 'bytes' object has no attribute 'read'
+
         elif str_encoding_method == "OnlineCode":
             np_list_generated_seq = encoding_online.encode(
                 os.path.join("..", "..", path_file), list_np_data
@@ -310,6 +317,13 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_simple.decode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.decode("", list_np_data)
+
+        # TODO: None below work due to the following RaptorCode error:
+        # /RaptorCode/norec4dna/helper/helper.py", line 225, in calc_crc
+        #     while chunk := file_io.read(chunksize):
+        #                    ^^^^^^^^^^^^
+        # AttributeError: 'bytes' object has no attribute 'read'
+
         elif str_encoding_method == "OnlineCode":
             np_list_generated_seq = encoding_online.decode(
                 os.path.join("..", "..", path_file), list_np_data

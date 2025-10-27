@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1756297139_881548_test.txt",
+        "input": "../Data/Uploaded/1761579449_026569_all_black.png",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",
@@ -50,7 +50,7 @@
         }
     },
     "NOREC4DNA": {
-        "chunk_size": 100,
+        "chunk_size": 50,
         "package_redundancy": 0.4,
         "insert_header": true,
         "header_crc_length": 8,

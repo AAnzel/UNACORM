@@ -26,6 +26,7 @@
 #include <chrono>  // NOLINT(build/c++11)
 
 #include "absl/base/attributes.h"
+#include "absl/base/config.h"
 #include "absl/base/internal/unscaledcycleclock.h"
 
 namespace absl {
@@ -33,9 +34,6 @@ ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
 #if ABSL_USE_UNSCALED_CYCLECLOCK
-
-constexpr int32_t CycleClock::kShift;
-constexpr double CycleClock::kFrequencyScale;
 
 ABSL_CONST_INIT std::atomic<CycleClockSourceFunc>
     CycleClock::cycle_clock_source_{nullptr};

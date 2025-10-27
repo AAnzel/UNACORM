@@ -4,7 +4,8 @@ FROM continuumio/miniconda3
 ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 
-RUN apt update && apt install -y fontconfig gcc build-essential ffmpeg \
+RUN apt update \
+    && apt install -y fontconfig gcc build-essential ffmpeg \
     && apt autoclean -y \
     && apt autoremove -y \
     && export PATH=~/anaconda3/bin:$PATH \
@@ -23,19 +24,14 @@ SHELL ["conda", "run", "-n", "dna_project_env", "/bin/bash", "-c"]
 
 RUN conda clean --all --yes
 
-WORKDIR /app/Source/Encodings/RaptorCode
-
-RUN pip install -r requirements.txt \
-    && python setup.py install
-
 WORKDIR /app/Source/Encodings/XORBasedCode
 
-RUN pip install -r requirements.txt \
-    && python setup.py install
+RUN python setup.py install
 
-WORKDIR /app/Source/Encodings/The2DCode
+WORKDIR /app/Source/Encodings/RaptorCode
 
-RUN pip install -r requirements.txt
+RUN python -m build . \
+    && pip install -e .
 
 WORKDIR /app/Source/Encodings/DNA_Aeon
 
