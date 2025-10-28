@@ -111,7 +111,7 @@ We would like to thank the authors of the coding schemes (located at [Source/Enc
 
 ## Installation & Running
 ### Docker
-The easiest way to install the tool is to use our latest Docker image by building a docker container and running it locally.  Below is a sequence of instructions (for Linux-based systems) to run the container:
+The easiest way to install the tool is to use our latest Docker image by building a docker container and running it locally. To do so, you first need to install Docker by following the official documentation found at [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). After installing Docker, you should use a following sequence of instructions (for Linux-based systems) to build and run the container:
 
 ```bash
 # How to build the docker container and run it locally

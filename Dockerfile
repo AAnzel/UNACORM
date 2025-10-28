@@ -4,14 +4,18 @@ FROM continuumio/miniconda3
 ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 
+RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcquire::BrokenProxy true;\n' > /etc/apt/apt.conf.d/99fixbadproxy
+
 RUN apt update \
-    && apt install -y fontconfig gcc build-essential ffmpeg \
+    && apt full-upgrade -y \
+    && apt install -y libc6-amd64-cross git wget fontconfig build-essential ffmpeg ca-certificates \
     && apt autoclean -y \
     && apt autoremove -y \
     && export PATH=~/anaconda3/bin:$PATH \
     && export FONTCONFIG_FILE=/etc/fonts/fonts.conf \
     && export FONTCONFIG_PATH=/etc/fonts/ \
-    && export FILECONFIG_PATH=/etc/fonts
+    && export FILECONFIG_PATH=/etc/fonts \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
