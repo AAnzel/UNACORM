@@ -28,6 +28,7 @@ dependencies:
   - bitstring
   - galois
   - pathos
+  - protobuf==3.20.*
 
   - pip # Ensure pip is installed in conda environment to handle pip packages.
   - pip:
