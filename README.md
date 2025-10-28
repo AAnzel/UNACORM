@@ -116,13 +116,41 @@ The easiest way to install the tool is to use our latest Docker image by buildin
 ```bash
 # How to build the docker container and run it locally
 
+# Clone the repository
 git clone https://github.com/AAnzel/UNACORM.git
 cd UNACORM/
+
+# Build the image
 docker build -t unacorm-local:stable .
+
+# Run the container (in detached mode)
 docker run --publish 8501:8501 --detach --name unacorm-local unacorm-local:stable
 ```
-
 You can start using the tool by opening a web browser and typing in [http://localhost:8501/](http://localhost:8501/) as the address. If you run the docker container, you have to use the IP address or hostname instead of localhost.
+If you would like to remove the container and the image completely, the following sequence of commands should be used:
+
+```bash
+# ----- Stopping and removing the container -----
+
+# Stop the running container gracefully
+docker stop unacorm-local
+
+# Remove the stopped container
+docker rm unacorm-local
+
+# ----- Removing the built image -----
+
+# Remove the image (can refer by name or image ID)
+docker rmi unacorm-local:stable
+
+# If you want to confirm the image ID first, list images:
+docker images
+
+# Alternative forced removal (only if needed)
+docker rmi -f unacorm-local:stable
+```
+
+
 
 ### Conda Environment
 The platform can also be installed without the docker container. This process requires users to install Anaconda or Miniconda package managers. Users can install Conda using the instructions on the following link [https://docs.anaconda.com/miniconda/#quick-command-line-install](https://docs.anaconda.com/miniconda/#quick-command-line-install). If Conda is installed, the following sequence of instructions (for Linux-based systems) installs all dependencies and runs the dashboard:

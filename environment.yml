@@ -25,13 +25,13 @@ dependencies:
   - progressbar2
   - crcmod
   - crccheck
-  - reedsolo
   - bitstring
   - galois
   - pathos
 
   - pip # Ensure pip is installed in conda environment to handle pip packages.
   - pip:
+      - reedsolo
       - bcolors
       - cycler
       - pybloom3

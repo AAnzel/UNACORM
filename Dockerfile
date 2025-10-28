@@ -6,9 +6,10 @@ ARG PATH="/root/miniconda3/bin:${PATH}"
 
 RUN echo 'Acquire::http::Pipeline-Depth 0;\nAcquire::http::No-Cache true;\nAcquire::BrokenProxy true;\n' > /etc/apt/apt.conf.d/99fixbadproxy
 
-RUN apt update \
+RUN rm -rf /var/lib/apt/lists/* \
+    && apt update \
     && apt full-upgrade -y \
-    && apt install -y libc6-amd64-cross git wget fontconfig build-essential ffmpeg ca-certificates \
+    && apt install -y --fix-missing fontconfig g++ cmake \
     && apt autoclean -y \
     && apt autoremove -y \
     && export PATH=~/anaconda3/bin:$PATH \
@@ -21,7 +22,9 @@ WORKDIR /app
 
 COPY . /app
 
-RUN conda env create -f environment.yml
+RUN conda update --all -y \
+    && conda tos accept \
+    && conda env create -f environment.yml
 
 # Make RUN commands use the new environment:
 SHELL ["conda", "run", "-n", "dna_project_env", "/bin/bash", "-c"]
@@ -39,7 +42,7 @@ RUN python -m build . \
 
 WORKDIR /app/Source/Encodings/DNA_Aeon
 
-RUN python setup.py
+RUN rm CMakeCache.txt && python setup.py
 
 WORKDIR /app/Source/
 
