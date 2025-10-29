@@ -19,21 +19,20 @@ dependencies:
   - pycryptodomex
   - pytest
   - watchdog
-  - streamlit
+  - streamlit==1.50*
   - plotly
   - bitarray
-  - progressbar2
-  - crcmod
-  - crccheck
   - bitstring
   - galois
   - pathos
   - cython
-  - protobuf==3.20.*
 
   - pip # Ensure pip is installed in conda environment to handle pip packages.
   - pip:
       - reedsolo
+      - crcmod
+      - crccheck
+      - progressbar2
       - bcolors
       - cycler
       - pybloom3
