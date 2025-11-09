@@ -282,25 +282,27 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_simple.encode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.encode("", list_np_data)
-
-        # TODO: None below work due to the following RaptorCode error:
-        # /RaptorCode/norec4dna/helper/helper.py", line 225, in calc_crc
-        #     while chunk := file_io.read(chunksize):
-        #                    ^^^^^^^^^^^^
-        # AttributeError: 'bytes' object has no attribute 'read'
-
         elif str_encoding_method == "OnlineCode":
-            np_list_generated_seq = encoding_online.encode(
-                os.path.join("..", "..", path_file), list_np_data
-            )[0]
+            np_list_generated_seq = encoding_online.encode(path_file)[0]
         elif str_encoding_method == "LTCode":
-            np_list_generated_seq = encoding_lt.encode(
-                os.path.join("..", "..", path_file), list_np_data
-            )[0]
+            np_list_generated_seq = encoding_lt.encode(path_file, list_np_data)[
+                0
+            ]
+
+        # Raptor and all other codes relying on Raptor have a bug
+        # It is probably caused by the bad config file
+        # File "/home/alexein-personal/Documents/Ongoing_projects/DNA_Encodings/Source/utilities.py", line 314, in np_list_encode_decode
+        #     np_list_generated_seq = encoding_raptor.decode(None, list_np_data)
+        #                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # File "/home/alexein-personal/Documents/Ongoing_projects/DNA_Encodings/Source/Encodings/RaptorCode/unified_dna_raptor.py", line 153, in decode
+        #     solved = decoder.solve()
+        #             ^^^^^^^^^^^^^^^
+        # File "/home/alexein-personal/Documents/Ongoing_projects/DNA_Encodings/Source/Encodings/RaptorCode/norec4dna/RU10Decoder.py", line 414, in solve
+        #     return self.GEPP.solve(partial=partial)
+        #             ^^^^^^^^^^^^^^^
+        # AttributeError: 'NoneType' object has no attribute 'solve'
         elif str_encoding_method == "RaptorCode":
-            np_list_generated_seq = encoding_raptor.encode(
-                os.path.join("..", "..", path_file), list_np_data
-            )[0]
+            np_list_generated_seq = encoding_raptor.encode(path_file)[0]
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.encode(path_file, "")
         else:
@@ -317,25 +319,13 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_simple.decode("", list_np_data)
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.decode("", list_np_data)
-
-        # TODO: None below work due to the following RaptorCode error:
-        # /RaptorCode/norec4dna/helper/helper.py", line 225, in calc_crc
-        #     while chunk := file_io.read(chunksize):
-        #                    ^^^^^^^^^^^^
-        # AttributeError: 'bytes' object has no attribute 'read'
-
         elif str_encoding_method == "OnlineCode":
-            np_list_generated_seq = encoding_online.decode(
-                os.path.join("..", "..", path_file), list_np_data
-            )
+            np_list_generated_seq = encoding_online.decode(None, list_np_data)
         elif str_encoding_method == "LTCode":
-            np_list_generated_seq = encoding_lt.decode(
-                os.path.join("..", "..", path_file), list_np_data
-            )
+            np_list_generated_seq = encoding_lt.decode(None, list_np_data)
         elif str_encoding_method == "RaptorCode":
-            np_list_generated_seq = encoding_raptor.decode(
-                os.path.join("..", "..", path_file), list_np_data
-            )
+            print(list_np_data)
+            np_list_generated_seq = encoding_raptor.decode(None, list_np_data)
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.decode("", list_np_data)
         else:

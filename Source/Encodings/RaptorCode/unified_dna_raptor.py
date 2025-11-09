@@ -1,9 +1,9 @@
 import io
-import os
 import struct
 
 import numpy as np
 
+# from invivo_window_decoder import INPUT_FILE
 from norec4dna import (
     Encoder,
     RaptorDistribution,
@@ -17,7 +17,12 @@ from norec4dna.helper.quaternary2Bin import tranlate_quat_to_byte
 from norec4dna.Packet import Packet
 from norec4dna.rules.FastDNARules import FastDNARules
 
-OVERHEAD = 0.2
+# from norec4dna.RU10InactivationDecoder import RU10RFCInactivationDecoder
+
+
+# INPUT_FILE = "data_1mb.test"
+
+OVERHEAD = 0.07
 INSERT_HEADER = True
 DROP_UPPER_BOUND = 1.0  # decreasing this value will drop more packets but ensure all rules are followed
 NUMBER_OF_CHUNKS_IN_PACKET = False
@@ -27,7 +32,7 @@ XOR_BY_SEED = True  # uses the seed to create a pseudo-random sequence of length
 SEED_SPACING = 3  # spaces out the seed to avoid
 
 # either set NUMBER_OF_CHUNKS or CHUNK_SIZE !
-CHUNK_SIZE = 100
+CHUNK_SIZE = 75
 # the decoder needs to know the number of chunks: if CHUNK_SIZE was used, enter the number of chunks here
 # (you could store the NUMBER OF CHUNKS in each packet header but this would increase the overhead)
 # alternatively, one could infer the number of chunks from the number of encoded packets and the expected overhead
@@ -36,7 +41,7 @@ NUMBER_OF_CHUNKS = None
 
 # if the header is too small for the data, consider renaming the file or decreasing
 # the size of the checksum (the last chunk len field can not be changed in this tool...):
-CHECKSUM_LEN_STR = "H"  # file level checksum stored in the header chunk
+CHECKSUM_LEN_STR = "I"  # file level checksum stored in the header chunk
 SEED = 2
 
 ERROR_CORRECTION = "reedsolomon"  # packet level error correction
@@ -52,7 +57,7 @@ DIST = RaptorDistribution  # in general this should be left unchanged
 
 DNA_RULES = FastDNARules()
 
-READ_ALL = True  # reads all sequences before decoding (usefull in case of high required overhead -
+READ_ALL = True  # reads all sequences before decoding (useful in case of high required overhead
 # setting this to false will trigger a Gaussian elimination for each packet > n
 NULL_IS_TERMINATOR = False  # should only be set for c-string encoded text
 DECODER_NUM_CHUNK_LEN_FORMAT = (
@@ -62,7 +67,7 @@ SEED_LEN_FORMAT = "I"  # use "H" for smaller files / less packets to generate or
 RAISE_ON_UNSOLVED = True  # if set to false, the decoder will return partial results if a full decode is not possible.
 
 
-def encode(string_file_name, numpy_boolean_array):
+def encode(string_file_name):
     global NUMBER_OF_CHUNKS
     # we operate on files, not raw bits, thus we only use the file name and load the data from disk,
     # if required we could change this...
@@ -92,11 +97,13 @@ def encode(string_file_name, numpy_boolean_array):
     )
     encoder.set_overhead_limit(OVERHEAD)
     encoder.encode_to_packets()
+
     return [x.get_dna_struct(True) for x in encoder.encodedPackets], encoder
 
 
 def decode(string_file_name, list_of_dna_strings):
     # make sure that the dist is freshly initialized...
+
     decoder = RU10Decoder(
         string_file_name,
         error_correction=error_correction_func_dec,
@@ -106,6 +113,17 @@ def decode(string_file_name, list_of_dna_strings):
         mask_id=False,
         id_spacing=SEED_SPACING,
     )
+    """
+    decoder = RU10RFCInactivationDecoder(
+        string_file_name,
+        error_correction=error_correction_func_dec,
+        use_headerchunk=INSERT_HEADER,
+        static_number_of_chunks=NUMBER_OF_CHUNKS,
+        xor_by_seed=XOR_BY_SEED,
+        mask_id=False,
+        id_spacing=SEED_SPACING
+    )
+    """
     decoder.read_all_before_decode = READ_ALL
 
     for dna_str in list_of_dna_strings:
@@ -130,6 +148,7 @@ def decode(string_file_name, list_of_dna_strings):
             number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
             id_len_format=SEED_LEN_FORMAT,
         )
+
         if new_pack is not None and new_pack != "CORRUPT":
             decoder.input_new_packet(new_pack)
 
@@ -186,13 +205,21 @@ def decode(string_file_name, list_of_dna_strings):
 
 
 if __name__ == "__main__":
-    string_file_name = os.path.join(
-        "..", "..", "..", "Data", "Original", "Test", "Dorn.txt"
-    )
-
-    res, encoder = encode(string_file_name, None)
-    org = None
-    with open(string_file_name, "r") as f:
-        org = np.unpackbits(np.frombuffer(f.read().encode(), dtype=np.uint8))
-    decoded = decode(None, res)
-    assert np.all(np.equal(org, decoded))
+    for INPUT_FILE in [
+        "Dorn",
+        # "../../../Data/Uploaded/1762709788_9048717_test.txt",
+        "sleeping_beauty",
+        "README.md",
+        "logo.jpg",
+        "data_1mb.test",
+        "data_2mb.test",
+    ]:
+        NUMBER_OF_CHUNKS = None
+        res, encoder = encode(INPUT_FILE)
+        try:
+            with open(INPUT_FILE, "rb") as f:
+                org = np.unpackbits(np.frombuffer(f.read(), dtype=np.uint8))
+                decoded = decode(None, res)
+                print(f"{INPUT_FILE}, {np.all(np.equal(org, decoded))}")
+        except:
+            print(f"{INPUT_FILE}, False")
