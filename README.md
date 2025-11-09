@@ -25,11 +25,7 @@ Abstract:
 
 ## Dependencies
 
-The code is written in Python 3.12.2 and tested on Linux with the libraries included in the following Anaconda environment: [environment.yml](environment.yml). Some DNA coding schemes (codecs) have additional dependencies listed in the following files::
-* [Source/Encodings/XORBasedCode/requirements.txt](Source/Encodings/XORBasedCode/requirements.txt)
-* [Source/Encodings/The2DCode/requirements.txt](Source/Encodings/The2DCode/requirements.txt)
-* [Source/Encodings/RaptorCode/requirements.txt](Source/Encodings/RaptorCode/requirements.txt)
-
+The code is written in Python 3.12.2 and tested on Linux with the libraries included in the following Anaconda environment: [environment.yml](environment.yml). Some DNA coding schemes (codecs) have additional dependencies that are all included in this environment and there is no need to install them separately.
 
 ## Data
 
