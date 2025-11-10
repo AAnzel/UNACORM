@@ -29,7 +29,7 @@ dependencies:
 
   - pip # Ensure pip is installed in conda environment to handle pip packages.
   - pip:
-      - reedsolo
+      - reedsolo==0.3
       - crcmod
       - crccheck
       - progressbar2

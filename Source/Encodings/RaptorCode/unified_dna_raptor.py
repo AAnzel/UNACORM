@@ -142,6 +142,7 @@ def decode(string_file_name, list_of_dna_strings):
             res += input_str
             dna_str = res
         # raw_packet_list.append((error_prob, seed, dna_str))
+
         new_pack = decoder.parse_raw_packet(
             io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
             crc_len_format=CHECKSUM_LEN_STR,
@@ -206,13 +207,14 @@ def decode(string_file_name, list_of_dna_strings):
 
 if __name__ == "__main__":
     for INPUT_FILE in [
-        "Dorn",
-        # "../../../Data/Uploaded/1762709788_9048717_test.txt",
-        "sleeping_beauty",
-        "README.md",
-        "logo.jpg",
-        "data_1mb.test",
-        "data_2mb.test",
+        # "Dorn",
+        # "tests/1kb_lorem.txt",
+        "../../../Data/Uploaded/1762788342_512459_Dorn.txt",
+        # "sleeping_beauty",
+        # "README.md",
+        # "logo.jpg",
+        # "data_1mb.test",
+        # "data_2mb.test",
     ]:
         NUMBER_OF_CHUNKS = None
         res, encoder = encode(INPUT_FILE)
