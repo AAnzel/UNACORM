@@ -71,7 +71,7 @@ NUM_CHUNK_LEN_FORMAT = (
 RAISE_ON_UNSOLVED = True  # if set to false, the decoder will return partial results if a full decode is not possible.
 
 
-def encode(string_file_name, numpy_boolean_array):
+def encode(string_file_name):
     global NUMBER_OF_CHUNKS
     # we operate on files, not raw bits, thus we only use the file name and load the data from disk,
     # if required we could change this...
@@ -101,7 +101,7 @@ def encode(string_file_name, numpy_boolean_array):
     # checksum_len_str=CHECKSUM_LEN_STR)
     encoder.set_overhead_limit(OVERHEAD)
     encoder.encode_to_packets()
-    return [x.get_dna_struct(True) for x in encoder.encodedPackets], encoder
+    return [x.get_dna_struct(True) for x in encoder.encodedPackets]
 
 
 def decode(string_file_name, list_of_dna_strings):
@@ -187,7 +187,7 @@ if __name__ == "__main__":
         "data_2mb.test",
     ]:
         NUMBER_OF_CHUNKS = None
-        res, encoder = encode(INPUT_FILE, None)
+        res = encode(INPUT_FILE)
         try:
             with open(INPUT_FILE, "rb") as f:
                 org = np.unpackbits(np.frombuffer(f.read(), dtype=np.uint8))

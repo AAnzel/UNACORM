@@ -98,7 +98,7 @@ def encode(string_file_name):
     encoder.set_overhead_limit(OVERHEAD)
     encoder.encode_to_packets()
 
-    return [x.get_dna_struct(True) for x in encoder.encodedPackets], encoder
+    return [x.get_dna_struct(True) for x in encoder.encodedPackets]  # , encoder
 
 
 def decode(string_file_name, list_of_dna_strings):
@@ -125,6 +125,8 @@ def decode(string_file_name, list_of_dna_strings):
     )
     """
     decoder.read_all_before_decode = READ_ALL
+
+    print(list_of_dna_strings)
 
     for dna_str in list_of_dna_strings:
         # un-space the dna string:
@@ -202,6 +204,7 @@ def decode(string_file_name, list_of_dna_strings):
         numpy_boolean_array = np.unpackbits(
             np.frombuffer(f.getvalue(), dtype=np.uint8)
         )
+
         return numpy_boolean_array
 
 
@@ -217,7 +220,7 @@ if __name__ == "__main__":
         # "data_2mb.test",
     ]:
         NUMBER_OF_CHUNKS = None
-        res, encoder = encode(INPUT_FILE)
+        res = encode(INPUT_FILE)
         try:
             with open(INPUT_FILE, "rb") as f:
                 org = np.unpackbits(np.frombuffer(f.read(), dtype=np.uint8))

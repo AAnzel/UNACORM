@@ -283,26 +283,11 @@ def np_list_encode_decode(
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.encode("", list_np_data)
         elif str_encoding_method == "OnlineCode":
-            np_list_generated_seq = encoding_online.encode(path_file)[0]
+            np_list_generated_seq = encoding_online.encode(path_file)
         elif str_encoding_method == "LTCode":
-            np_list_generated_seq = encoding_lt.encode(path_file, list_np_data)[
-                0
-            ]
-
-        # Raptor and all other codes relying on Raptor have a bug
-        # It is probably caused by the bad config file
-        # File "/home/alexein-personal/Documents/Ongoing_projects/DNA_Encodings/Source/utilities.py", line 314, in np_list_encode_decode
-        #     np_list_generated_seq = encoding_raptor.decode(None, list_np_data)
-        #                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        # File "/home/alexein-personal/Documents/Ongoing_projects/DNA_Encodings/Source/Encodings/RaptorCode/unified_dna_raptor.py", line 153, in decode
-        #     solved = decoder.solve()
-        #             ^^^^^^^^^^^^^^^
-        # File "/home/alexein-personal/Documents/Ongoing_projects/DNA_Encodings/Source/Encodings/RaptorCode/norec4dna/RU10Decoder.py", line 414, in solve
-        #     return self.GEPP.solve(partial=partial)
-        #             ^^^^^^^^^^^^^^^
-        # AttributeError: 'NoneType' object has no attribute 'solve'
+            np_list_generated_seq = encoding_lt.encode(path_file)
         elif str_encoding_method == "RaptorCode":
-            np_list_generated_seq = encoding_raptor.encode(path_file)[0]
+            np_list_generated_seq = encoding_raptor.encode(path_file)
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.encode(path_file, "")
         else:
@@ -324,7 +309,6 @@ def np_list_encode_decode(
         elif str_encoding_method == "LTCode":
             np_list_generated_seq = encoding_lt.decode(None, list_np_data)
         elif str_encoding_method == "RaptorCode":
-            print(list_np_data)
             np_list_generated_seq = encoding_raptor.decode(None, list_np_data)
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.decode("", list_np_data)
@@ -665,7 +649,6 @@ def df_generate_summary(df_report):
     return df_summary
 
 
-@st.cache_data
 def np_data_to_binary_array(path_original_file):
     """
     np_data_to_binary_array function is used to convert the original file to
@@ -725,6 +708,9 @@ def run_capturing_process(mp_queue, function_target, tuple_args):
         # Call the encode/decode function and capture its return value
         np_list_generated_seq = function_target(*tuple_args)
 
+        # Send the result (which can be any Python object) to the queue
+        mp_queue.put(("result", np_list_generated_seq))  # Send result back
+
         # Capture output and error messages
         output = sys.stdout.getvalue()
         error_output = sys.stderr.getvalue()
@@ -734,9 +720,6 @@ def run_capturing_process(mp_queue, function_target, tuple_args):
             mp_queue.put(("stdout", output))
         if error_output:
             mp_queue.put(("stderr", error_output))
-
-        # Send the result (which can be any Python object) to the queue
-        mp_queue.put(("result", np_list_generated_seq))  # Send result back
 
     except Exception as e:
         print(f"Error during processing: {e}", file=sys.stderr)

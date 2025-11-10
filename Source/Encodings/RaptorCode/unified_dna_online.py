@@ -181,7 +181,7 @@ def encode(string_file_name):
     )
     encoder.set_overhead_limit(OVERHEAD)
     encoder.encode_to_packets()
-    return [x.get_dna_struct(True) for x in encoder.encodedPackets], encoder
+    return [x.get_dna_struct(True) for x in encoder.encodedPackets]
 
 
 def decode(string_file_name, list_of_dna_strings):
@@ -261,7 +261,7 @@ if __name__ == "__main__":
         NUMBER_OF_CHUNKS = None
         file_size = os.path.getsize(INPUT_FILE)
         EPS, extra, K, s, p1 = best_epsilon_online(file_size, CHUNK_SIZE)
-        res, encoder = encode(INPUT_FILE)
+        res = encode(INPUT_FILE)
         try:
             with open(INPUT_FILE, "rb") as f:
                 org = np.unpackbits(np.frombuffer(f.read(), dtype=np.uint8))
