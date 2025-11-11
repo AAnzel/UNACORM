@@ -153,6 +153,9 @@ def best_epsilon_online(
 
 
 def encode(string_file_name):
+    file_size = os.path.getsize(string_file_name)
+    EPS, extra, K, s, p1 = best_epsilon_online(file_size, CHUNK_SIZE)
+
     global NUMBER_OF_CHUNKS
     # we operate on files, not raw bits, thus we only use the file name and load the data from disk,
     # if required we could change this...
@@ -185,6 +188,10 @@ def encode(string_file_name):
 
 
 def decode(string_file_name, list_of_dna_strings):
+
+    file_size = os.path.getsize(string_file_name)
+    EPS, extra, K, s, p1 = best_epsilon_online(file_size, CHUNK_SIZE)
+
     global NUMBER_OF_CHUNKS
     # we operate on files, not raw bits, thus we only use the file name and load the data from disk,
     # if required we could change this...
@@ -265,7 +272,7 @@ if __name__ == "__main__":
         "sleeping_beauty",
         "README.md",
         "logo.jpg",
-        "../../../Data/Uploaded/1762788342_512459_Dorn.txt",
+        "../../../Data/Uploaded/1762856648_583057_Dorn.txt",
         # "data_1mb.test",
         # "data_2mb.test",
     ]:
