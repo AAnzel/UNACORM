@@ -305,11 +305,15 @@ def np_list_encode_decode(
         elif str_encoding_method == "RepetitionCode":
             np_list_generated_seq = encoding_repetition.decode("", list_np_data)
         elif str_encoding_method == "OnlineCode":
-            np_list_generated_seq = encoding_online.decode(None, list_np_data)
+            np_list_generated_seq = encoding_online.decode(
+                path_file, list_np_data
+            )
         elif str_encoding_method == "LTCode":
-            np_list_generated_seq = encoding_lt.decode(None, list_np_data)
+            np_list_generated_seq = encoding_lt.decode(path_file, list_np_data)
         elif str_encoding_method == "RaptorCode":
-            np_list_generated_seq = encoding_raptor.decode(None, list_np_data)
+            np_list_generated_seq = encoding_raptor.decode(
+                path_file, list_np_data
+            )
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.decode("", list_np_data)
         else:

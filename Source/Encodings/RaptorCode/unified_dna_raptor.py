@@ -103,6 +103,15 @@ def encode(string_file_name):
 
 def decode(string_file_name, list_of_dna_strings):
     # make sure that the dist is freshly initialized...
+    global NUMBER_OF_CHUNKS
+    if NUMBER_OF_CHUNKS is None:
+        NUMBER_OF_CHUNKS = (
+            Encoder.get_number_of_chunks_for_file_with_chunk_size(
+                string_file_name,
+                chunk_size=CHUNK_SIZE,
+                insert_header=INSERT_HEADER,
+            )
+        )
 
     decoder = RU10Decoder(
         string_file_name,
@@ -125,8 +134,6 @@ def decode(string_file_name, list_of_dna_strings):
     )
     """
     decoder.read_all_before_decode = READ_ALL
-
-    print(list_of_dna_strings)
 
     for dna_str in list_of_dna_strings:
         # un-space the dna string:
@@ -210,21 +217,21 @@ def decode(string_file_name, list_of_dna_strings):
 
 if __name__ == "__main__":
     for INPUT_FILE in [
-        # "Dorn",
-        # "tests/1kb_lorem.txt",
-        "../../../Data/Uploaded/1762788342_512459_Dorn.txt",
-        # "sleeping_beauty",
-        # "README.md",
-        # "logo.jpg",
-        # "data_1mb.test",
-        # "data_2mb.test",
+        "Dorn",
+        "tests/1kb_lorem.txt",
+        # "../../../Data/Uploaded/1762788342_512459_Dorn.txt",
+        "sleeping_beauty",
+        "README.md",
+        "logo.jpg",
+        "data_1mb.test",
+        "data_2mb.test",
     ]:
         NUMBER_OF_CHUNKS = None
         res = encode(INPUT_FILE)
         try:
             with open(INPUT_FILE, "rb") as f:
                 org = np.unpackbits(np.frombuffer(f.read(), dtype=np.uint8))
-                decoded = decode(None, res)
+                decoded = decode(INPUT_FILE, res)
                 print(f"{INPUT_FILE}, {np.all(np.equal(org, decoded))}")
         except:
             print(f"{INPUT_FILE}, False")

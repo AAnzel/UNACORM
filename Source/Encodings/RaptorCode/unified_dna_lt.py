@@ -105,6 +105,17 @@ def encode(string_file_name):
 
 
 def decode(string_file_name, list_of_dna_strings):
+    global NUMBER_OF_CHUNKS
+    # we operate on files, not raw bits, thus we only use the file name and load the data from disk,
+    # if required we could change this...
+    if NUMBER_OF_CHUNKS is None:
+        NUMBER_OF_CHUNKS = (
+            Encoder.get_number_of_chunks_for_file_with_chunk_size(
+                string_file_name,
+                chunk_size=CHUNK_SIZE,
+                insert_header=INSERT_HEADER,
+            )
+        )
     # make sure that the dist is freshly initialized...
     decoder = DECODER_CLASS(
         string_file_name,
@@ -191,7 +202,7 @@ if __name__ == "__main__":
         try:
             with open(INPUT_FILE, "rb") as f:
                 org = np.unpackbits(np.frombuffer(f.read(), dtype=np.uint8))
-                decoded = decode(None, res)
+                decoded = decode(INPUT_FILE, res)
                 print(f"{INPUT_FILE}, {np.all(np.equal(org, decoded))}")
         except Exception as ex:
             print(ex)

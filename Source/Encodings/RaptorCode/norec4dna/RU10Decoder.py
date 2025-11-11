@@ -684,7 +684,9 @@ class RU10Decoder(Decoder):
                 ]
             else:
                 raise RuntimeError("Not a valid start:", method_data)
+
         len_data = struct.unpack(struct_str, header)
+
         if self.static_number_of_chunks is None:
             self.number_of_chunks = xor_mask(
                 len_data[0], number_of_chunks_len_format
