@@ -33,7 +33,7 @@ RUN conda clean --all --yes
 
 WORKDIR /app/Source/Encodings/XORBasedCode
 
-RUN python setup.py install
+RUN rm -rf build/ && python setup.py install
 
 WORKDIR /app/Source/Encodings/RaptorCode
 
