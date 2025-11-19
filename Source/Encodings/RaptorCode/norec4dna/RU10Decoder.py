@@ -107,6 +107,9 @@ class RU10Decoder(Decoder):
         crc_len_format: str = "I",
         number_of_chunks_len_format: str = "I",
         id_len_format: str = "I",
+        store_parsed_packets: bool = False,
+        *args,
+        **kwargs,
     ):
         if hasattr(self, "f"):
             self.f.close()
@@ -172,6 +175,9 @@ class RU10Decoder(Decoder):
         crc_len_format: str = "I",
         number_of_chunks_len_format: str = "I",
         id_len_format: str = "I",
+        store_parsed_packets: bool = False,
+        *args,
+        **kwargs,
     ):
         """
         Decodes the information from a folder if self.file represents a folder and the packets were saved
@@ -260,6 +266,8 @@ class RU10Decoder(Decoder):
         number_of_chunks_len_format: str = "I",
         id_len_format: str = "I",
         store_parsed_packets=False,
+        *args,
+        **kwargs,
     ):
         """
         Decodes the information from a file if self.file represents a file and the packets were saved in a single file.

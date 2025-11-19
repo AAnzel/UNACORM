@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1762871392_744534_Dorn.txt",
+        "input": "../Data/Uploaded/1763566008_4932632_all_black.png",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",

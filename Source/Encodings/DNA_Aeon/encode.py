@@ -48,7 +48,7 @@ def encode_norec_for_ac(config_data, current_path):
     filename = input_file.split("/")[-1]
 
     # NEW CODE WITH LIBRARY USAGE
-    py_command = "python Encodings/RaptorCode/demo_raptor_encode.py --chunk_size {chunk_size_str} --error_correction {err_det} --save_as_zip {file}{ins_header}{crc_str} --overhead {redundancy}".format(
+    py_command = "python Encodings/RaptorCode/demo_raptor_encode.py --chunk_size {chunk_size_str} --error_correction {err_det} --save_as_zip --overhead {redundancy} --no_mask_id {file}{ins_header}{crc_str}".format(
         chunk_size_str=str(chunk_size),
         file=input_file,
         redundancy=packet_redundancy,

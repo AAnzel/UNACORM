@@ -14,8 +14,7 @@ def decode_ac(current_path, config_path):
     process = subprocess.Popen(
         py_command.split(), stdout=subprocess.PIPE, universal_newlines=True
     )
-    for string_line in process.stdout:
-        print(string_line, end="")  # process line here
+
     output, error = process.communicate()
     return
 
