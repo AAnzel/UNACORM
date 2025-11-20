@@ -42,7 +42,7 @@ QUALITY = 8
 SEED = 2
 
 ERROR_CORRECTION = "reedsolomon"  # packet level error correction
-REPAIR_SYMBOLS = 2  # number of symbols / bytes for each packet
+REPAIR_SYMBOLS = 8  # number of symbols / bytes for each packet
 error_correction_func = get_error_correction_encode(
     ERROR_CORRECTION, REPAIR_SYMBOLS
 )
@@ -213,14 +213,17 @@ def decode(string_file_name, list_of_dna_strings):
     decoder.read_all_before_decode = READ_ALL
 
     for dna_str in list_of_dna_strings:
-        new_pack = decoder.parse_raw_packet(
-            io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
-            crc_len_format=CHECKSUM_LEN_STR,
-            number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
-            check_block_number_len_format=SEED_LEN_FORMAT,
-        )
-        if new_pack is not None and new_pack != "CORRUPT":
-            decoder.input_new_packet(new_pack)
+        try:
+            new_pack = decoder.parse_raw_packet(
+                io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
+                crc_len_format=CHECKSUM_LEN_STR,
+                number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
+                check_block_number_len_format=SEED_LEN_FORMAT,
+            )
+            if new_pack is not None and new_pack != "CORRUPT":
+                decoder.input_new_packet(new_pack)
+        except:
+            pass
 
     decoder.solve()
     __byte_io = io.BytesIO()
@@ -232,17 +235,20 @@ def decode(string_file_name, list_of_dna_strings):
                 continue
             if INSERT_HEADER and decoder.headerChunk is None:
                 header_row = decoder.GEPP.result_mapping[0]
-                decoder.headerChunk = HeaderChunk(
-                    Packet(
-                        decoder.GEPP.b[header_row],
-                        {0},
-                        decoder.number_of_chunks,
-                        read_only=True,
-                    ),
-                    checksum_len_format=CHECKSUM_LEN_STR,
-                )
+                try:
+                    decoder.headerChunk = HeaderChunk(
+                        Packet(
+                            decoder.GEPP.b[header_row],
+                            {0},
+                            decoder.number_of_chunks,
+                            read_only=True,
+                        ),
+                        checksum_len_format=CHECKSUM_LEN_STR,
+                    )
+                except:
+                    pass
             if 0 != x or not INSERT_HEADER:
-                if decoder.number_of_chunks - 1 == x and INSERT_HEADER:
+                if decoder.number_of_chunks - 1 == x and INSERT_HEADER and decoder.headerChunk is not None:
                     output = decoder.GEPP.b[x][0][
                         0 : decoder.headerChunk.get_last_chunk_length()
                     ]

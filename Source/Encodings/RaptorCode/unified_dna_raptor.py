@@ -22,14 +22,14 @@ from norec4dna.rules.FastDNARules import FastDNARules
 
 # INPUT_FILE = "data_1mb.test"
 
-OVERHEAD = 0.07
+OVERHEAD = 0.2
 INSERT_HEADER = True
 DROP_UPPER_BOUND = 1.0  # decreasing this value will drop more packets but ensure all rules are followed
 NUMBER_OF_CHUNKS_IN_PACKET = False
 
 # These additions were introduced in 10.1016/j.csbj.2024.10.038 and are only implemented for the raptor-based code:
 XOR_BY_SEED = True  # uses the seed to create a pseudo-random sequence of length of the packet and xor's the packet with it
-SEED_SPACING = 3  # spaces out the seed to avoid
+SEED_SPACING = 2  # spaces out the seed to avoid
 
 # either set NUMBER_OF_CHUNKS or CHUNK_SIZE !
 CHUNK_SIZE = 75
@@ -45,7 +45,7 @@ CHECKSUM_LEN_STR = "I"  # file level checksum stored in the header chunk
 SEED = 2
 
 ERROR_CORRECTION = "reedsolomon"  # packet level error correction
-REPAIR_SYMBOLS = 2  # number of symbols / bytes for each packet
+REPAIR_SYMBOLS = 7  # number of symbols / bytes for each packet
 error_correction_func = get_error_correction_encode(
     ERROR_CORRECTION, REPAIR_SYMBOLS
 )
@@ -64,7 +64,7 @@ DECODER_NUM_CHUNK_LEN_FORMAT = (
     ""  # should only be set if the number of chunks is stored in each packet
 )
 SEED_LEN_FORMAT = "I"  # use "H" for smaller files / less packets to generate or "I" for larger files
-RAISE_ON_UNSOLVED = True  # if set to false, the decoder will return partial results if a full decode is not possible.
+RAISE_ON_UNSOLVED = False  # if set to false, the decoder will return partial results if a full decode is not possible.
 
 
 def encode(string_file_name):
@@ -136,33 +136,35 @@ def decode(string_file_name, list_of_dna_strings):
     decoder.read_all_before_decode = READ_ALL
 
     for dna_str in list_of_dna_strings:
-        # un-space the dna string:
-        struct_len = struct.calcsize(SEED_LEN_FORMAT) * 4
-        if SEED_SPACING > 0 and struct_len > 0:
-            res = ""
-            input_str = list(dna_str)
-            i = 0
-            while len(res) < struct_len:
-                res += input_str[i]
-                input_str[i] = " "
-                i += SEED_SPACING + 1
-            input_str = "".join(input_str)
-            input_str = input_str.replace(" ", "")
-            res += input_str
-            dna_str = res
-        # raw_packet_list.append((error_prob, seed, dna_str))
+        try:
+            struct_len = struct.calcsize(SEED_LEN_FORMAT) * 4
+            if SEED_SPACING > 0 and struct_len > 0:
+                res = ""
+                input_str = list(dna_str)
+                i = 0
+                while len(res) < struct_len:
+                    res += input_str[i]
+                    input_str[i] = " "
+                    i += SEED_SPACING + 1
+                input_str = "".join(input_str)
+                input_str = input_str.replace(" ", "")
+                res += input_str
+                dna_str = res
+            # raw_packet_list.append((error_prob, seed, dna_str))
 
-        new_pack = decoder.parse_raw_packet(
-            io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
-            crc_len_format=CHECKSUM_LEN_STR,
-            number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
-            id_len_format=SEED_LEN_FORMAT,
-        )
+            new_pack = decoder.parse_raw_packet(
+                io.BytesIO(tranlate_quat_to_byte(dna_str)).read(),
+                crc_len_format=CHECKSUM_LEN_STR,
+                number_of_chunks_len_format=DECODER_NUM_CHUNK_LEN_FORMAT,
+                id_len_format=SEED_LEN_FORMAT,
+            )
 
-        if new_pack is not None and new_pack != "CORRUPT":
-            decoder.input_new_packet(new_pack)
+            if new_pack is not None and new_pack != "CORRUPT":
+                decoder.input_new_packet(new_pack)
+        except Exception as ex:
+            pass
 
-    solved = decoder.solve()
+    solved = decoder.solve(partial=True)
     if RAISE_ON_UNSOLVED and not solved:
         raise RuntimeError(
             "Could not solve the system of equations. A partial recovery might be possible!"
@@ -180,17 +182,20 @@ def decode(string_file_name, list_of_dna_strings):
                 continue
             if INSERT_HEADER and decoder.headerChunk is None:
                 header_row = decoder.GEPP.result_mapping[0]
-                decoder.headerChunk = HeaderChunk(
-                    Packet(
-                        decoder.GEPP.b[header_row],
-                        {0},
-                        decoder.number_of_chunks,
-                        read_only=True,
-                    ),
-                    checksum_len_format=CHECKSUM_LEN_STR,
-                )
+                try:
+                    decoder.headerChunk = HeaderChunk(
+                        Packet(
+                            decoder.GEPP.b[header_row],
+                            {0},
+                            decoder.number_of_chunks,
+                            read_only=True,
+                        ),
+                        checksum_len_format=CHECKSUM_LEN_STR,
+                    )
+                except:
+                    pass
             if 0 != x or not INSERT_HEADER:
-                if decoder.number_of_chunks - 1 == x and INSERT_HEADER:
+                if decoder.number_of_chunks - 1 == x and INSERT_HEADER and decoder.headerChunk is not None:
                     output = decoder.GEPP.b[x][0][
                         0 : decoder.headerChunk.get_last_chunk_length()
                     ]

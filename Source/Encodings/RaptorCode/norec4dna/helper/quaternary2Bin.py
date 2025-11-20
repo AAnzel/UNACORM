@@ -47,7 +47,10 @@ def quats_to_bytes(quats: typing.AnyStr) -> bytes:
 def tranlate_quat_to_byte(in_txt):
     out = b''
     for i in range(0, len(in_txt), 4):
-        out += quats_to_bytes(in_txt[i:i + 4])
+        try:
+            out += quats_to_bytes(in_txt[i:i + 4])
+        except: # truncate DNA in the case of insertions / deletions
+            pass
     return out
 
 

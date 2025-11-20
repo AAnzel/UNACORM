@@ -87,7 +87,66 @@ class GEPP_intern:
         self.tmp_b.append(data)
         self._update_input()
 
+    # python
+    def sanitize_tmp(self):
+        """
+        remove all rows of tmp_b (and tmp_A) that have a smaller or longer length than the average
+        """
+        if not self.tmp_A and not self.tmp_b:
+            return
+
+        # helper to get length of a tmp_A row
+        def row_len(row):
+            if isinstance(row, set):
+                return len(row)
+            try:
+                arr = np.asarray(row)
+                # if boolean or numeric vector -> count True entries if boolean else use length
+                if arr.dtype == bool or np.issubdtype(arr.dtype, np.bool_):
+                    return int(np.sum(arr))
+                return arr.size
+            except Exception:
+                try:
+                    return len(row)
+                except Exception:
+                    return 0
+
+        # helper to get length of a tmp_b entry (flattened byte-length)
+        def data_len(d):
+            try:
+                arr = np.asarray(d).reshape(-1)
+                return arr.size
+            except Exception:
+                try:
+                    return len(d)
+                except Exception:
+                    return 0
+
+        b_lens = [data_len(d) for d in self.tmp_b] if self.tmp_b else []
+
+        avg_b = int(round(np.mean(b_lens))) if b_lens else None
+
+        # keep indices where lengths match their respective averages
+        keep_indices = []
+        max_len = max(len(self.tmp_A), len(self.tmp_b))
+        for i in range(max_len):
+            b_ok = True
+            if i < len(self.tmp_b) and avg_b is not None:
+                b_ok = (b_lens[i] == avg_b)
+            if b_ok:
+                keep_indices.append(i)
+
+        # rebuild tmp lists keeping only selected indices
+        if self.tmp_A:
+            self.tmp_A = [self.tmp_A[i] for i in keep_indices if i < len(self.tmp_A)]
+        if self.tmp_b:
+            self.tmp_b = [self.tmp_b[i] for i in keep_indices if i < len(self.tmp_b)]
+
+        # update internal counters
+        self._update_input()
+
     def insert_tmp(self):
+        self.sanitize_tmp()
         if len(self.tmp_A) > 0:
             self.packet_mapping = np.concatenate(
                 (self.packet_mapping, np.array([x for x in range(len(self.A) + 1, self.m + len(self.tmp_A) + 1)])))
