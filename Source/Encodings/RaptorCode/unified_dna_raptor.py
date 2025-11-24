@@ -22,7 +22,7 @@ from norec4dna.rules.FastDNARules import FastDNARules
 
 # INPUT_FILE = "data_1mb.test"
 
-OVERHEAD = 0.2
+OVERHEAD = 0.9
 INSERT_HEADER = True
 DROP_UPPER_BOUND = 1.0  # decreasing this value will drop more packets but ensure all rules are followed
 NUMBER_OF_CHUNKS_IN_PACKET = False
@@ -161,7 +161,7 @@ def decode(string_file_name, list_of_dna_strings):
 
             if new_pack is not None and new_pack != "CORRUPT":
                 decoder.input_new_packet(new_pack)
-        except Exception as ex:
+        except Exception:
             pass
 
     solved = decoder.solve(partial=True)
@@ -195,7 +195,11 @@ def decode(string_file_name, list_of_dna_strings):
                 except:
                     pass
             if 0 != x or not INSERT_HEADER:
-                if decoder.number_of_chunks - 1 == x and INSERT_HEADER and decoder.headerChunk is not None:
+                if (
+                    decoder.number_of_chunks - 1 == x
+                    and INSERT_HEADER
+                    and decoder.headerChunk is not None
+                ):
                     output = decoder.GEPP.b[x][0][
                         0 : decoder.headerChunk.get_last_chunk_length()
                     ]
