@@ -288,7 +288,7 @@ def merge_details_and_generate_summary():
 
 
 def main():
-    run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
+    #run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
     merge_details_and_generate_summary()
 
     return None
