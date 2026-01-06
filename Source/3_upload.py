@@ -212,13 +212,13 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
 
     st.header(":primary[︱]Information Density", help=tc.STRING_DENSITY_HELP)
     chart = vis.visualize_density_benchmark(df_new_summary)
-    st.plotly_chart(chart, use_container_width=True)
+    st.plotly_chart(chart, width="stretch")
     st.header(":primary[︱]Size", help=tc.STRING_SIZE_HELP)
-    st.plotly_chart(chart_size, use_container_width=True)
+    st.plotly_chart(chart_size, width="stretch")
     st.header(":primary[︱]Time", help=tc.STRING_TIME_HELP)
-    st.plotly_chart(chart_time, use_container_width=True)
+    st.plotly_chart(chart_time, width="stretch")
     st.header(":primary[︱]Cost", help=tc.STRING_COST_HELP)
-    st.plotly_chart(chart_cost, use_container_width=True)
+    st.plotly_chart(chart_cost, width="stretch")
 
 elif list_chosen_dna_encoding != [] and np_binary_encoding is not None:
     st.error("Choose a file and length of storage first.")  # TODO: Change

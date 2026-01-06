@@ -24,15 +24,15 @@ st.divider()
 
 st.header(":primary[︱]Information Density", help=tc.STRING_DENSITY_HELP)
 chart_density = vis.visualize_density_benchmark(df_existing_summary)
-st.plotly_chart(chart_density, use_container_width=True)
+st.plotly_chart(chart_density, width="stretch")
 
 st.header(":primary[︱]Success Rate", help=tc.STRING_SUCCESS_RATE_HELP)
 chart_sucess_rate = vis.visualize_success_rate_general(df_existing_detail)
-st.plotly_chart(chart_sucess_rate, use_container_width=True)
+st.plotly_chart(chart_sucess_rate, width="stretch")
 
 st.header(":primary[︱]Base Error", help=tc.STRING_BASE_ERROR_HELP)
 chart_base_error = vis.visualize_base_error_general(df_existing_detail)
-st.plotly_chart(chart_base_error, use_container_width=True)
+st.plotly_chart(chart_base_error, width="stretch")
 
 st.header(
     ":primary[︱]Cost and Runtime per Error Multiplier",
@@ -50,9 +50,7 @@ with st.container(border=True):
             options=uti.LIST_FLOAT_ERROR_MULTIPLIERS,
         )
         with st.popover(
-            "What is error multiplier?",
-            icon=":material/help:",
-            use_container_width=True,
+            "What is error multiplier?", icon=":material/help:", width="stretch"
         ):
             st.markdown(tc.STRING_MUTAGENESIS_HELP)
 
@@ -106,10 +104,10 @@ chart_time_all = vis.visualize_time_benchmark(
 
 st.subheader("Cost ", help=tc.STRING_COST_HELP)
 st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
-st.plotly_chart(chart_cost_all, use_container_width=True)
+st.plotly_chart(chart_cost_all, width="stretch")
 st.subheader("Runtime", help=tc.STRING_TIME_HELP)
 st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
-st.plotly_chart(chart_time_all, use_container_width=True)
+st.plotly_chart(chart_time_all, width="stretch")
 
 
 uti.display_footer()

@@ -31,7 +31,7 @@ st_col_1.link_button(
     "GitHub Repository",
     url="https://github.com/AAnzel/UNACORM/tree/master",
     icon=":material/home_storage:",
-    use_container_width=True,
+    width="stretch",
     type="primary",
 )
 
@@ -39,7 +39,7 @@ st_col_2.link_button(
     "Open Issue",
     url="https://github.com/AAnzel/UNACORM/issues/new",
     icon=":material/bug_report:",
-    use_container_width=True,
+    width="stretch",
     type="primary",
 )
 
@@ -47,7 +47,7 @@ st_col_3.link_button(
     "Create a Pull Request",
     url="https://github.com/AAnzel/UNACORM/compare",
     icon=":material/add:",
-    use_container_width=True,
+    width="stretch",
     type="primary",
 )
 
@@ -68,7 +68,7 @@ st_col_1.link_button(
     "Discuss",
     url="https://github.com/AAnzel/UNACORM/discussions/new/choose",
     icon=":material/comment:",
-    use_container_width=True,
+    width="stretch",
     type="primary",
 )
 
@@ -76,7 +76,7 @@ st_col_2.link_button(
     "Releases",
     url="https://github.com/AAnzel/UNACORM/releases",
     icon=":material/deployed_code:",
-    use_container_width=True,
+    width="stretch",
     type="primary",
 )
 
@@ -84,7 +84,7 @@ st_col_3.link_button(
     "AnzelA@rki.de",
     url="mailto:AnzelA@rki.de",
     icon=":material/mail:",
-    use_container_width=True,
+    width="stretch",
     type="primary",
 )
 

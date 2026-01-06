@@ -89,7 +89,7 @@ def display_footer():
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
     string_key = "new" if bool_expand_detail else "old"
-    st.dataframe(df_summary, use_container_width=True)
+    st.dataframe(df_summary, width="stretch")
     st.download_button(
         label="Download Benchmark Data",
         data=df_summary.to_csv(index=False).encode("utf-8"),
@@ -105,7 +105,7 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
         icon=":material/search_insights:",
     ):
         st.markdown("### Detailed Benchmark Data", help=tc.STRING_DETAILED_HELP)
-        st.dataframe(df_detail, use_container_width=True)
+        st.dataframe(df_detail, width="stretch")
         st.download_button(
             label="Download Detailed Benchmark Data",
             data=df_detail.to_csv(index=False).encode("utf-8"),
@@ -587,7 +587,8 @@ def df_generate_summary(df_report):
         ["Transformation", "Size", "OriFile_Size"], axis=1, inplace=True
     )
     df_information_densities = (
-        df_information_densities.groupby(["Filename", "Method", "Type"])
+        df_information_densities
+        .groupby(["Filename", "Method", "Type"])
         .agg({"Information_Density": "first"})
         .reset_index()
     )
@@ -595,7 +596,8 @@ def df_generate_summary(df_report):
     df_summary.drop(["Size", "OriFile_Size"], axis=1, inplace=True)
 
     df_summary = (
-        df_summary.groupby([
+        df_summary
+        .groupby([
             "Filename",
             "Method",
             "Transformation",
@@ -615,7 +617,8 @@ def df_generate_summary(df_report):
         .reset_index()
     )
     df_summary = (
-        df_summary.groupby([
+        df_summary
+        .groupby([
             "Filename",
             "Method",
             "Type",
