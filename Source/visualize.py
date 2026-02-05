@@ -45,7 +45,8 @@ def visualize_uploaded(df_report):
     """
 
     chart_size = (
-        px.bar(
+        px
+        .bar(
             df_report,
             x="Method",
             y="Size",
@@ -63,7 +64,8 @@ def visualize_uploaded(df_report):
     )
 
     chart_time = (
-        px.bar(
+        px
+        .bar(
             df_report,
             x="Method",
             y="Time",
@@ -81,7 +83,8 @@ def visualize_uploaded(df_report):
     )
 
     chart_cost = (
-        px.bar(
+        px
+        .bar(
             df_report,
             x="Method",
             y="Cost",
@@ -174,7 +177,7 @@ def visualize_cost_benchmark(
             color="Transformation",
             facet_col="Filename",
             facet_col_wrap=4,
-            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
             height=_INT_CHART_ROW_SIZE
             * (int((len(list_files_chosen) - 1) / 4) + 1),
@@ -200,7 +203,7 @@ def visualize_cost_benchmark(
             color="Transformation",
             facet_col="Filename",
             facet_col_wrap=4,
-            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
             height=_INT_CHART_ROW_SIZE
             * (int((len(list_files_chosen) - 1) / 4) + 1),
@@ -259,7 +262,7 @@ def visualize_time_benchmark(
             color="Transformation",
             log_y=True,
             facet_col="Filename",
-            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
             height=_INT_CHART_ROW_SIZE
             * (int((len(list_files_chosen) - 1) / 4) + 1),
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
@@ -284,7 +287,7 @@ def visualize_time_benchmark(
             color="Transformation",
             log_y=True,
             facet_col="Filename",
-            facet_row_spacing=0.12,  # Default=0.07 when facet_col_wrap is used
+            facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
             height=_INT_CHART_ROW_SIZE
             * (int((len(list_files_chosen) - 1) / 4) + 1),
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
@@ -328,7 +331,7 @@ def visualize_base_error_per_file(
         y="Information_Density",
         color="Method",
         facet_col="Filename",
-        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
+        facet_row_spacing=0.16,  # Default is 0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE
         * (int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
@@ -357,7 +360,8 @@ def visualize_base_error_general(df_detail):
     df_tmp = df_detail.copy()
 
     df_success_rate = (
-        df_tmp.groupby(["Method", "Filename", "Error_Multiplier"])
+        df_tmp
+        .groupby(["Method", "Filename", "Error_Multiplier"])
         .agg({"Similarity": "mean", "Base_error_ratio": "max"})
         .reset_index()
     )
@@ -399,7 +403,8 @@ def visualize_base_error_general(df_detail):
 
     # Combine, prefer drop rows if available
     df_final = (
-        pd.concat([
+        pd
+        .concat([
             df_drops,
             df_max_rows[
                 ~df_max_rows.set_index(["Method", "Filename"]).index.isin(
@@ -423,7 +428,7 @@ def visualize_base_error_general(df_detail):
         markers=True,
         facet_col="Filename",
         facet_col_wrap=3,
-        facet_row_spacing=0.12,  # Default is 0.07 when facet_col_wrap is used
+        facet_row_spacing=0.16,  # Default is 0.07 when facet_col_wrap is used
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * 2,
         template=_STRING_PLOTLY_THEME,
