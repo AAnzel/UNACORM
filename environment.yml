@@ -1,4 +1,4 @@
-name: dna_project_env
+name: unacorm_env
 
 channels:
   - conda-forge

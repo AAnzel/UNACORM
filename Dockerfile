@@ -27,7 +27,7 @@ RUN conda update --all -y \
     && conda env create -f environment.yml
 
 # Make RUN commands use the new environment:
-SHELL ["conda", "run", "-n", "dna_project_env", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "unacorm_env", "/bin/bash", "-c"]
 
 RUN conda clean --all --yes
 

@@ -11,7 +11,7 @@
 # Load conda environment
 module load anaconda
 source $(conda info --base)/etc/profile.d/conda.sh
-conda activate dna_project_env
+conda activate unacorm_env
 
 mkdir -p logs
 rm -f logs/*

@@ -155,7 +155,7 @@ The platform can also be installed without the docker container. This process re
 git clone https://github.com/AAnzel/UNACORM.git
 cd UNACORM/
 conda env create -f environment.yml
-conda activate dna_project_env
+conda activate unacorm_env
 cd Source/Encodings/XORBasedCode
 python setup.py install
 cd ../RaptorCode
@@ -170,7 +170,7 @@ streamlit run main.py
 Every subsequent run of the tool after restarting the terminal emulator session requires activating the installed conda environment and running the dashboard. The following sequence of instructions defines that process:
 
 ```bash
-conda activate dna_project_env
+conda activate unacorm_env
 streamlit run main.py
 ```
 
