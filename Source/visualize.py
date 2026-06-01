@@ -1,6 +1,9 @@
+import os
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from utilities import PATH_CACHE_DATA
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
@@ -25,6 +28,7 @@ _DISCRETE_COLOR_PALLETE = (
 )
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
+_BOOL_SAVE_FIGURES = True
 
 
 # TODO: Decide if we want to visualize measures only for successful encode
@@ -131,6 +135,11 @@ def visualize_density_benchmark(df_measure_sum_concat):
     # TODO: Make it into a bar chart for uploaded data
     chart_density.update_yaxes(showgrid=True)
 
+    if _BOOL_SAVE_FIGURES:
+        chart_density.write_image(
+            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "density.pdf")
+        )
+
     return chart_density
 
 
@@ -217,6 +226,11 @@ def visualize_cost_benchmark(
     chart_cost.update_xaxes(showticklabels=True)
     chart_cost.update_yaxes(showgrid=True)
 
+    if _BOOL_SAVE_FIGURES:
+        chart_cost.write_image(
+            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "cost.pdf")
+        )
+
     return chart_cost
 
 
@@ -302,6 +316,11 @@ def visualize_time_benchmark(
     chart_time.update_xaxes(showticklabels=True)
     chart_time.update_yaxes(showgrid=True)  # , title="log(Time(s))")
 
+    if _BOOL_SAVE_FIGURES:
+        chart_time.write_image(
+            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "time.pdf")
+        )
+
     return chart_time
 
 
@@ -342,6 +361,11 @@ def visualize_base_error_per_file(
 
     chart_base_error.update_xaxes(showticklabels=True)
     chart_base_error.update_yaxes(showgrid=True)
+
+    if _BOOL_SAVE_FIGURES:
+        chart_base_error.write_image(
+            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "base_error.pdf")
+        )
 
     return chart_base_error
 
@@ -445,6 +469,13 @@ def visualize_base_error_general(df_detail):
     )
     chart_base_error.update_traces(line=dict(dash="dash"))
 
+    if _BOOL_SAVE_FIGURES:
+        chart_base_error.write_image(
+            os.path.join(
+                PATH_CACHE_DATA, "benchmark_figures", "base_error_general.pdf"
+            )
+        )
+
     return chart_base_error
 
 
@@ -495,5 +526,12 @@ def visualize_success_rate_general(df_detail):
         showgrid=True,
         zeroline=True,
     )
+
+    if _BOOL_SAVE_FIGURES:
+        chart_success_rate.write_image(
+            os.path.join(
+                PATH_CACHE_DATA, "benchmark_figures", "success_rate.pdf"
+            )
+        )
 
     return chart_success_rate
