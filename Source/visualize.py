@@ -28,7 +28,7 @@ _DISCRETE_COLOR_PALLETE = (
 )
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
-_BOOL_SAVE_FIGURES = True
+_BOOL_SAVE_FIGURES = False
 
 
 # TODO: Decide if we want to visualize measures only for successful encode
