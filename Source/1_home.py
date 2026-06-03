@@ -24,11 +24,13 @@ str_sum_size = str(
 )
 int_sum_methods = len(uti.LIST_ENCODING_METHODS)
 int_sum_files = len(list(pd.unique(df_existing_detail["Filename"])))
-series_success_rate = df_existing_detail["Similarity"].value_counts(  # pyright: ignore [reportAttributeAccessIssue]
+series_success_rate = df_existing_detail[
+    df_existing_detail["Transformation"] == "Decoding"
+]["Similarity"].value_counts(  # pyright: ignore [reportAttributeAccessIssue]
     normalize=True
 )
 
-str_success_rate = str("{:.2f} %".format(series_success_rate[True]))
+str_success_rate = str(f"{series_success_rate[True]:.2f} %")
 
 _, st_col_1, st_col_2, st_col_3, _ = st.columns([1, 3, 3, 3, 1])
 _, st_col_4, st_col_5, st_col_6, _ = st.columns([1, 3, 3, 3, 1])

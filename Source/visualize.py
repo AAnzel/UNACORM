@@ -490,7 +490,7 @@ def visualize_success_rate_general(df_detail):
     Returns:
         chart_success_rate (px.Chart): chart with success rates
     """
-    df_tmp = df_detail.copy()
+    df_tmp = df_detail[df_detail["Transformation"] == "Decoding"]
 
     df_success_rate = (
         df_tmp.groupby("Method")["Similarity"].mean().reset_index()
