@@ -57,7 +57,7 @@ _FLOAT_NANOPORE_COST_PER_BASE = 0.000025
 _FLOAT_PACBIO_COST_PER_BASE = 0.000035
 _INT_SEQUENCING_COVERAGE = 100
 _FLOAT_SYNTHESIS_COST_PER_BASE = 0.1
-LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.05, 0.1, 0.5, 1.0, 1.5, 2.0, 2.5]
+LIST_FLOAT_ERROR_MULTIPLIERS = [0.0, 0.1, 0.5, 1.0, 1.5, 2.0, 2.5]
 
 _UPLOADED_SAVE_TIME = 3600  # 3600 seconds = 1h
 encoding_2d = encoding_2d_tmp.api()  # Required because of the implementation
@@ -83,8 +83,6 @@ def display_footer():
             + tc.STRING_FOOTER
             + "</div>"
         )
-
-    return None
 
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
@@ -114,8 +112,6 @@ def display_processed_data(df_summary, df_detail, bool_expand_detail=False):
             icon=":material/download:",
             key="Download_Detail_" + string_key,
         )
-
-    return None
 
 
 def remove_cached_data():
@@ -163,7 +159,6 @@ def remove_cached_data():
                     #        ' directory')
                 else:
                     pass
-    return None
 
 
 @st.cache_data
@@ -294,7 +289,6 @@ def np_list_encode_decode(
             print(
                 "Encoding method " + str_encoding_method + " is not implemented"
             )
-            pass
     else:
         if str_encoding_method == "The2DCode":
             np_list_generated_seq = encoding_2d.decode("", list_np_data)
@@ -320,7 +314,6 @@ def np_list_encode_decode(
             print(
                 "Encoding method " + str_encoding_method + " is not implemented"
             )
-            pass
 
     if bool_encode:
         if not isinstance(np_list_generated_seq, list):
