@@ -535,3 +535,68 @@ def visualize_success_rate_general(df_detail):
         )
 
     return chart_success_rate
+
+
+def visualize_success_rate_per_multiplier(
+    list_files_chosen, df_detail, float_error_multiplier
+):
+    """
+    visualize_time_benchmark function is used for visualizing run times it took
+    each method to encode/decode files
+
+    Args:
+        list_files_chosen (list): names of files that are to be visualized
+        df_detail (pd.DataFrame): detail benchmarking dataset
+        float_error_multiplier (float): selected error multiplier to filter the
+        df_detail
+
+    Returns:
+        chart_success_rate (px.Chart): chart with success rates
+    """
+
+    df_tmp = df_detail[
+        (
+            df_detail["Filename"].isin(list_files_chosen)
+            & (df_detail["Error_Multiplier"] == float_error_multiplier)
+            & (df_detail["Transformation"] == "Decoding")
+        )
+    ]
+
+    df_tmp["Similarity"] = df_tmp["Similarity"] * 100
+    df_tmp.reset_index(inplace=True)
+    df_tmp["index"] = df_tmp["index"] % 5
+
+    df_tmp = (
+        df_tmp[["index", "Filename", "Method", "Similarity"]]
+        .sort_values("Method")
+        .rename(columns={"Similarity": "Success Rate (%)", "index": "Run"})
+    )
+
+    chart_success_rate = px.strip(
+        df_tmp,
+        x="Method",
+        y="Success Rate (%)",
+        color="Run",
+        facet_col="Filename",
+        facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
+        height=_INT_CHART_ROW_SIZE
+        * (int((len(list_files_chosen) - 1) / 4) + 1),
+        facet_col_wrap=4,
+        template=_STRING_PLOTLY_THEME,
+        category_orders={"Filename": list_files_chosen},
+        stripmode="group",
+    )
+
+    chart_success_rate.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
+    chart_success_rate.update_xaxes(showticklabels=True)
+    chart_success_rate.update_yaxes(showgrid=True)
+    chart_success_rate.update_layout(showlegend=False)
+
+    if _BOOL_SAVE_FIGURES:
+        chart_success_rate.write_image(
+            os.path.join(
+                PATH_CACHE_DATA, "benchmark_figures", "success_rate.pdf"
+            )
+        )
+
+    return chart_success_rate

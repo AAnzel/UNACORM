@@ -34,10 +34,8 @@ st.header(":primary[︱]Base Error", help=tc.STRING_BASE_ERROR_HELP)
 chart_base_error = vis.visualize_base_error_general(df_existing_detail)
 st.plotly_chart(chart_base_error, width="stretch")
 
-st.header(
-    ":primary[︱]Cost and Runtime per Error Multiplier",
-    help=tc.STRING_COST_RUNTIME,
-)
+
+st.header(":primary[︱]Detailed Charts per File and Error Multiplier")
 st.markdown("")
 
 with st.container(border=True):
@@ -48,6 +46,7 @@ with st.container(border=True):
             "Choose error multiplier value or leave it 0 to skip",
             value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
             options=uti.LIST_FLOAT_ERROR_MULTIPLIERS,
+            key="detailed_charts_error_multiplier_slider",
         )
         with st.popover(
             "What is error multiplier?", icon=":material/help:", width="stretch"
@@ -63,6 +62,48 @@ with st.container(border=True):
             default=list_files_to_visualize,
             options=list_files_to_visualize,
             placeholder="Choose files",
+            key="detailed_charts_multiselect",
+        )
+
+chart_sucess_rate_per_multiplier = vis.visualize_success_rate_per_multiplier(
+    list_files_chosen, df_existing_detail, float_error_multiplier
+)
+st.subheader("Success Rate ", help=tc.STRING_SUCCESS_RATE_HELP)
+st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
+st.plotly_chart(chart_sucess_rate_per_multiplier, width="stretch")
+
+
+st.header(
+    ":primary[︱]Cost and Runtime per File and Error Multiplier",
+    help=tc.STRING_COST_RUNTIME,
+)
+st.markdown("")
+
+with st.container(border=True):
+    st_col_1, _, st_col_2 = st.columns([4, 1, 8])
+
+    with st_col_1:
+        float_error_multiplier = st.select_slider(
+            "Choose error multiplier value or leave it 0 to skip",
+            value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
+            options=uti.LIST_FLOAT_ERROR_MULTIPLIERS,
+            key="cost_runtime_error_multiplier_slider",
+        )
+        with st.popover(
+            "What is error multiplier?", icon=":material/help:", width="stretch"
+        ):
+            st.markdown(tc.STRING_MUTAGENESIS_HELP)
+
+    list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
+
+    with st_col_2:
+        list_files_chosen = st.multiselect(
+            "Select the files to review (This will affect Cost"
+            + " and Time Charts)",
+            default=list_files_to_visualize,
+            options=list_files_to_visualize,
+            placeholder="Choose files",
+            key="cost_runtime_multiselect",
         )
 
     st.markdown("")
@@ -88,6 +129,7 @@ with st.container(border=True):
         bool_whisker_chart = True
     else:
         bool_whisker_chart = False
+
 
 chart_cost_all = vis.visualize_cost_benchmark(
     list_files_chosen,
