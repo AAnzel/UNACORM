@@ -1245,3 +1245,4 @@ Source/Encodings/DNA_Aeon/data
 Source/Encodings/DNA_Aeon/test
 Source/Encodings/DNA_Aeon/arithmetic_modulator_error_correction
 Source/Encodings/DNA_Aeon/config.json
+pyrightconfig.json
