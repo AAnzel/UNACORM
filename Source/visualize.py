@@ -137,7 +137,9 @@ def visualize_density_benchmark(df_measure_sum_concat):
 
     if _BOOL_SAVE_FIGURES:
         chart_density.write_image(
-            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "density.pdf")
+            os.path.join(
+                PATH_CACHE_DATA, "benchmark_figures", "general_density.pdf"
+            )
         )
 
     return chart_density
@@ -228,7 +230,11 @@ def visualize_cost_benchmark(
 
     if _BOOL_SAVE_FIGURES:
         chart_cost.write_image(
-            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "cost.pdf")
+            os.path.join(
+                PATH_CACHE_DATA,
+                "benchmark_figures",
+                "cost_error_" + str(float_error_multiplier) + ".pdf",
+            )
         )
 
     return chart_cost
@@ -318,7 +324,11 @@ def visualize_time_benchmark(
 
     if _BOOL_SAVE_FIGURES:
         chart_time.write_image(
-            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "time.pdf")
+            os.path.join(
+                PATH_CACHE_DATA,
+                "benchmark_figures",
+                "time_" + str(float_error_multiplier) + ".pdf",
+            )
         )
 
     return chart_time
@@ -364,7 +374,9 @@ def visualize_base_error_per_file(
 
     if _BOOL_SAVE_FIGURES:
         chart_base_error.write_image(
-            os.path.join(PATH_CACHE_DATA, "benchmark_figures", "base_error.pdf")
+            os.path.join(
+                PATH_CACHE_DATA, "benchmark_figures", "base_error_per_file.pdf"
+            )
         )
 
     return chart_base_error
@@ -530,7 +542,7 @@ def visualize_success_rate_general(df_detail):
     if _BOOL_SAVE_FIGURES:
         chart_success_rate.write_image(
             os.path.join(
-                PATH_CACHE_DATA, "benchmark_figures", "success_rate.pdf"
+                PATH_CACHE_DATA, "benchmark_figures", "success_rate_general.pdf"
             )
         )
 
@@ -595,8 +607,65 @@ def visualize_success_rate_per_multiplier(
     if _BOOL_SAVE_FIGURES:
         chart_success_rate.write_image(
             os.path.join(
-                PATH_CACHE_DATA, "benchmark_figures", "success_rate.pdf"
+                PATH_CACHE_DATA,
+                "benchmark_figures",
+                "success_rate_" + str(float_error_multiplier) + ".pdf",
             )
         )
 
     return chart_success_rate
+
+
+def visualize_density_per_multiplier(
+    list_files_chosen, df_measure_sum_concat, float_error_multiplier
+):
+    """
+    visualize_density_per_multiplier function is used for visualizing the
+    information densities from the benchmarking dataset per multiplier and
+    selected files. These densities tell us how much the size of the encoded
+    file differs from the size of the decoded file
+
+    Args:
+        list_files_chosen (list): names of files that are to be visualized
+        df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+            containing detailed results of the encoding/decoding processes.
+        float_error_multiplier (float): selected error multiplier to filter the
+            df_detail
+    Returns:
+        chart_density (px.Chart): chart with information density
+    """
+
+    df_tmp = df_measure_sum_concat[
+        (
+            df_measure_sum_concat["Filename"].isin(list_files_chosen)
+            & (
+                df_measure_sum_concat["Error_Multiplier"]
+                == float_error_multiplier
+            )
+        )
+    ]
+
+    chart_density = px.box(
+        df_tmp,
+        y="Information_Density",
+        x="Method",
+        height=_INT_CHART_ROW_SIZE,
+        template=_STRING_PLOTLY_THEME,
+    )
+    chart_density.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
+
+    chart_density.update_xaxes(showticklabels=True)
+    chart_density.update_layout(yaxis_title="Information_Density (b/nt)")
+    # TODO: Make it into a bar chart for uploaded data
+    chart_density.update_yaxes(showgrid=True)
+
+    if _BOOL_SAVE_FIGURES:
+        chart_density.write_image(
+            os.path.join(
+                PATH_CACHE_DATA,
+                "benchmark_figures",
+                "density_" + str(float_error_multiplier) + ".pdf",
+            )
+        )
+
+    return chart_density
