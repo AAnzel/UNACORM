@@ -1,6 +1,5 @@
 import os
 
-import pandas as pd
 import plotly.express as px
 import streamlit as st
 from utilities import PATH_CACHE_DATA
@@ -187,7 +186,7 @@ def visualize_cost_benchmark(
             log_y=True,
             color="Transformation",
             facet_col="Filename",
-            facet_col_wrap=4,
+            facet_col_wrap=3,
             facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
             height=_INT_CHART_ROW_SIZE
@@ -213,7 +212,7 @@ def visualize_cost_benchmark(
             log_y=True,
             color="Transformation",
             facet_col="Filename",
-            facet_col_wrap=4,
+            facet_col_wrap=3,
             facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
             height=_INT_CHART_ROW_SIZE
@@ -286,7 +285,7 @@ def visualize_time_benchmark(
             height=_INT_CHART_ROW_SIZE
             * (int((len(list_files_chosen) - 1) / 4) + 1),
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-            facet_col_wrap=4,
+            facet_col_wrap=3,
             template=_STRING_PLOTLY_THEME,
             category_orders={"Filename": list_files_chosen},
         )
@@ -311,7 +310,7 @@ def visualize_time_benchmark(
             height=_INT_CHART_ROW_SIZE
             * (int((len(list_files_chosen) - 1) / 4) + 1),
             color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-            facet_col_wrap=4,
+            facet_col_wrap=3,
             template=_STRING_PLOTLY_THEME,
             barmode="group",
             category_orders={"Filename": list_files_chosen},
@@ -364,7 +363,7 @@ def visualize_base_error_per_file(
         height=_INT_CHART_ROW_SIZE
         * (int((len(list_files_chosen) - 1) / 4) + 1),
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
-        facet_col_wrap=4,
+        facet_col_wrap=3,
         template=_STRING_PLOTLY_THEME,
         category_orders={"Filename": list_files_chosen},
     )
@@ -382,10 +381,11 @@ def visualize_base_error_per_file(
     return chart_base_error
 
 
-def visualize_base_error_general(df_detail):
+def visualize_base_error_general(df_detail, list_files_chosen):
     """
     visualize_base_error_general function is used for visualizing base error
     values for each method across all runs, files, and error multipliers
+    list_files_chosen (list): names of files that are to be visualized
 
     Args:
         df_detail (pd.DataFrame): detail benchmark DataFrame
@@ -398,7 +398,7 @@ def visualize_base_error_general(df_detail):
     df_success_rate = (
         df_tmp
         .groupby(["Method", "Filename", "Error_Multiplier"])
-        .agg({"Similarity": "mean", "Base_error_ratio": "max"})
+        .agg({"Similarity": "mean", "Base_error_ratio": "mean"})
         .reset_index()
     )
 
@@ -408,53 +408,12 @@ def visualize_base_error_general(df_detail):
         columns={"Similarity": "Success Rate (%)"}
     )
 
-    # Now we calculate the last ratio, in which the code had a 100% success rate
-    # (out of 5 repetitions) and up until the first time, the code had a zero
-    # percent success rate
-
-    df_success_rate = df_success_rate.sort_values([
-        "Method",
-        "Filename",
-        "Base_error_ratio",
-    ]).reset_index(drop=True)
-
-    # Compute previous success rate for each (Method, Filename) group
-    df_success_rate["Prev_Success"] = df_success_rate.groupby([
-        "Method",
-        "Filename",
-    ])["Success Rate (%)"].shift(1)
-
-    # Find drops from 100% to <100%
-    df_drops = df_success_rate[
-        (df_success_rate["Prev_Success"] == 100)
-        & (df_success_rate["Success Rate (%)"] < 100)
-    ]
-
-    # Rows for (Method, Filename) where drop never happens (always 100%), keep max Base_error_ratio
-    df_max_rows = df_success_rate.loc[
-        df_success_rate.groupby(["Method", "Filename"])[
-            "Base_error_ratio"
-        ].idxmax()
-    ]
-
-    # Combine, prefer drop rows if available
     df_final = (
-        pd
-        .concat([
-            df_drops,
-            df_max_rows[
-                ~df_max_rows.set_index(["Method", "Filename"]).index.isin(
-                    df_drops.set_index(["Method", "Filename"]).index
-                )
-            ],
-        ])
-        .sort_values(["Method", "Filename"])
-        .reset_index(drop=True)
+        df_success_rate
+        .groupby(["Method", "Filename", "Base_error_ratio"])
+        .agg({"Success Rate (%)": "max"})
+        .reset_index()
     )
-
-    df_final = df_final[
-        ["Method", "Filename", "Success Rate (%)", "Base_error_ratio"]
-    ]
 
     chart_base_error = px.line(
         df_final,
@@ -468,18 +427,27 @@ def visualize_base_error_general(df_detail):
         color_discrete_sequence=_DISCRETE_COLOR_PALLETE,
         height=_INT_CHART_ROW_SIZE * 2,
         template=_STRING_PLOTLY_THEME,
+        category_orders={"Filename": list_files_chosen},
     )
 
     chart_base_error.update_xaxes(
         showticklabels=True,
-        range=[-0.05, 1],
     )
     chart_base_error.update_yaxes(
         showgrid=True,
         range=[-5, 105],
         zeroline=True,
     )
-    chart_base_error.update_traces(line=dict(dash="dash"))
+    chart_base_error.update_traces(line={"dash": "dash"})
+    chart_base_error.update_layout(
+        legend={
+            "orientation": "h",
+            "yanchor": "top",
+            "y": 1.22,
+            "xanchor": "left",
+            "x": 0,
+        }
+    )
 
     if _BOOL_SAVE_FIGURES:
         chart_base_error.write_image(
@@ -654,7 +622,7 @@ def visualize_sucess_rate_per_multiplier_and_file(
         facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE
         * (int((len(list_files_chosen) - 1) / 4) + 1),
-        facet_col_wrap=4,
+        facet_col_wrap=3,
         template=_STRING_PLOTLY_THEME,
         category_orders={"Filename": list_files_chosen},
         stripmode="group",
@@ -774,7 +742,7 @@ def visualize_density_per_multiplier_and_file(
         facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
         height=_INT_CHART_ROW_SIZE
         * (int((len(list_files_chosen) - 1) / 4) + 1),
-        facet_col_wrap=4,
+        facet_col_wrap=3,
         template=_STRING_PLOTLY_THEME,
         category_orders={"Filename": list_files_chosen},
     )

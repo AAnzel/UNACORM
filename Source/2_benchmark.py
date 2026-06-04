@@ -16,6 +16,7 @@ __status__ = "Stable"
 
 df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
 df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
+list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
 
 st.header(":primary[︱]Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
 st.markdown("")
@@ -31,7 +32,9 @@ chart_sucess_rate = vis.visualize_success_rate_general(df_existing_detail)
 st.plotly_chart(chart_sucess_rate, width="stretch")
 
 st.header(":primary[︱]Base Error", help=tc.STRING_BASE_ERROR_HELP)
-chart_base_error = vis.visualize_base_error_general(df_existing_detail)
+chart_base_error = vis.visualize_base_error_general(
+    df_existing_detail, list_files_to_visualize
+)
 st.plotly_chart(chart_base_error, width="stretch")
 
 
@@ -52,8 +55,6 @@ with st.container(border=True):
             "What is error multiplier?", icon=":material/help:", width="stretch"
         ):
             st.markdown(tc.STRING_MUTAGENESIS_HELP)
-
-    list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
 
     with st_col_2:
         list_files_chosen = st.multiselect(
@@ -117,8 +118,6 @@ with st.container(border=True):
             "What is error multiplier?", icon=":material/help:", width="stretch"
         ):
             st.markdown(tc.STRING_MUTAGENESIS_HELP)
-
-    list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
 
     with st_col_2:
         list_files_chosen = st.multiselect(
