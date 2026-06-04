@@ -385,7 +385,7 @@ def visualize_base_error_per_file(
 def visualize_base_error_general(df_detail):
     """
     visualize_base_error_general function is used for visualizing base error
-    values for each method across all runs and files
+    values for each method across all runs, files, and error multipliers
 
     Args:
         df_detail (pd.DataFrame): detail benchmark DataFrame
@@ -510,7 +510,7 @@ def visualize_success_rate_general(df_detail):
 
     df_success_rate["Similarity"] = df_success_rate["Similarity"] * 100
 
-    df_success_rate = df_success_rate.rename(
+    df_success_rate = df_success_rate.sort_values("Method").rename(
         columns={"Similarity": "Success Rate (%)"}
     )
 
@@ -549,12 +549,73 @@ def visualize_success_rate_general(df_detail):
     return chart_success_rate
 
 
-def visualize_success_rate_per_multiplier(
+def visualize_sucess_rate_per_multiplier(
     list_files_chosen, df_detail, float_error_multiplier
 ):
     """
-    visualize_time_benchmark function is used for visualizing run times it took
-    each method to encode/decode files
+    visualize_sucess_rate_per_multiplier function is used for visualizing
+    the success rates for each method across all runs and files for specified
+    error multiplier
+
+    Args:
+        list_files_chosen (list): names of files that are to be visualized
+        df_detail (pd.DataFrame): detail benchmarking dataset
+        float_error_multiplier (float): selected error multiplier to filter the
+        df_detail
+
+    Returns:
+        chart_success_rate (px.Chart): chart with success rates
+    """
+
+    df_tmp = df_detail[
+        (
+            (df_detail["Error_Multiplier"] == float_error_multiplier)
+            & (df_detail["Transformation"] == "Decoding")
+        )
+    ]
+
+    df_tmp["Similarity"] = df_tmp["Similarity"] * 100
+    df_tmp.reset_index(inplace=True)
+    df_tmp["index"] = df_tmp["index"] % 5
+
+    df_tmp = (
+        df_tmp[["index", "Filename", "Method", "Similarity"]]
+        .sort_values("Method")
+        .rename(columns={"Similarity": "Success Rate (%)", "index": "Run"})
+    )
+
+    chart_success_rate = px.box(
+        df_tmp,
+        x="Method",
+        y="Success Rate (%)",
+        height=_INT_CHART_ROW_SIZE,
+        template=_STRING_PLOTLY_THEME,
+    )
+
+    chart_success_rate.update_traces(marker_color=_STRING_DENSITY_MARKER_COLOR)
+    chart_success_rate.update_xaxes(showticklabels=True)
+    chart_success_rate.update_yaxes(showgrid=True)
+    chart_success_rate.update_layout(showlegend=False)
+
+    if _BOOL_SAVE_FIGURES:
+        chart_success_rate.write_image(
+            os.path.join(
+                PATH_CACHE_DATA,
+                "benchmark_figures",
+                "success_rate_general_" + str(float_error_multiplier) + ".pdf",
+            )
+        )
+
+    return chart_success_rate
+
+
+def visualize_sucess_rate_per_multiplier_and_file(
+    list_files_chosen, df_detail, float_error_multiplier
+):
+    """
+    visualize_sucess_rate_per_multiplier_and_file function is used for visualizing
+    the success rates for each method across all runs, for specified files and
+    error multipliers
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
@@ -609,7 +670,7 @@ def visualize_success_rate_per_multiplier(
             os.path.join(
                 PATH_CACHE_DATA,
                 "benchmark_figures",
-                "success_rate_" + str(float_error_multiplier) + ".pdf",
+                "success_rate_per_file_" + str(float_error_multiplier) + ".pdf",
             )
         )
 
@@ -621,9 +682,9 @@ def visualize_density_per_multiplier(
 ):
     """
     visualize_density_per_multiplier function is used for visualizing the
-    information densities from the benchmarking dataset per multiplier and
-    selected files. These densities tell us how much the size of the encoded
-    file differs from the size of the decoded file
+    information densities from the benchmarking dataset per multiplier.
+    These densities tell us how much the size of the encoded file differs from
+    the size of the decoded file
 
     Args:
         list_files_chosen (list): names of files that are to be visualized
@@ -643,7 +704,7 @@ def visualize_density_per_multiplier(
                 == float_error_multiplier
             )
         )
-    ]
+    ].sort_values("Method")
 
     chart_density = px.box(
         df_tmp,
@@ -664,7 +725,79 @@ def visualize_density_per_multiplier(
             os.path.join(
                 PATH_CACHE_DATA,
                 "benchmark_figures",
-                "density_" + str(float_error_multiplier) + ".pdf",
+                "density_general" + str(float_error_multiplier) + ".pdf",
+            )
+        )
+
+    return chart_density
+
+
+def visualize_density_per_multiplier_and_file(
+    list_files_chosen, df_measure_sum_concat, float_error_multiplier
+):
+    """
+    visualize_density_per_multiplier_and_file function is used for visualizing
+    the information densities from the benchmarking dataset per multiplier and
+    selected files. These densities tell us how much the size of the encoded
+    file differs from the size of the decoded file
+
+    Args:
+        list_files_chosen (list): names of files that are to be visualized
+        df_measure_sum_concat (pd.DataFrame): summary benchmark DataFrame
+            containing detailed results of the encoding/decoding processes.
+        float_error_multiplier (float): selected error multiplier to filter the
+            df_detail
+    Returns:
+        chart_density (px.Chart): chart with information density
+    """
+
+    df_tmp = (
+        df_measure_sum_concat[
+            (
+                df_measure_sum_concat["Filename"].isin(list_files_chosen)
+                & (
+                    df_measure_sum_concat["Error_Multiplier"]
+                    == float_error_multiplier
+                )
+            )
+        ]
+        .rename(columns={"Information_Density": "Information_Density (b/nt)"})
+        .sort_values("Method")
+    )
+
+    chart_density = px.scatter(
+        df_tmp,
+        y="Information_Density (b/nt)",
+        x="Method",
+        text="Information_Density (b/nt)",
+        facet_col="Filename",
+        facet_row_spacing=0.16,  # Default=0.07 when facet_col_wrap is used
+        height=_INT_CHART_ROW_SIZE
+        * (int((len(list_files_chosen) - 1) / 4) + 1),
+        facet_col_wrap=4,
+        template=_STRING_PLOTLY_THEME,
+        category_orders={"Filename": list_files_chosen},
+    )
+
+    chart_density.update_traces(
+        marker_color=_STRING_DENSITY_MARKER_COLOR,
+        # marker_line_color=_STRING_DENSITY_MARKER_COLOR,
+        # marker_line_width=4,
+        # marker_cornerradius="5%",
+        texttemplate="%{y:.2f}",
+        textposition="top center",
+    )
+
+    chart_density.update_xaxes(showticklabels=True)
+
+    chart_density.update_yaxes(showgrid=True)
+
+    if _BOOL_SAVE_FIGURES:
+        chart_density.write_image(
+            os.path.join(
+                PATH_CACHE_DATA,
+                "benchmark_figures",
+                "density_per_file" + str(float_error_multiplier) + ".pdf",
             )
         )
 

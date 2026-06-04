@@ -57,20 +57,44 @@ with st.container(border=True):
 
     with st_col_2:
         list_files_chosen = st.multiselect(
-            "Select the files to review (This will affect Cost"
-            + " and Time Charts)",
+            "Select the files to review (This will affect charts below)",
             default=list_files_to_visualize,
             options=list_files_to_visualize,
             placeholder="Choose files",
             key="detailed_charts_multiselect",
         )
 
-chart_sucess_rate_per_multiplier = vis.visualize_success_rate_per_multiplier(
+chart_sucess_rate_per_multiplier = vis.visualize_sucess_rate_per_multiplier(
     list_files_chosen, df_existing_detail, float_error_multiplier
 )
+
+chart_sucess_rate_per_multiplier_and_file = (
+    vis.visualize_sucess_rate_per_multiplier_and_file(
+        list_files_chosen, df_existing_detail, float_error_multiplier
+    )
+)
+
+chart_information_density_per_multiplier = vis.visualize_density_per_multiplier(
+    list_files_chosen, df_existing_summary, float_error_multiplier
+)
+
+chart_information_density_per_multiplier_and_file = (
+    vis.visualize_density_per_multiplier_and_file(
+        list_files_chosen, df_existing_summary, float_error_multiplier
+    )
+)
+
 st.subheader("Success Rate ", help=tc.STRING_SUCCESS_RATE_HELP)
 st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
 st.plotly_chart(chart_sucess_rate_per_multiplier, width="stretch")
+st.plotly_chart(chart_sucess_rate_per_multiplier_and_file, width="stretch")
+
+st.subheader("Information Density ", help=tc.STRING_DENSITY_HELP)
+st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
+st.plotly_chart(chart_information_density_per_multiplier, width="stretch")
+st.plotly_chart(
+    chart_information_density_per_multiplier_and_file, width="stretch"
+)
 
 
 st.header(
