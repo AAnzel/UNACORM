@@ -98,7 +98,7 @@ for string_figure_name, chart_figure in dict_charts_no_multipliers.items():
     if string_figure_name in ["success_rate", "density"]:
         chart_figure.write_image(path_figure)
     else:
-        chart_figure.write_image(path_figure, width=900, height=1200, scale=2)
+        chart_figure.write_image(path_figure, width=1000, height=1200, scale=2)
 
 for (
     string_figure_name,
@@ -110,9 +110,12 @@ for (
             string_figure_name + "_error_" + string_error_multiplier + ".pdf",
         )
 
-        if string_figure_name in ["information_density_per_multiplier"]:
+        if string_figure_name in [
+            "information_density_per_multiplier",
+            "sucess_rate_per_multiplier",
+        ]:
             chart_figure.write_image(path_figure)
         else:
             chart_figure.write_image(
-                path_figure, width=900, height=1200, scale=2
+                path_figure, width=1000, height=1200, scale=2
             )
