@@ -13,15 +13,15 @@ list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
 
 dict_charts_no_multipliers = {
     "density": vis.visualize_density_benchmark(df_existing_summary),
-    "sucess_rate": vis.visualize_success_rate_general(df_existing_detail),
+    "success_rate": vis.visualize_success_rate_general(df_existing_detail),
     "base_error": vis.visualize_base_error_general(
         df_existing_detail, list_files_to_visualize
     ),
 }
 
 dict_charts_with_multipliers = {
-    "sucess_rate_per_multiplier": {},
-    "sucess_rate_per_multiplier_and_file": {},
+    "success_rate_per_multiplier": {},
+    "success_rate_per_multiplier_and_file": {},
     "information_density_per_multiplier": {},
     "information_density_per_multiplier_and_file": {},
     "cost_all_bar": {},
@@ -31,15 +31,15 @@ dict_charts_with_multipliers = {
 }
 
 for float_error_multiplier in uti.LIST_FLOAT_ERROR_MULTIPLIERS:
-    dict_charts_with_multipliers["sucess_rate_per_multiplier"][
+    dict_charts_with_multipliers["success_rate_per_multiplier"][
         str(float_error_multiplier)
-    ] = vis.visualize_sucess_rate_per_multiplier(
+    ] = vis.visualize_success_rate_per_multiplier(
         list_files_to_visualize, df_existing_detail, float_error_multiplier
     )
 
-    dict_charts_with_multipliers["sucess_rate_per_multiplier_and_file"][
+    dict_charts_with_multipliers["success_rate_per_multiplier_and_file"][
         str(float_error_multiplier)
-    ] = vis.visualize_sucess_rate_per_multiplier_and_file(
+    ] = vis.visualize_success_rate_per_multiplier_and_file(
         list_files_to_visualize, df_existing_detail, float_error_multiplier
     )
 
@@ -112,7 +112,7 @@ for (
 
         if string_figure_name in [
             "information_density_per_multiplier",
-            "sucess_rate_per_multiplier",
+            "success_rate_per_multiplier",
         ]:
             chart_figure.write_image(path_figure)
         else:

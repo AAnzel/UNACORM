@@ -467,11 +467,11 @@ def visualize_success_rate_general(df_detail):
     return chart_success_rate
 
 
-def visualize_sucess_rate_per_multiplier(
+def visualize_success_rate_per_multiplier(
     list_files_chosen, df_detail, float_error_multiplier
 ):
     """
-    visualize_sucess_rate_per_multiplier function is used for visualizing
+    visualize_success_rate_per_multiplier function is used for visualizing
     the success rates for each method across all runs and files for specified
     error multiplier
 
@@ -518,11 +518,11 @@ def visualize_sucess_rate_per_multiplier(
     return chart_success_rate
 
 
-def visualize_sucess_rate_per_multiplier_and_file(
+def visualize_success_rate_per_multiplier_and_file(
     list_files_chosen, df_detail, float_error_multiplier
 ):
     """
-    visualize_sucess_rate_per_multiplier_and_file function is used for visualizing
+    visualize_success_rate_per_multiplier_and_file function is used for visualizing
     the success rates for each method across all runs, for specified files and
     error multipliers
 

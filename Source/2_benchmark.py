@@ -28,8 +28,8 @@ chart_density = vis.visualize_density_benchmark(df_existing_summary)
 st.plotly_chart(chart_density, width="stretch")
 
 st.header(":primary[︱]Success Rate", help=tc.STRING_SUCCESS_RATE_HELP)
-chart_sucess_rate = vis.visualize_success_rate_general(df_existing_detail)
-st.plotly_chart(chart_sucess_rate, width="stretch")
+chart_success_rate = vis.visualize_success_rate_general(df_existing_detail)
+st.plotly_chart(chart_success_rate, width="stretch")
 
 st.header(":primary[︱]Base Error", help=tc.STRING_BASE_ERROR_HELP)
 chart_base_error = vis.visualize_base_error_general(
@@ -65,12 +65,12 @@ with st.container(border=True):
             key="detailed_charts_multiselect",
         )
 
-chart_sucess_rate_per_multiplier = vis.visualize_sucess_rate_per_multiplier(
+chart_success_rate_per_multiplier = vis.visualize_success_rate_per_multiplier(
     list_files_chosen, df_existing_detail, float_error_multiplier
 )
 
-chart_sucess_rate_per_multiplier_and_file = (
-    vis.visualize_sucess_rate_per_multiplier_and_file(
+chart_success_rate_per_multiplier_and_file = (
+    vis.visualize_success_rate_per_multiplier_and_file(
         list_files_chosen, df_existing_detail, float_error_multiplier
     )
 )
@@ -87,8 +87,8 @@ chart_information_density_per_multiplier_and_file = (
 
 st.subheader("Success Rate ", help=tc.STRING_SUCCESS_RATE_HELP)
 st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
-st.plotly_chart(chart_sucess_rate_per_multiplier, width="stretch")
-st.plotly_chart(chart_sucess_rate_per_multiplier_and_file, width="stretch")
+st.plotly_chart(chart_success_rate_per_multiplier, width="stretch")
+st.plotly_chart(chart_success_rate_per_multiplier_and_file, width="stretch")
 
 st.subheader("Information Density ", help=tc.STRING_DENSITY_HELP)
 st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
