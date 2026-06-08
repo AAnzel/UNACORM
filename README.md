@@ -2,6 +2,8 @@
 
 # UNACORM --- The Unified DNA Codecs Platform
 
+[![Docker Image CI](https://github.com/AAnzel/UNACORM/actions/workflows/build_docker.yml/badge.svg)](https://github.com/AAnzel/UNACORM/actions/workflows/build_docker.yml)
+
 ## Manuscript
 
 This tool was created for the following paper:
