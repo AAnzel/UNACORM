@@ -5,6 +5,7 @@ import utilities as uti
 import visualize as vis
 
 _PATH_FIGURES = os.path.join(uti.PATH_CACHE_DATA, "benchmark_figures")
+os.makedirs(_PATH_FIGURES, exist_ok=True)
 df_existing_summary = pd.read_pickle(uti.PATH_EXISTING_SUMMARY)
 df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
@@ -91,22 +92,27 @@ for float_error_multiplier in uti.LIST_FLOAT_ERROR_MULTIPLIERS:
 
 # We now save the figures
 for string_figure_name, chart_figure in dict_charts_no_multipliers.items():
-    chart_figure.write_image(
-        os.path.join(_PATH_FIGURES, "general_" + string_figure_name + ".pdf")
+    path_figure = os.path.join(
+        _PATH_FIGURES, string_figure_name + "_general" + ".pdf"
     )
+    if string_figure_name in ["success_rate", "density"]:
+        chart_figure.write_image(path_figure)
+    else:
+        chart_figure.write_image(path_figure, width=900, height=1200, scale=2)
 
 for (
     string_figure_name,
-    list_errors_charts,
+    dict_errors_charts,
 ) in dict_charts_with_multipliers.items():
-    for string_error_multiplier, chart_figure in list_errors_charts:
-        chart_figure.write_image(
-            os.path.join(
-                _PATH_FIGURES,
-                "general_"
-                + string_figure_name
-                + "_error_"
-                + string_error_multiplier
-                + ".pdf",
-            )
+    for string_error_multiplier, chart_figure in dict_errors_charts.items():
+        path_figure = os.path.join(
+            _PATH_FIGURES,
+            string_figure_name + "_error_" + string_error_multiplier + ".pdf",
         )
+
+        if string_figure_name in ["information_density_per_multiplier"]:
+            chart_figure.write_image(path_figure)
+        else:
+            chart_figure.write_image(
+                path_figure, width=900, height=1200, scale=2
+            )
