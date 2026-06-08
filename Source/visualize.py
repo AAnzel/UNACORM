@@ -157,7 +157,7 @@ def visualize_cost_benchmark(
             df_detail["Filename"].isin(list_files_chosen)
             & (df_detail["Error_Multiplier"] == float_error_multiplier)
         )
-    ]
+    ].copy()
 
     chart_cost = None
 
@@ -243,7 +243,7 @@ def visualize_time_benchmark(
             df_detail["Filename"].isin(list_files_chosen)
             & (df_detail["Error_Multiplier"] == float_error_multiplier)
         )
-    ]
+    ].copy()
 
     chart_time = None
 
@@ -366,11 +366,7 @@ def visualize_base_error_general(df_detail, list_files_chosen):
         .reset_index()
     )
 
-    df_success_rate["Similarity"] = df_success_rate["Similarity"] * 100
-
-    df_success_rate = df_success_rate.rename(
-        columns={"Similarity": "Success Rate (%)"}
-    )
+    df_success_rate["Success Rate (%)"] = df_success_rate["Similarity"] * 100
 
     df_final = (
         df_success_rate
@@ -427,20 +423,16 @@ def visualize_success_rate_general(df_detail):
     Returns:
         chart_success_rate (px.Chart): chart with success rates
     """
-    df_tmp = df_detail[df_detail["Transformation"] == "Decoding"]
+    df_tmp = df_detail[df_detail["Transformation"] == "Decoding"].copy()
 
     df_success_rate = (
         df_tmp.groupby("Method")["Similarity"].mean().reset_index()
     )
 
-    df_success_rate["Similarity"] = df_success_rate["Similarity"] * 100
-
-    df_success_rate = df_success_rate.sort_values("Method").rename(
-        columns={"Similarity": "Success Rate (%)"}
-    )
+    df_success_rate["Success Rate (%)"] = df_success_rate["Similarity"] * 100
 
     chart_success_rate = px.bar(
-        df_success_rate,
+        df_success_rate.sort_values("Method"),
         x="Method",
         y="Success Rate (%)",
         text="Success Rate (%)",
@@ -490,17 +482,15 @@ def visualize_success_rate_per_multiplier(
             (df_detail["Error_Multiplier"] == float_error_multiplier)
             & (df_detail["Transformation"] == "Decoding")
         )
-    ]
+    ].copy()
 
-    df_tmp["Similarity"] = df_tmp["Similarity"] * 100
+    df_tmp["Success Rate (%)"] = df_tmp["Similarity"] * 100
     df_tmp.reset_index(inplace=True)
-    df_tmp["index"] = df_tmp["index"] % 5
+    df_tmp["Run"] = df_tmp["index"] % 5
 
-    df_tmp = (
-        df_tmp[["index", "Filename", "Method", "Similarity"]]
-        .sort_values("Method")
-        .rename(columns={"Similarity": "Success Rate (%)", "index": "Run"})
-    )
+    df_tmp = df_tmp[
+        ["Run", "Filename", "Method", "Success Rate (%)"]
+    ].sort_values("Method")
 
     chart_success_rate = px.box(
         df_tmp,
@@ -542,17 +532,15 @@ def visualize_success_rate_per_multiplier_and_file(
             & (df_detail["Error_Multiplier"] == float_error_multiplier)
             & (df_detail["Transformation"] == "Decoding")
         )
-    ]
+    ].copy()
 
-    df_tmp["Similarity"] = df_tmp["Similarity"] * 100
+    df_tmp["Success Rate (%)"] = df_tmp["Similarity"] * 100
     df_tmp.reset_index(inplace=True)
-    df_tmp["index"] = df_tmp["index"] % 5
+    df_tmp["Run"] = df_tmp["index"] % 5
 
-    df_tmp = (
-        df_tmp[["index", "Filename", "Method", "Similarity"]]
-        .sort_values("Method")
-        .rename(columns={"Similarity": "Success Rate (%)", "index": "Run"})
-    )
+    df_tmp = df_tmp[
+        ["Run", "Filename", "Method", "Success Rate (%)"]
+    ].sort_values("Method")
 
     chart_success_rate = px.strip(
         df_tmp,
