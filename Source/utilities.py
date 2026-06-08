@@ -74,15 +74,9 @@ for string_encoding_method in os.listdir(_PATH_ENCODING_METHODS):
 
 
 def display_footer():
-    st.html("<br><br><br><br><br>")
-    _, st_col_2, _ = st.columns([1, 9, 1])
-    with st_col_2:
-        st.divider()
-        st.html(
-            '<small><div style="text-align: center">'
-            + tc.STRING_FOOTER
-            + "</div>"
-        )
+    st.space(size="xxlarge")
+    st.divider()
+    st.markdown(":small[" + tc.STRING_FOOTER + "]", text_alignment="center")
 
 
 def display_processed_data(df_summary, df_detail, bool_expand_detail=False):

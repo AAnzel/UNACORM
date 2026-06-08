@@ -11,81 +11,88 @@ __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
-_, st_col_1, _ = st.columns([1, 9, 1])
-st_col_1.header(":primary[︱]Contact Us")
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_0)
-st.html("<br><br>")
+with st.container(horizontal_alignment="center"), st.container(width=1300):
+    st.header(":primary[︱]Contact Us")
+    st.markdown(tc.STRING_CONTACT_PAGE_0)
+    st.space(size="small")
 
-_, st_col_1, st_col_2, st_col_3, _ = st.columns(
-    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
-)
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_1)
-st_col_2.markdown(tc.STRING_CONTACT_PAGE_2)
-st_col_3.markdown(tc.STRING_CONTACT_PAGE_3)
+    with st.container(
+        horizontal=True, horizontal_alignment="center", gap="large"
+    ):
+        with st.container(
+            vertical_alignment="distribute", height=210, border=False
+        ):
+            st.markdown(tc.STRING_CONTACT_PAGE_1)
+            st.link_button(
+                "GitHub Repository",
+                url="https://github.com/AAnzel/UNACORM/tree/master",
+                icon=":material/home_storage:",
+                width="stretch",
+                type="primary",
+            )
+        with st.container(
+            vertical_alignment="distribute", height=210, border=False
+        ):
+            st.markdown(tc.STRING_CONTACT_PAGE_2)
+            st.link_button(
+                "Open Issue",
+                url="https://github.com/AAnzel/UNACORM/issues/new",
+                icon=":material/bug_report:",
+                width="stretch",
+                type="primary",
+            )
 
-_, st_col_1, st_col_2, st_col_3, _ = st.columns(
-    [1, 3, 3, 3, 1], gap="large", vertical_alignment="bottom"
-)
+        with st.container(
+            vertical_alignment="distribute", height=210, border=False
+        ):
+            st.markdown(tc.STRING_CONTACT_PAGE_3)
+            st.link_button(
+                "Create a Pull Request",
+                url="https://github.com/AAnzel/UNACORM/compare",
+                icon=":material/add:",
+                width="stretch",
+                type="primary",
+            )
 
-st_col_1.link_button(
-    "GitHub Repository",
-    url="https://github.com/AAnzel/UNACORM/tree/master",
-    icon=":material/home_storage:",
-    width="stretch",
-    type="primary",
-)
+    st.space(size="large")
 
-st_col_2.link_button(
-    "Open Issue",
-    url="https://github.com/AAnzel/UNACORM/issues/new",
-    icon=":material/bug_report:",
-    width="stretch",
-    type="primary",
-)
+    with st.container(
+        horizontal=True, horizontal_alignment="center", gap="large"
+    ):
+        with st.container(
+            vertical_alignment="distribute", height=210, border=False
+        ):
+            st.markdown(tc.STRING_CONTACT_PAGE_4)
+            st.link_button(
+                "Discuss",
+                url="https://github.com/AAnzel/UNACORM/discussions/new/choose",
+                icon=":material/comment:",
+                width="stretch",
+                type="primary",
+            )
 
-st_col_3.link_button(
-    "Create a Pull Request",
-    url="https://github.com/AAnzel/UNACORM/compare",
-    icon=":material/add:",
-    width="stretch",
-    type="primary",
-)
+        with st.container(
+            vertical_alignment="distribute", height=210, border=False
+        ):
+            st.markdown(tc.STRING_CONTACT_PAGE_5)
+            st.link_button(
+                "Releases",
+                url="https://github.com/AAnzel/UNACORM/releases",
+                icon=":material/deployed_code:",
+                width="stretch",
+                type="primary",
+            )
 
-st.html("<br><br>")
+        with st.container(
+            vertical_alignment="distribute", height=210, border=False
+        ):
+            st.markdown(tc.STRING_CONTACT_PAGE_6)
+            st.link_button(
+                "AnzelA@rki.de",
+                url="mailto:AnzelA@rki.de",
+                icon=":material/mail:",
+                width="stretch",
+                type="primary",
+            )
 
-_, st_col_1, st_col_2, st_col_3, _ = st.columns(
-    [1, 3, 3, 3, 1], gap="large", vertical_alignment="top"
-)
-st_col_1.markdown(tc.STRING_CONTACT_PAGE_4)
-st_col_2.markdown(tc.STRING_CONTACT_PAGE_5)
-st_col_3.markdown(tc.STRING_CONTACT_PAGE_6)
-
-_, st_col_1, st_col_2, st_col_3, _ = st.columns(
-    [1, 3, 3, 3, 1], gap="large", vertical_alignment="bottom"
-)
-
-st_col_1.link_button(
-    "Discuss",
-    url="https://github.com/AAnzel/UNACORM/discussions/new/choose",
-    icon=":material/comment:",
-    width="stretch",
-    type="primary",
-)
-
-st_col_2.link_button(
-    "Releases",
-    url="https://github.com/AAnzel/UNACORM/releases",
-    icon=":material/deployed_code:",
-    width="stretch",
-    type="primary",
-)
-
-st_col_3.link_button(
-    "AnzelA@rki.de",
-    url="mailto:AnzelA@rki.de",
-    icon=":material/mail:",
-    width="stretch",
-    type="primary",
-)
-
-uti.display_footer()
+    uti.display_footer()

@@ -212,9 +212,7 @@ STRING_INTRODUCTION = "\n".join((
     "```",
 ))
 STRING_FOOTER = "\n".join((
-    "Aleksandar Anžel, Chisom Ezekannagha, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Bernd Freisleben, Dominik Heider, and Georges Hattab (2026)",
-    "<br>",
-    "<i>The Unified Evaluation Tool for DNA Data Storage Codecs</i>",
-    "<br>",
+    "Aleksandar Anžel, Chisom Ezekannagha, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Bernd Freisleben, Dominik Heider, and Georges Hattab (2026)  ",
+    "_The Unified Evaluation Tool for DNA Data Storage Codecs_  ",
     "Journal Name. [DOI LINK].",
 ))

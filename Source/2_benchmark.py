@@ -19,7 +19,7 @@ df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 list_files_to_visualize = list(pd.unique(df_existing_summary["Filename"]))
 
 st.header(":primary[︱]Benchmark", help=tc.STRING_MAIN_BENCHMARK_HELP)
-st.markdown("")
+st.space(size="medium")
 uti.display_processed_data(df_existing_summary, df_existing_detail)
 st.divider()
 
@@ -39,12 +39,15 @@ st.plotly_chart(chart_base_error, width="stretch")
 
 
 st.header(":primary[︱]Detailed Charts per File and Error Multiplier")
-st.markdown("")
+st.space(size="small")
 
-with st.container(border=True):
-    st_col_1, _, st_col_2 = st.columns([4, 1, 8])
-
-    with st_col_1:
+with st.container(
+    border=True,
+    horizontal=True,
+    horizontal_alignment="distribute",
+    gap="medium",
+):
+    with st.container(width=500):
         float_error_multiplier = st.select_slider(
             "Choose error multiplier value or leave it 0 to skip",
             value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
@@ -56,14 +59,14 @@ with st.container(border=True):
         ):
             st.markdown(tc.STRING_MUTAGENESIS_HELP)
 
-    with st_col_2:
-        list_files_chosen = st.multiselect(
-            "Select the files to review (This will affect charts below)",
-            default=list_files_to_visualize,
-            options=list_files_to_visualize,
-            placeholder="Choose files",
-            key="detailed_charts_multiselect",
-        )
+    list_files_chosen = st.multiselect(
+        "Select the files to review (This will affect charts below)",
+        default=list_files_to_visualize,
+        options=list_files_to_visualize,
+        placeholder="Choose files",
+        key="detailed_charts_multiselect",
+        width=800,
+    )
 
 chart_success_rate_per_multiplier = vis.visualize_success_rate_per_multiplier(
     list_files_chosen, df_existing_detail, float_error_multiplier
@@ -85,74 +88,64 @@ chart_information_density_per_multiplier_and_file = (
     )
 )
 
-st.subheader("Success Rate ", help=tc.STRING_SUCCESS_RATE_HELP)
-st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
+st.subheader(
+    "Success Rate"
+    + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+    + ":small[Error Multiplier: "
+    + ":primary-background[ "
+    + str(float_error_multiplier)
+    + "]]",
+    help=tc.STRING_SUCCESS_RATE_HELP,
+)
 st.plotly_chart(chart_success_rate_per_multiplier, width="stretch")
 st.plotly_chart(chart_success_rate_per_multiplier_and_file, width="stretch")
 
-st.subheader("Information Density ", help=tc.STRING_DENSITY_HELP)
-st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
+st.subheader(
+    "Information Density"
+    + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+    + ":small[Error Multiplier: "
+    + ":primary-background[ "
+    + str(float_error_multiplier)
+    + "]]",
+    help=tc.STRING_DENSITY_HELP,
+)
 st.plotly_chart(chart_information_density_per_multiplier, width="stretch")
 st.plotly_chart(
     chart_information_density_per_multiplier_and_file, width="stretch"
 )
 
+with st.container(
+    border=False,
+    horizontal=True,
+    horizontal_alignment="center",
+    vertical_alignment="bottom",
+):
+    st.header(
+        ":primary[︱]Cost and Runtime per File and Error Multiplier",
+        help=tc.STRING_COST_RUNTIME,
+    )
 
-st.header(
-    ":primary[︱]Cost and Runtime per File and Error Multiplier",
-    help=tc.STRING_COST_RUNTIME,
-)
-st.markdown("")
+    string_selected_visualization = st.pills(
+        "Visualize using",
+        [
+            ":material/bar_chart: Bar Chart",
+            ":material/candlestick_chart: Whisker Chart",
+        ],
+        default=":material/bar_chart: Bar Chart",
+    )
+    st.markdown(
+        ":yellow-background[:small[The y-axes use a logarithmic scale]]"
+    )
 
-with st.container(border=True):
-    st_col_1, _, st_col_2 = st.columns([4, 1, 8])
+if (
+    string_selected_visualization
+    == ":material/candlestick_chart: Whisker Chart"
+):
+    bool_whisker_chart = True
+else:
+    bool_whisker_chart = False
 
-    with st_col_1:
-        float_error_multiplier = st.select_slider(
-            "Choose error multiplier value or leave it 0 to skip",
-            value=uti.LIST_FLOAT_ERROR_MULTIPLIERS[0],
-            options=uti.LIST_FLOAT_ERROR_MULTIPLIERS,
-            key="cost_runtime_error_multiplier_slider",
-        )
-        with st.popover(
-            "What is error multiplier?", icon=":material/help:", width="stretch"
-        ):
-            st.markdown(tc.STRING_MUTAGENESIS_HELP)
-
-    with st_col_2:
-        list_files_chosen = st.multiselect(
-            "Select the files to review (This will affect Cost"
-            + " and Time Charts)",
-            default=list_files_to_visualize,
-            options=list_files_to_visualize,
-            placeholder="Choose files",
-            key="cost_runtime_multiselect",
-        )
-
-    st.markdown("")
-    st_col_1, _, st_col_2 = st.columns([4, 1, 8])
-
-    with st_col_1:
-        string_selected_visualization = st.pills(
-            "Visualize using",
-            [
-                ":material/bar_chart: Bar Chart",
-                ":material/candlestick_chart: Whisker Chart",
-            ],
-            default=":material/bar_chart: Bar Chart",
-        )
-
-    with st_col_2:
-        st.warning("The y-axes use a logarithmic scale", width=260)
-
-    if (
-        string_selected_visualization
-        == ":material/candlestick_chart: Whisker Chart"
-    ):
-        bool_whisker_chart = True
-    else:
-        bool_whisker_chart = False
-
+st.space(size="small")
 
 chart_cost_all = vis.visualize_cost_benchmark(
     list_files_chosen,
@@ -167,11 +160,27 @@ chart_time_all = vis.visualize_time_benchmark(
     bool_whisker_chart,
 )
 
-st.subheader("Cost ", help=tc.STRING_COST_HELP)
-st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
+st.subheader(
+    "Cost"
+    + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+    + ":small[Error Multiplier: "
+    + ":primary-background[ "
+    + str(float_error_multiplier)
+    + "]]",
+    help=tc.STRING_COST_HELP,
+)
+
 st.plotly_chart(chart_cost_all, width="stretch")
-st.subheader("Runtime", help=tc.STRING_TIME_HELP)
-st.markdown("Error Multiplier: :primary[" + str(float_error_multiplier) + "]")
+st.subheader(
+    "Runtime"
+    + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+    + ":small[Error Multiplier: "
+    + ":primary-background[ "
+    + str(float_error_multiplier)
+    + "]]",
+    help=tc.STRING_TIME_HELP,
+)
+
 st.plotly_chart(chart_time_all, width="stretch")
 
 

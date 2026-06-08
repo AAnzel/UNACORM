@@ -7,10 +7,15 @@ import utilities as uti
 
 df_existing_detail = pd.read_pickle(uti.PATH_EXISTING_DETAIL)
 
-_, st_col_2, _ = st.columns([1, 9, 1])
-with st_col_2:
-    st.info(tc.STRING_INTRODUCTION)
-    st.html("<br><br>")
+with st.container(
+    border=False,
+    horizontal=True,
+    horizontal_alignment="center",
+    gap="small",
+):
+    st.info(tc.STRING_INTRODUCTION, width=1300)
+
+st.space(size="medium")
 
 
 str_sum_time = str(
@@ -33,36 +38,56 @@ float_success_rate = (
 
 str_success_rate = str(f"{float_success_rate:.2f} %")
 
-_, st_col_1, st_col_2, st_col_3, _ = st.columns([1, 3, 3, 3, 1])
-_, st_col_4, st_col_5, st_col_6, _ = st.columns([1, 3, 3, 3, 1])
+with st.container(
+    border=False,
+    horizontal=True,
+    horizontal_alignment="center",
+    gap="large",
+):
+    st.metric(
+        ":primary[:material/genetics:]$~~~~$Coding Schemes (Codecs)",
+        int_sum_methods,
+        border=True,
+        width=300,
+    )
+    st.metric(
+        ":primary[:material/files:]$~~~~$Files Encoded",
+        int_sum_files,
+        border=True,
+        width=300,
+    )
+    st.metric(
+        ":primary[:material/storage:]$~~~~$Encoded and Decoded in Total",
+        str_sum_size,
+        border=True,
+        width=300,
+    )
 
-st_col_1.metric(
-    ":primary[:material/genetics:]$~~~~$Coding Schemes (Codecs)",
-    int_sum_methods,
-    border=True,
-)
-st_col_2.metric(
-    ":primary[:material/files:]$~~~~$Files Encoded", int_sum_files, border=True
-)
-st_col_3.metric(
-    ":primary[:material/storage:]$~~~~$Encoded and Decoded in Total",
-    str_sum_size,
-    border=True,
-)
-st_col_4.metric(
-    ":primary[:material/timer:]$~~~~$Encoding and Decoding Lasted",
-    str_sum_time,
-    border=True,
-)
-st_col_5.metric(
-    ":primary[:material/attach_money:]$~~~~$Sum of Costs in US Dollars",
-    str_sum_cost,
-    border=True,
-)
-st_col_6.metric(
-    ":primary[:material/check_circle:]$~~~~$Succesfully Encoded and Decoded",
-    str_success_rate,
-    border=True,
-)
+st.space(size="medium")
+
+with st.container(
+    border=False,
+    horizontal=True,
+    horizontal_alignment="center",
+    gap="large",
+):
+    st.metric(
+        ":primary[:material/timer:]$~~~~$Encoding and Decoding Lasted",
+        str_sum_time,
+        border=True,
+        width=300,
+    )
+    st.metric(
+        ":primary[:material/attach_money:]$~~~~$Sum of Costs in US Dollars",
+        str_sum_cost,
+        border=True,
+        width=300,
+    )
+    st.metric(
+        ":primary[:material/check_circle:]$~~~~$Succesfully Encoded and Decoded",
+        str_success_rate,
+        border=True,
+        width=300,
+    )
 
 uti.display_footer()

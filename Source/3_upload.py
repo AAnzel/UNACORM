@@ -18,15 +18,29 @@ __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
 st.header(":primary[︱]File Upload")
-st.markdown("")
+st.space(size="small")
 list_file_type = None  # ["txt", "jpg", "wav"]
 
-imported_file = st.file_uploader(
-    label="Upload a file",
-    type=list_file_type,
-    accept_multiple_files=False,
-    key="Upload_file_",
-)
+with st.container(
+    border=False,
+    horizontal=True,
+    horizontal_alignment="distribute",
+    vertical_alignment="bottom",
+    gap="medium",
+):
+    imported_file = st.file_uploader(
+        label="Upload a file",
+        type=list_file_type,
+        accept_multiple_files=False,
+        key="Upload_file_",
+    )
+
+    st.info(
+        "Your data is automatically deleted after changing the tab"
+        + " or closing the window.",
+        icon=":material/info_i:",
+        width=600,
+    )
 
 string_input_file = ""
 path_input_file = ""
@@ -42,24 +56,15 @@ if imported_file is not None:
     if not os.path.exists(path_input_file):
         st.error("Error while uploading the file")
 
-st_col_1, st_col_2 = st.columns(
-    [1.5, 1], gap="medium", vertical_alignment="bottom"
-)
 
-with st_col_1:
-    if path_input_file != "":
-        st.success(
-            "Uploaded file path:    `" + path_input_file + "`",
-            icon=":material/check:",
-        )
-    else:
-        st.empty()
-with st_col_2:
-    st.info(
-        "Your data is automatically deleted after changing the tab"
-        + " or closing the window.",
-        icon=":material/info_i:",
+if path_input_file != "":
+    st.success(
+        "Uploaded file path:    `" + path_input_file + "`",
+        icon=":material/check:",
     )
+else:
+    st.empty()
+
 
 if path_input_file != "":
     np_binary_encoding, original_file_size = uti.np_data_to_binary_array(
@@ -72,23 +77,39 @@ else:
 st.markdown("---")
 
 st.header(":primary[︱]DNA Encoding, Storage, and Decoding")
-st.markdown("")
-list_chosen_dna_encoding = st.multiselect(
-    "Select preferred DNA Coding Schemes",
-    uti.LIST_ENCODING_METHODS,
-    placeholder="Choose DNA Coding Schemes",
-)
+st.space(size="small")
 
-st.warning("The length of processing time depends on chosen methods")
+with st.container(
+    border=False,
+    horizontal=True,
+    horizontal_alignment="distribute",
+    vertical_alignment="bottom",
+    gap="medium",
+):
+    list_chosen_dna_encoding = st.multiselect(
+        "Select preferred DNA Coding Schemes",
+        uti.LIST_ENCODING_METHODS,
+        placeholder="Choose DNA Coding Schemes",
+    )
 
-st_cont_0 = st.container(border=True)
+    st.warning(
+        "The length of processing time depends on chosen methods", width=600
+    )
 
-with st_cont_0:
-    st.markdown("#### Error Simulation")
 
-    st_col_1, _, st_col_2 = st.columns([4, 1, 4], vertical_alignment="bottom")
+with st.container(border=True):
+    with st.container(
+        border=False,
+    ):
+        st.markdown("#### Error Simulation")
 
-    with st_col_1:
+    with st.container(
+        border=False,
+        horizontal=True,
+        horizontal_alignment="distribute",
+        vertical_alignment="bottom",
+        gap="medium",
+    ):
         int_chosen_storage_length = st.number_input(
             "Choose length of storage (in months) or leave it empty to skip"
             + " (uses [MESA](https://mesa.mosla.de/) API)",
@@ -98,7 +119,6 @@ with st_cont_0:
             disabled=True,
         )
 
-    with st_col_2:
         float_error_multiplier = st.number_input(
             "Choose error multiplier value or leave it 0 to skip",
             value=0.0,
