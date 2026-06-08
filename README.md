@@ -37,6 +37,7 @@ The code is written in Python 3.12.2 and tested on Linux with the libraries incl
 | [Data/Decoded/](Data/Decoded/) | the directory is empty and used only during benchmarking coding schemes to save the decoded previously encoded data |
 | [Data/Uploaded/](Data/Uploaded/) | the directory is empty and used only for storing user-uploaded data |
 | [Data/cache_data/](Data/cache_data/) | contains cached data |
+| [Data/cache_data/benchmark_figures/](Data/cache_data/benchmark_figures/) | contains publication-ready exported figures |
 | [Data/cache_data/partial_results/](Data/cache_data/partial_results/) | contains partial per-file unmerged results created during benchmarking |
 | [Data/cache_data/int_detail.pkl](Data/cache_data/int_detail.pkl) | contains cached intermediary benchmark data of 5 runs for each DNA codec and each original file. This file eventually becomes [pre_detail.pkl](Data/cache_data/pre_detail.pkl) after a manual check has been performed |
 | [Data/cache_data/int_summary.pkl](Data/cache_data/int_summary.pkl) | contains cached benchmark data that represents the summary of [Data/cache_data/pre_detail.pkl](Data/cache_data/pre_detail.pkl) aggregated across runs. This file eventually becomes [pre_summary.pkl](Data/cache_data/pre_summary.pkl) after a manual check has been performed |
@@ -77,6 +78,7 @@ The data located in [Data/Original/](Data/Original/) was used to test and benchm
 | [Source/Encodings](Source/Encodings) | contains all DNA codecs, each in its own separate directory |
 | [Source/utilities.py](Source/utilities.py) | contains the code that implements main functionalities of the platform |
 | [Source/visualize.py](Source/visualize.py) | contains the code that implements visualization functionalities of the platform |
+| [Source/generate_publication_figures.py](Source/generate_publication_figures.py) | contains the code that generates publication-ready figures and places them at [Data/cache_data/benchmark_figures/](Data/cache_data/benchmark_figures/) |
 | [Source/text_content.py](Source/text_content.py) | contains only various markdown strings that are used to build some pages or provide help tootlips |
 | [Source/mesa_call.py](Source/mesa_call.py) | contains the code that implements [MESA](https://mesa.mosla.de/) API calls using  [Source/mesa.json](Source/mesa.json) configuration |
 | [Source/simulate_errors.py](Source/simulate_errors.py) | contains the code that implements DNA error simulation which replaces MESA script if necessary |
