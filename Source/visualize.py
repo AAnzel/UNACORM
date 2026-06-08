@@ -1,8 +1,5 @@
-import os
-
 import plotly.express as px
 import streamlit as st
-from utilities import PATH_CACHE_DATA
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
@@ -27,7 +24,6 @@ _DISCRETE_COLOR_PALLETE = (
 )
 _INT_CHART_ROW_SIZE = 400
 _INT_CHART_TITLE_SIZE = 24
-_BOOL_SAVE_FIGURES = False
 
 
 # TODO: Decide if we want to visualize measures only for successful encode
@@ -134,13 +130,6 @@ def visualize_density_benchmark(df_measure_sum_concat):
     # TODO: Make it into a bar chart for uploaded data
     chart_density.update_yaxes(showgrid=True)
 
-    if _BOOL_SAVE_FIGURES:
-        chart_density.write_image(
-            os.path.join(
-                PATH_CACHE_DATA, "benchmark_figures", "general_density.pdf"
-            )
-        )
-
     return chart_density
 
 
@@ -227,15 +216,6 @@ def visualize_cost_benchmark(
     chart_cost.update_xaxes(showticklabels=True)
     chart_cost.update_yaxes(showgrid=True)
 
-    if _BOOL_SAVE_FIGURES:
-        chart_cost.write_image(
-            os.path.join(
-                PATH_CACHE_DATA,
-                "benchmark_figures",
-                "cost_error_" + str(float_error_multiplier) + ".pdf",
-            )
-        )
-
     return chart_cost
 
 
@@ -321,15 +301,6 @@ def visualize_time_benchmark(
     chart_time.update_xaxes(showticklabels=True)
     chart_time.update_yaxes(showgrid=True)  # , title="log(Time(s))")
 
-    if _BOOL_SAVE_FIGURES:
-        chart_time.write_image(
-            os.path.join(
-                PATH_CACHE_DATA,
-                "benchmark_figures",
-                "time_" + str(float_error_multiplier) + ".pdf",
-            )
-        )
-
     return chart_time
 
 
@@ -370,13 +341,6 @@ def visualize_base_error_per_file(
 
     chart_base_error.update_xaxes(showticklabels=True)
     chart_base_error.update_yaxes(showgrid=True)
-
-    if _BOOL_SAVE_FIGURES:
-        chart_base_error.write_image(
-            os.path.join(
-                PATH_CACHE_DATA, "benchmark_figures", "base_error_per_file.pdf"
-            )
-        )
 
     return chart_base_error
 
@@ -449,13 +413,6 @@ def visualize_base_error_general(df_detail, list_files_chosen):
         }
     )
 
-    if _BOOL_SAVE_FIGURES:
-        chart_base_error.write_image(
-            os.path.join(
-                PATH_CACHE_DATA, "benchmark_figures", "base_error_general.pdf"
-            )
-        )
-
     return chart_base_error
 
 
@@ -507,13 +464,6 @@ def visualize_success_rate_general(df_detail):
         zeroline=True,
     )
 
-    if _BOOL_SAVE_FIGURES:
-        chart_success_rate.write_image(
-            os.path.join(
-                PATH_CACHE_DATA, "benchmark_figures", "success_rate_general.pdf"
-            )
-        )
-
     return chart_success_rate
 
 
@@ -564,15 +514,6 @@ def visualize_sucess_rate_per_multiplier(
     chart_success_rate.update_xaxes(showticklabels=True)
     chart_success_rate.update_yaxes(showgrid=True)
     chart_success_rate.update_layout(showlegend=False)
-
-    if _BOOL_SAVE_FIGURES:
-        chart_success_rate.write_image(
-            os.path.join(
-                PATH_CACHE_DATA,
-                "benchmark_figures",
-                "success_rate_general_" + str(float_error_multiplier) + ".pdf",
-            )
-        )
 
     return chart_success_rate
 
@@ -633,15 +574,6 @@ def visualize_sucess_rate_per_multiplier_and_file(
     chart_success_rate.update_yaxes(showgrid=True)
     chart_success_rate.update_layout(showlegend=False)
 
-    if _BOOL_SAVE_FIGURES:
-        chart_success_rate.write_image(
-            os.path.join(
-                PATH_CACHE_DATA,
-                "benchmark_figures",
-                "success_rate_per_file_" + str(float_error_multiplier) + ".pdf",
-            )
-        )
-
     return chart_success_rate
 
 
@@ -687,15 +619,6 @@ def visualize_density_per_multiplier(
     chart_density.update_layout(yaxis_title="Information_Density (b/nt)")
     # TODO: Make it into a bar chart for uploaded data
     chart_density.update_yaxes(showgrid=True)
-
-    if _BOOL_SAVE_FIGURES:
-        chart_density.write_image(
-            os.path.join(
-                PATH_CACHE_DATA,
-                "benchmark_figures",
-                "density_general" + str(float_error_multiplier) + ".pdf",
-            )
-        )
 
     return chart_density
 
@@ -759,14 +682,5 @@ def visualize_density_per_multiplier_and_file(
     chart_density.update_xaxes(showticklabels=True)
 
     chart_density.update_yaxes(showgrid=True)
-
-    if _BOOL_SAVE_FIGURES:
-        chart_density.write_image(
-            os.path.join(
-                PATH_CACHE_DATA,
-                "benchmark_figures",
-                "density_per_file" + str(float_error_multiplier) + ".pdf",
-            )
-        )
 
     return chart_density
