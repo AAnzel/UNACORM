@@ -42,7 +42,7 @@ RUN python -m build . \
 
 WORKDIR /app/Source/Encodings/DNA_Aeon
 
-RUN rm CMakeCache.txt && python setup.py
+RUN rm -f CMakeCache.txt && python setup.py
 
 WORKDIR /app/Source/
 
