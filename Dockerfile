@@ -16,6 +16,7 @@ RUN rm -rf /var/lib/apt/lists/* \
     && export FONTCONFIG_FILE=/etc/fonts/fonts.conf \
     && export FONTCONFIG_PATH=/etc/fonts/ \
     && export FILECONFIG_PATH=/etc/fonts \
+    && export CONDA_PLUGINS_AUTO_ACCEPT_TOS=yes \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -23,7 +24,6 @@ WORKDIR /app
 COPY . /app
 
 RUN conda update --all -y \
-    && conda tos accept \
     && conda env create -f environment.yml
 
 # Make RUN commands use the new environment:
