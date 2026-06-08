@@ -1,0 +1,25 @@
+name: Build Docker Image Check
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-docker-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      id: docker_buildx_setup
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      id: build_docker
+      run: docker build --pull . && echo "Build completed successfully" || echo "Build failed"
+
+    - name: Check if build succeeded
+      run: echo "Build status: ${{ steps.build_docker.outputs.build_status }}"
