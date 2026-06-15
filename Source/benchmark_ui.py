@@ -18,7 +18,7 @@ from utilities import (
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
-__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Ezekannagha"]
+__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Anyabolu"]
 __license__ = "GNU General Public License v3.0"
 __version__ = "1.0.0"
 __maintainer__ = "Aleksandar Anžel"
@@ -66,8 +66,6 @@ def save_intermediary(list_results):
     df_intermediary_summary = df_generate_summary(df_intermediary_detail)
     df_intermediary_detail.to_pickle(PATH_INTERMEDIARY_DETAIL)
     df_intermediary_summary.to_pickle(PATH_INTERMEDIARY_SUMMARY)
-
-    return None
 
 
 def run_precalculation(int_num_of_iteration):
@@ -318,7 +316,6 @@ def run_precalculation(int_num_of_iteration):
             st.dataframe(df_summary_concat)
         else:
             st.error("There was an error while uploading the pickle file")
-    return None
 
 
 def main():
@@ -329,8 +326,6 @@ def main():
         None
     """
     run_precalculation(_NUMBER_OF_EXPERIMENT_RUNS)
-
-    return None
 
 
 if __name__ == "__main__":

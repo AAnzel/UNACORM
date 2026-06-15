@@ -5,7 +5,7 @@ import numpy as np
 
 __author__ = ["Aleksandar Anžel"]
 __copyright__ = ""
-__credits__ = ["Aleksandar Anžel", "Marius Welzel", "Chisom Ezekannagha"]
+__credits__ = ["Aleksandar Anžel", "Marius Welzel", "Chisom Anyabolu"]
 __license__ = "GNU General Public License v3.0"
 __version__ = "1.0.0"
 __maintainer__ = "Aleksandar Anžel"

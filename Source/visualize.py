@@ -3,7 +3,7 @@ import streamlit as st
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
-__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Ezekannagha"]
+__credits__ = ["Aleksandar Anžel", "Ihsan Tri Heldian", "Chisom Anyabolu"]
 __license__ = "GNU General Public License v3.0"
 __version__ = "1.0.0"
 __maintainer__ = "Aleksandar Anžel"
