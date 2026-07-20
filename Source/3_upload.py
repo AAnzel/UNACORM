@@ -112,11 +112,11 @@ with st.container(border=True):
     ):
         int_chosen_storage_length = st.number_input(
             "Choose length of storage (in months) or leave it empty to skip"
-            + " (uses [MESA](https://mesa.mosla.de/) API)",
+            + " (uses local instance of [MESA](https://mesa.mosla.de/))",
             value=None,
             min_value=1,
             step=1,
-            disabled=True,
+            disabled=True,  # TODO: Implement local instance available check
         )
 
         float_error_multiplier = st.number_input(
@@ -132,6 +132,11 @@ if int_chosen_storage_length is None and float_error_multiplier == 0.0:
     bool_simulate_errors = False
 else:
     bool_simulate_errors = True
+
+if int_chosen_storage_length != None:
+    bool_use_mesa = True
+else:
+    bool_use_mesa = False
 
 df_new_detail = None
 df_new_summary = None
@@ -158,7 +163,7 @@ if list_chosen_dna_encoding != [] and np_binary_encoding is not None:
             string_input_file,
             original_file_size,
             bool_simulate_errors,
-            False,  # TODO: Add logic for this (bool_use_mesa)
+            bool_use_mesa,
             int_chosen_storage_length,
             float_error_multiplier,
         )

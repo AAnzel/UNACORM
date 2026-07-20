@@ -15,8 +15,8 @@ __status__ = "Stable"
 
 
 # Attributes for API calling
-_STRING_MESA_URL = "https://mesa.mosla.de/api/all"
-_STRING_MESA_KEY = "9z5NOwZE5QEmU2h4-sAPIx7VhlGOxoEroK5Li2CjyaI"
+_STRING_MESA_URL = "http://localhost:5000/"
+_STRING_MESA_KEY = "UNACORM_ADMIN_API_KEY"
 _DICT_MESA_HEADER = {"content-type": "application/json;charset=UTF-8"}
 _INT_MAX_RETRY_FOR_SESSION = 2
 _FLOAT_BACK_OFF_FACTOR = 0.3
@@ -74,6 +74,8 @@ def string_api_call(list_encoded_dna, int_storage_length):
         data=json.dumps(dict_payload),
         headers=_DICT_MESA_HEADER,
     )
+
+    # Returns Method not allowed 405
 
     dict_result = mesa_response.json()
     string_modified_sequence = ""

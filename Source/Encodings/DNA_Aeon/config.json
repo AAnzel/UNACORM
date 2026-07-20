@@ -29,7 +29,7 @@
         }
     },
     "encode": {
-        "input": "../Data/Uploaded/1770892804_406567_bbc_peregrine_falcon.wav",
+        "input": "../Data/Uploaded/1784542810_083563_Dorn.txt",
         "keep_intermediary": true,
         "min_length": 0,
         "output": "Encodings/DNA_Aeon/data/encoded.fasta",

@@ -6,7 +6,7 @@
 #SBATCH --time=10-02
 #SBATCH --mem=50G
 #SBATCH --cpus-per-task=8
-#SBATCH --mail-user=AnzelA@rki.de
+#SBATCH --mail-user=myname@mydomain.com
 
 # Load conda environment
 module load anaconda
