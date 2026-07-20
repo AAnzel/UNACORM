@@ -15,7 +15,7 @@ __status__ = "Stable"
 
 
 # Attributes for API calling
-_STRING_MESA_URL = "http://localhost:5000/"
+_STRING_MESA_URL = "http://127.0.0.1/api/all"
 _STRING_MESA_KEY = "UNACORM_ADMIN_API_KEY"
 _DICT_MESA_HEADER = {"content-type": "application/json;charset=UTF-8"}
 _INT_MAX_RETRY_FOR_SESSION = 2

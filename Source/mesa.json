@@ -347,7 +347,7 @@
   "use_error_probs": false,
   "acgt_only": true,
   "random_seed": "",
-  "do_max_expect": true,
+  "do_max_expect": false,
   "temperature": "310.15",
   "send_mail": false,
   "email": "",
