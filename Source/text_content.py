@@ -204,7 +204,7 @@ STRING_INTRODUCTION = "\n".join((
     "```tex",
     "@article{anzel2026unified,",
     "author = {Aleksandar Anžel and Chisom Anyabolu and Leon Wimbes and Luca Staus and Ihsan Tri Heldian and David Sonnabend and Khawla Elhadri and Samuel Becker and Felix Klein and Raffael Schön and Marius Welzel and Michael Schwarz and Bernd Freisleben and Dominik Heider and Georges Hattab},",
-    "title = {The Unified Evaluation Tool for DNA Data Storage Codecs},",
+    "title = {The Unified Evaluation App for DNA Data Storage Codecs},",
     "journal = {Journal Name},",
     "year = {2026},",
     "doi = {[DOI LINK]},",
@@ -213,6 +213,6 @@ STRING_INTRODUCTION = "\n".join((
 ))
 STRING_FOOTER = "\n".join((
     "Aleksandar Anžel, Chisom Anyabolu, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Bernd Freisleben, Dominik Heider, and Georges Hattab (2026)  ",
-    "_The Unified Evaluation Tool for DNA Data Storage Codecs_  ",
+    "_The Unified Evaluation App for DNA Data Storage Codecs_  ",
     "Journal Name. [DOI LINK].",
 ))

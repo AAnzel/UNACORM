@@ -8,7 +8,7 @@
 
 This tool was created for the following paper:
 
-***"The Unified Evaluation Tool for DNA Data Storage Codecs"*** by Aleksandar Anžel^, Chisom Anyabolu^, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Bernd Freisleben, Dominik Heider, and Georges Hattab
+***"The Unified Evaluation App for DNA Data Storage Codecs"*** by Aleksandar Anžel^, Chisom Anyabolu^, Leon Wimbes, Luca Staus, Ihsan Tri Heldian, David Sonnabend, Khawla Elhadri, Samuel Becker, Felix Klein, Raffael Schön, Marius Welzel, Michael Schwarz, Bernd Freisleben, Dominik Heider, and Georges Hattab
 
 ^ --- These authors contributed equally to this work
 
