@@ -110,7 +110,33 @@ We would like to thank the authors of the coding schemes (located at [Source/Enc
 | [NOREC4DNA Online-based codec](Source/Encodings/OnlineCode) | Peter Michael Schwarz & Bernd Freisleben | Peter Michael Schwarz | [https://github.com/umr-ds/NOREC4DNA/tree/dev/unified](https://github.com/umr-ds/NOREC4DNA/tree/dev/unified) | [10.1186/s12859-021-04318-x](https://doi.org/10.1186/s12859-021-04318-x) (Source codec by Petar Maymounkov [TR2002-833.pdf](https://cs.nyu.edu/media/publications/TR2002-833.pdf)) |
 
 ## Installation & Running
-### Docker
+
+### Optional First Step: MESA storage simulation
+If you would like to simulate DNA degradation that comes with storing DNA sequences for archival purposes, UNACORM includes MESA as the main simulator. Please note that if you have firewall or a VPN activated, MESA might not work as its container has to be able to freely connect to the UNACORM's container. If you would like to use MESA, the following sequence of instructions (for Linux-based systems) should be used to build and run the MESA container:
+
+```bash
+# How to build the docker container and run it locally
+
+# Clone the repository
+git clone -b feature/adminapikey https://github.com/umr-ds/mesa_dna_sim.git
+cd mesa_dna_sim/
+
+# Set the parameters for UNACORM connection
+sed -i -E 's/^([[:space:]]*)#[[:space:]]*ADMIN_API_KEY:[[:space:]]*CHANGE_ME_ADMIN_API_KEY/\1ADMIN_API_KEY: UNACORM_ADMIN_API_KEY/' docker-compose.yml
+
+sed -i -E 's|^([[:space:]]*-[[:space:]]*)/srv/docker/postgresql:/var/lib/postgresql/data$|\1./postgresql:/var/lib/postgresql/data|' docker-compose.yml
+
+sed -i -E 's|^([[:space:]]*-[[:space:]]*)/srv/docker/redis:/data$|\1./redis-data:/data|' docker-compose.yml
+
+# Compose the containers
+docker compose up -d
+
+cd ..
+# From here on UNACORM installation instructions should be followed
+```
+
+
+### UNACORM Docker
 The easiest way to install the tool is to use our latest Docker image by building a docker container and running it locally. To do so, you first need to install Docker by following the official documentation found at [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). After installing Docker, you should use a following sequence of instructions (for Linux-based systems) to build and run the container:
 
 ```bash
@@ -124,7 +150,7 @@ cd UNACORM/
 docker build -t unacorm-local:stable .
 
 # Run the container (in detached mode)
-docker run --publish 8501:8501 --detach --name unacorm-local unacorm-local:stable
+docker run --publish 8501:8501 --detach --name unacorm-local --add-host=host.docker.internal:host-gateway unacorm-local:stable
 ```
 You can start using the tool by opening a web browser and typing in [http://localhost:8501/](http://localhost:8501/) as the address. If you run the docker container, you have to use the IP address or hostname instead of localhost.
 If you would like to remove the container and the image completely, the following sequence of commands should be used:
@@ -152,7 +178,7 @@ docker rmi -f unacorm-local:stable
 
 
 
-### Conda Environment
+### UNACORM Conda Environment
 The platform can also be installed without the docker container. This process requires users to install Anaconda or Miniconda package managers. Users can install Conda using the instructions on the following link [https://docs.anaconda.com/miniconda/#quick-command-line-install](https://docs.anaconda.com/miniconda/#quick-command-line-install). If Conda is installed, the following sequence of instructions (for Linux-based systems) installs all dependencies and runs the dashboard:
 
 ```bash

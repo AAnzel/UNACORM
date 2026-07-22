@@ -7,6 +7,7 @@ import streamlit as st
 import text_content as tc
 import utilities as uti
 import visualize as vis
+from mesa_call import tuple_mesa_available
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
@@ -16,6 +17,8 @@ __version__ = "1.0.0"
 __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
+
+_BOOL_MESA_AVAILABLE, _STRING_MESA_STATUS_MESSAGE = tuple_mesa_available()
 
 st.header(":primary[︱]File Upload")
 st.space(size="small")
@@ -107,17 +110,36 @@ with st.container(border=True):
         border=False,
         horizontal=True,
         horizontal_alignment="distribute",
-        vertical_alignment="bottom",
+        vertical_alignment="top",
         gap="medium",
     ):
-        int_chosen_storage_length = st.number_input(
-            "Choose length of storage (in months) or leave it empty to skip"
-            + " (uses local instance of [MESA](https://mesa.mosla.de/))",
-            value=None,
-            min_value=1,
-            step=1,
-            disabled=True,  # TODO: Implement local instance available check
-        )
+        with st.container(
+            border=False,
+            horizontal=False,
+            horizontal_alignment="distribute",
+            vertical_alignment="bottom",
+            gap="small",
+        ):
+            int_chosen_storage_length = st.number_input(
+                "Choose length of storage (in months) or leave it empty to skip"
+                + " (uses local instance of [MESA](https://mesa.mosla.de/))",
+                value=None,
+                min_value=1,
+                step=1,
+                disabled=not _BOOL_MESA_AVAILABLE,
+            )
+            if _BOOL_MESA_AVAILABLE:
+                st.badge(
+                    _STRING_MESA_STATUS_MESSAGE,
+                    icon=":material/done_outline:",
+                    color="green",
+                )
+            else:
+                st.badge(
+                    _STRING_MESA_STATUS_MESSAGE,
+                    icon=":material/error:",
+                    color="red",
+                )
 
         float_error_multiplier = st.number_input(
             "Choose error multiplier value or leave it 0 to skip",

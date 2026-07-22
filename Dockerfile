@@ -48,4 +48,6 @@ WORKDIR /app/Source/
 
 EXPOSE 8501
 
+ENV UNACORM_IS_IN_DOCKER_CONTAINER=1
+
 CMD streamlit run main.py --browser.gatherUsageStats False
