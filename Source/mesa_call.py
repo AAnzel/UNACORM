@@ -38,11 +38,11 @@ def tuple_mesa_available():
     try:
         response = requests.options(_STRING_MESA_URL)
         if response.ok:  # alternatively you can use response.status_code == 200
-            _STRING_MESSAGE = "Success — API is accessible"
+            _STRING_MESSAGE = "Success — MESA API is accessible"
             return (True, _STRING_MESSAGE, "")
         else:
             _STRING_MESSAGE = (
-                "Failure — API is accessible but something is not right."
+                "Failure — MESA API is accessible but something is not right."
             )
             _STRING_ERROR = str(response.status_code)
 
@@ -51,11 +51,11 @@ def tuple_mesa_available():
         requests.exceptions.HTTPError,
         requests.exceptions.ConnectionError,
     ) as e:
-        _STRING_MESSAGE = "Failure — Unable to establish connection."
+        _STRING_MESSAGE = "Failure — Unable to establish connection with MESA."
         _STRING_ERROR = str(e)
         return (False, _STRING_MESSAGE, _STRING_ERROR)
     except Exception as e:
-        _STRING_MESSAGE = "Failure — Unknown error occurred."
+        _STRING_MESSAGE = "Failure — Unknown error occurred with MESA."
         _STRING_ERROR = str(e)
         return (False, _STRING_MESSAGE, _STRING_ERROR)
 
