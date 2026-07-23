@@ -21,8 +21,6 @@ _UNACORM_IS_IN_DOCKER_CONTAINER = os.environ.get(
     "UNACORM_IS_IN_DOCKER_CONTAINER", ""
 ).lower() in ("yes", "y", "on", "true", "1")
 
-print("\n\nUNACORM DOCKER", _UNACORM_IS_IN_DOCKER_CONTAINER)
-
 if _UNACORM_IS_IN_DOCKER_CONTAINER:
     _STRING_MESA_URL = "http://host.docker.internal:5000/api/all"
 else:
@@ -41,26 +39,25 @@ def tuple_mesa_available():
         response = requests.options(_STRING_MESA_URL)
         if response.ok:  # alternatively you can use response.status_code == 200
             _STRING_MESSAGE = "Success — API is accessible"
-            return (True, _STRING_MESSAGE)
+            return (True, _STRING_MESSAGE, "")
         else:
             _STRING_MESSAGE = (
-                "Failure — API is accessible but sth is not right. "
-                + "Response code: "
-                + str(response.status_code)
+                "Failure — API is accessible but something is not right."
             )
+            _STRING_ERROR = str(response.status_code)
 
-            return (False, _STRING_MESSAGE)
+            return (False, _STRING_MESSAGE, _STRING_ERROR)
     except (
         requests.exceptions.HTTPError,
         requests.exceptions.ConnectionError,
     ) as e:
-        _STRING_MESSAGE = (
-            "Failure — Unable to establish connection. Error: " + str(e)
-        )
-        return (False, _STRING_MESSAGE)
+        _STRING_MESSAGE = "Failure — Unable to establish connection."
+        _STRING_ERROR = str(e)
+        return (False, _STRING_MESSAGE, _STRING_ERROR)
     except Exception as e:
-        _STRING_MESSAGE = "Failure — Unknown error occurred. Error: " + str(e)
-        return (False, _STRING_MESSAGE)
+        _STRING_MESSAGE = "Failure — Unknown error occurred."
+        _STRING_ERROR = str(e)
+        return (False, _STRING_MESSAGE, _STRING_ERROR)
 
 
 def requests_retry_session(

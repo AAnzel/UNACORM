@@ -18,7 +18,9 @@ __maintainer__ = "Aleksandar Anžel"
 __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
-_BOOL_MESA_AVAILABLE, _STRING_MESA_STATUS_MESSAGE = tuple_mesa_available()
+_BOOL_MESA_AVAILABLE, _STRING_MESA_STATUS_MESSAGE, _STRING_ERROR = (
+    tuple_mesa_available()
+)
 
 st.header(":primary[︱]File Upload")
 st.space(size="small")
