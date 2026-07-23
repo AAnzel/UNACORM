@@ -122,11 +122,17 @@ git clone -b feature/adminapikey https://github.com/umr-ds/mesa_dna_sim.git
 cd mesa_dna_sim/
 
 # Set the parameters for UNACORM connection
-sed -i -E 's/^([[:space:]]*)#[[:space:]]*ADMIN_API_KEY:[[:space:]]*CHANGE_ME_ADMIN_API_KEY/\1ADMIN_API_KEY: UNACORM_ADMIN_API_KEY/' docker-compose.yml
+tmpfile=$(mktemp) && \
+sed -E 's/^([[:space:]]*)#[[:space:]]*ADMIN_API_KEY:[[:space:]]*CHANGE_ME_ADMIN_API_KEY/\1ADMIN_API_KEY: UNACORM_ADMIN_API_KEY/' docker-compose.yml > "$tmpfile" && \
+mv "$tmpfile" docker-compose.yml
 
-sed -i -E 's|^([[:space:]]*-[[:space:]]*)/srv/docker/postgresql:/var/lib/postgresql/data$|\1./postgresql:/var/lib/postgresql/data|' docker-compose.yml
+tmpfile=$(mktemp) && \
+sed -E 's|^([[:space:]]*-[[:space:]]*)/srv/docker/postgresql:/var/lib/postgresql/data$|\1./postgresql:/var/lib/postgresql/data|' docker-compose.yml > "$tmpfile" && \
+mv "$tmpfile" docker-compose.yml
 
-sed -i -E 's|^([[:space:]]*-[[:space:]]*)/srv/docker/redis:/data$|\1./redis-data:/data|' docker-compose.yml
+tmpfile=$(mktemp) && \
+sed -E 's|^([[:space:]]*-[[:space:]]*)/srv/docker/redis:/data$|\1./redis-data:/data|' docker-compose.yml > "$tmpfile" && \
+mv "$tmpfile" docker-compose.yml
 
 # Compose the containers
 docker compose up -d
