@@ -13,16 +13,27 @@ This tool was created for the following paper:
 ^ --- These authors contributed equally to this work
 
 Please cite the paper as:
-```latex
-bibtex placeholder
+```bibtex
+@misc{anžel2026unifiedevaluationappdna,
+      title={The Unified Evaluation App for DNA Data Storage Codecs}, 
+      author={Aleksandar Anžel and Chisom Anyabolu and Leon Wimbes and Luca Staus and Ihsan Tri Heldian and David Sonnabend and Khawla Elhadri and Samuel Becker and Felix Klein and Raffael Schoen and Michael Schwarz and Marius Welzel and Bernd Freisleben and Dominik Heider and Georges Hattab},
+      year={2026},
+      eprint={2608.09673},
+      archivePrefix={arXiv},
+      primaryClass={cs.ET},
+      url={https://arxiv.org/abs/2608.09673}, 
+}
 ```
 
-DOI badge Placeholder
+[![DOI](./Data/cache_data/images/DOI.svg)](https://doi.org/10.48550/arXiv.2608.09673)
 
 ---
 Abstract:
 
-> Abstract placeholder
+> **Background**: Deoxyribonucleic acid (DNA) data storage is a paradigm with great potential for ultra-dense and durable information preservation. However, the rapid proliferation of coding schemes, or codecs, each with their own design constraints and reporting practices, has led to a fragmented landscape that lacks a standardized comparative assessment.  
+**Methods**: We developed an open-source, modular benchmarking platform that systematically integrates and evaluates state-of-the-art DNA storage encoding and decoding methods (codecs). Our approach uses a curated, diverse set of baseline data and applies multidimensional assessment criteria that are aligned with the consensus standard of the DNA Data Storage Alliance. These criteria include encoding/decoding throughput, computational efficiency, error correction performance across substitutions, insertions, and deletions, and cost efficiency.  
+**Results**: The developed platform integrates standardized wrapper functions for encoding and decoding, allows for the integration of new methods, and automates reproducible evaluations with comprehensive visual and tabular reporting. Benchmarking both contemporary and classical codecs using their default parameters and multiple metrics demonstrates that no single algorithm is optimal across all evaluated dimensions. The trade-offs between information density, success rate, runtime, and cost are quantified and shown to be critical factors in the design of future-proof formats.  
+**Conclusions**: Our work establishes a rigorously standardized, open-source evaluation framework that enables reproducible benchmarking, supports evidence-based codec selection, and provides the necessary foundation for translating DNA data storage from experimental research into deployable archival systems.  
 
 
 ## Dependencies
