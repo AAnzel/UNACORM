@@ -44,6 +44,11 @@ WORKDIR /app/Source/Encodings/DNA_Aeon
 
 RUN rm -f CMakeCache.txt && python setup.py
 
+# VNX-DNA gets its own environment: it needs reedsolo>=1.7, the platform pins reedsolo==0.3
+RUN python -m venv /opt/vnxdna \
+    && /opt/vnxdna/bin/pip install --no-cache-dir \
+       "vnx-dna @ https://github.com/vishnuselvam101-hash/VSnexustechnologies-/archive/refs/tags/v11.0.0.tar.gz"
+
 WORKDIR /app/Source/
 
 EXPOSE 8501
