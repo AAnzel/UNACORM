@@ -22,6 +22,7 @@ from Encodings.RaptorCode import unified_dna_raptor as encoding_raptor
 from Encodings.RepetitionCode.src import transform as encoding_repetition
 from Encodings.SimpleCode.src import transform as encoding_simple
 from Encodings.The2DCode import encoder as encoding_2d_tmp
+from Encodings.VNX_DNA import unified as encoding_vnxdna
 
 __author__ = ["Aleksandar Anžel", "Ihsan Tri Heldian"]
 __copyright__ = ""
@@ -278,6 +279,8 @@ def np_list_encode_decode(
             np_list_generated_seq = encoding_raptor.encode(path_file)
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.encode(path_file, "")
+        elif str_encoding_method == "VNX_DNA":
+            np_list_generated_seq = encoding_vnxdna.encode(path_file)
         else:
             print(
                 "Encoding method " + str_encoding_method + " is not implemented"
@@ -303,6 +306,8 @@ def np_list_encode_decode(
             )
         elif str_encoding_method == "DNA_Aeon":
             np_list_generated_seq = encoding_dnaaeon.decode("", list_np_data)
+        elif str_encoding_method == "VNX_DNA":
+            np_list_generated_seq = encoding_vnxdna.decode("", list_np_data)
         else:
             print(
                 "Encoding method " + str_encoding_method + " is not implemented"
